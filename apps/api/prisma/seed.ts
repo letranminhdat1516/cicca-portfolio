@@ -106,6 +106,24 @@ async function main() {
     ],
   });
 
+  await prisma.experience.deleteMany();
+  await prisma.experience.createMany({
+    data: [
+      { title: 'Senior Full-stack Engineer', org: 'Acme Realtime', period: '2024 — Now', description: 'Lead the web platform: realtime collab, design systems, and performance.', order: 0 },
+      { title: 'Frontend Engineer', org: 'Pixel Forge Studio', period: '2021 — 2024', description: 'Shipped interactive product experiences and a component library used across teams.', order: 1 },
+      { title: 'Freelance Developer', org: 'Self-employed', period: '2019 — 2021', description: 'Built websites and tools for startups and creators across web and web3.', order: 2 },
+    ],
+  });
+
+  await prisma.resource.deleteMany();
+  await prisma.resource.createMany({
+    data: [
+      { title: 'neon-ui', description: 'The cyberpunk component kit powering this site.', url: null, repoUrl: 'https://github.com/example/neon-ui', tags: ['react', 'tailwind', 'open-source'], order: 0 },
+      { title: 'realtime-cursors', description: 'Drop-in multiplayer cursor presence in <1kb.', url: 'https://example.com/realtime-cursors', repoUrl: 'https://github.com/example/realtime-cursors', tags: ['websocket', 'crdt'], order: 1 },
+      { title: 'portfolio-template', description: 'This very portfolio, as a starter you can fork.', url: null, repoUrl: 'https://github.com/example/portfolio', tags: ['nextjs', 'nestjs'], order: 2 },
+    ],
+  });
+
   await prisma.blogPost.deleteMany();
   await prisma.blogPost.create({
     data: {

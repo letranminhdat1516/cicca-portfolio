@@ -15,5 +15,7 @@ export const navItems: { id: string; en: string }[] = [
   { id: "missions", en: "MISSIONS" },
   { id: "inventory", en: "INVENTORY" },
   { id: "trophies", en: "TROPHIES" },
+  { id: "experiences", en: "EXP" },
+  { id: "resources", en: "LOOT" },
   { id: "contact", en: "CONTACT" },
 ];

@@ -83,6 +83,21 @@ export interface BlogPost extends BlogPostSummary {
   updatedAt: string;
 }
 
+export interface Experience {
+  title: string;
+  org: string;
+  period: string;
+  description: string;
+}
+
+export interface Resource {
+  title: string;
+  description: string;
+  url: string | null;
+  repoUrl: string | null;
+  tags: string[];
+}
+
 export interface Portfolio {
   profile: Profile;
   stats: Stat[];
@@ -91,4 +106,6 @@ export interface Portfolio {
   skillGroups: SkillGroup[];
   achievements: Achievement[];
   socials: Social[];
+  experiences: Experience[];
+  resources: Resource[];
 }

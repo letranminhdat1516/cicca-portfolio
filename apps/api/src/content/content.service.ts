@@ -6,16 +6,27 @@ export class ContentService {
   constructor(private prisma: PrismaService) {}
 
   async getPortfolio() {
-    const [profile, stats, counters, projects, skills, achievements, socials] =
-      await Promise.all([
-        this.prisma.profile.findUnique({ where: { id: 1 } }),
-        this.prisma.stat.findMany({ orderBy: { order: 'asc' } }),
-        this.prisma.counter.findMany({ orderBy: { order: 'asc' } }),
-        this.prisma.project.findMany({ orderBy: { order: 'asc' } }),
-        this.prisma.skill.findMany({ orderBy: { order: 'asc' } }),
-        this.prisma.achievement.findMany({ orderBy: { order: 'asc' } }),
-        this.prisma.social.findMany({ orderBy: { order: 'asc' } }),
-      ]);
+    const [
+      profile,
+      stats,
+      counters,
+      projects,
+      skills,
+      achievements,
+      socials,
+      experiences,
+      resources,
+    ] = await Promise.all([
+      this.prisma.profile.findUnique({ where: { id: 1 } }),
+      this.prisma.stat.findMany({ orderBy: { order: 'asc' } }),
+      this.prisma.counter.findMany({ orderBy: { order: 'asc' } }),
+      this.prisma.project.findMany({ orderBy: { order: 'asc' } }),
+      this.prisma.skill.findMany({ orderBy: { order: 'asc' } }),
+      this.prisma.achievement.findMany({ orderBy: { order: 'asc' } }),
+      this.prisma.social.findMany({ orderBy: { order: 'asc' } }),
+      this.prisma.experience.findMany({ orderBy: { order: 'asc' } }),
+      this.prisma.resource.findMany({ orderBy: { order: 'asc' } }),
+    ]);
 
     // group skills by groupName, preserving first-seen order
     const groupOrder: string[] = [];
@@ -37,6 +48,16 @@ export class ContentService {
       })),
     }));
 
-    return { profile, stats, counters, missions: projects, skillGroups, achievements, socials };
+    return {
+      profile,
+      stats,
+      counters,
+      missions: projects,
+      skillGroups,
+      achievements,
+      socials,
+      experiences,
+      resources,
+    };
   }
 }
