@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:#08070f;}
+  ::selection{background:rgba(176,38,255,0.5);color:#fff;}
+  /* thin neon scrollbar */
+  ::-webkit-scrollbar{width:10px;height:10px;}
+  ::-webkit-scrollbar-track{background:#0a0a12;}
+  ::-webkit-scrollbar-thumb{background:linear-gradient(#b026ff,#22d3ee);border-radius:0;}
+  @keyframes gridPan{from{background-position:0 0,0 0;}to{background-position:60px 60px,60px 60px;}}
+  @keyframes scan{from{transform:translateY(-100%);}to{transform:translateY(100%);}}
+  @keyframes pulseGlow{0%,100%{opacity:.55;}50%{opacity:1;}}
+  @keyframes floatY{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+  @keyframes sweep{from{transform:rotate(0);}to{transform:rotate(360deg);}}
+  @keyframes blink{0%,49%{opacity:1;}50%,100%{opacity:0;}}
+  @keyframes glitchTop{0%{clip-path:inset(0 0 60% 0);transform:translate(0);}20%{clip-path:inset(0 0 55% 0);transform:translate(-3px,-1px);}40%{clip-path:inset(0 0 62% 0);transform:translate(3px,1px);}60%{clip-path:inset(0 0 58% 0);transform:translate(-2px,0);}100%{clip-path:inset(0 0 60% 0);transform:translate(0);}}
+  @keyframes glitchBot{0%{clip-path:inset(60% 0 0 0);transform:translate(0);}20%{clip-path:inset(55% 0 0 0);transform:translate(3px,1px);}40%{clip-path:inset(62% 0 0 0);transform:translate(-3px,-1px);}60%{clip-path:inset(58% 0 0 0);transform:translate(2px,0);}100%{clip-path:inset(60% 0 0 0);transform:translate(0);}}
+  @keyframes toastIn{0%{transform:translateX(120%);opacity:0;}12%{transform:translateX(0);opacity:1;}85%{transform:translateX(0);opacity:1;}100%{transform:translateX(120%);opacity:0;}}
+  @keyframes flick{0%,100%{opacity:1;}97%{opacity:1;}98%{opacity:.4;}99%{opacity:1;}}
+  @media (prefers-reduced-motion: reduce){*{animation-duration:.001ms !important;animation-iteration-count:1 !important;}}
+  @media (max-width:900px){
+    #heroGrid,#aboutGrid,#missionGrid{grid-template-columns:1fr !important;}
+    #counterGrid{grid-template-columns:repeat(2,1fr) !important;}
+  }
+  @media (max-width:560px){
+    #counterGrid{grid-template-columns:1fr !important;}
+  }
+</style>
+</helmet>
+
+<!-- ============ FIXED CINEMATIC BACKGROUND ============ -->
+<div aria-hidden="true" style="position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse at 50% -10%,rgba(176,38,255,0.14),transparent 55%),radial-gradient(ellipse at 100% 100%,rgba(34,211,238,0.10),transparent 50%),#08070f;">
+  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(176,38,255,0.08) 1px,transparent 1px),linear-gradient(90deg,rgba(34,211,238,0.06) 1px,transparent 1px);background-size:60px 60px;animation:gridPan 14s linear infinite;mask-image:radial-gradient(ellipse at 50% 30%,#000 30%,transparent 85%);-webkit-mask-image:radial-gradient(ellipse at 50% 30%,#000 30%,transparent 85%);"></div>
+  <canvas id="bgCanvas" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
+  <div style="position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,0.16) 0px,rgba(0,0,0,0.16) 1px,transparent 1px,transparent 3px);opacity:.5;"></div>
+  <div id="scanline" style="position:absolute;left:0;right:0;height:140px;background:linear-gradient(180deg,transparent,rgba(34,211,238,0.07),transparent);animation:scan 7s linear infinite;"></div>
+</div>
+
+<!-- cursor reticle + trail -->
+<div id="reticle" aria-hidden="true" style="position:fixed;top:0;left:0;z-index:9998;width:34px;height:34px;margin:-17px 0 0 -17px;pointer-events:none;border:1px solid rgba(34,211,238,0.6);border-radius:50%;box-shadow:0 0 12px rgba(34,211,238,0.45);opacity:0;transition:opacity .3s;mix-blend-mode:screen;"></div>
+<canvas id="cursorCanvas" aria-hidden="true" style="position:fixed;inset:0;z-index:9997;pointer-events:none;width:100%;height:100%;"></canvas>
+
+<!-- achievement toast -->
+<div id="toast" role="status" aria-live="polite" style="position:fixed;right:24px;bottom:24px;z-index:9999;display:none;min-width:280px;padding:14px 18px;background:linear-gradient(135deg,rgba(28,20,8,0.92),rgba(12,8,18,0.92));backdrop-filter:blur(10px);border:1px solid rgba(255,210,63,0.5);clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,14px 100%,0 calc(100% - 14px));box-shadow:0 0 30px rgba(255,210,63,0.25),inset 0 0 20px rgba(255,210,63,0.08);">
+  <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:3px;color:#ffd23f;text-shadow:0 0 10px rgba(255,210,63,0.7);">★ ACHIEVEMENT UNLOCKED</div>
+  <div id="toastBody" style="font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;color:#fff;margin-top:4px;">[Milestone reached]</div>
+</div>
+
+<!-- scroll energy bar -->
+<div aria-hidden="true" style="position:fixed;top:0;left:0;right:0;z-index:60;height:3px;background:rgba(255,255,255,0.04);">
+  <div id="scrollBar" style="height:100%;width:0%;background:linear-gradient(90deg,#22d3ee,#b026ff,#ff2d9b);box-shadow:0 0 12px rgba(176,38,255,0.8);"></div>
+</div>
+
+<!-- ============ STICKY HUD NAV ============ -->
+<nav style="position:fixed;top:3px;left:0;right:0;z-index:55;display:flex;align-items:center;gap:18px;flex-wrap:wrap;justify-content:space-between;padding:12px 24px;background:linear-gradient(180deg,rgba(10,8,20,0.86),rgba(10,8,20,0.55));backdrop-filter:blur(14px);border-bottom:1px solid rgba(176,38,255,0.28);font-family:'JetBrains Mono',monospace;">
+  <a href="#top" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+    <span style="display:inline-flex;width:30px;height:30px;align-items:center;justify-content:center;border:1px solid rgba(34,211,238,0.6);color:#22d3ee;font-weight:700;font-size:13px;clip-path:polygon(0 0,100% 0,100% 70%,70% 100%,0 100%);box-shadow:0 0 14px rgba(34,211,238,0.35);">P1</span>
+    <span style="color:#e8e8f0;font-size:12px;letter-spacing:3px;font-weight:700;">PLAYER_01<span style="color:#b026ff;">.sys</span></span>
+  </a>
+
+  <div style="display:flex;gap:20px;flex-wrap:wrap;">
+    <sc-for list="{{ navItems }}" as="item" hint-placeholder-count="5">
+      <a href="#{{ item.id }}" data-vi="{{ item.vi }}" style="text-decoration:none;color:#9a9ab8;font-size:11px;letter-spacing:2.5px;padding:4px 2px;border-bottom:1px solid transparent;transition:color .2s,border-color .2s;" style-hover="color:#22d3ee;border-color:#22d3ee;text-shadow:0 0 10px rgba(34,211,238,0.6);">{{ item.en }}</a>
+    </sc-for>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:16px;">
+    <div style="display:none;gap:14px;font-size:10px;letter-spacing:1px;color:#5c5c78;" id="telemetry">
+      <span>FPS <span id="fps" style="color:#22d3ee;">60</span></span>
+      <span>PING <span id="ping" style="color:#22d3ee;">24</span>ms</span>
+      <span style="color:#4ade80;">● SYS:OK</span>
+    </div>
+    <div style="display:flex;border:1px solid rgba(176,38,255,0.4);clip-path:polygon(0 0,100% 0,100% 100%,8px 100%,0 calc(100% - 8px));overflow:hidden;">
+      <button id="langEN" type="button" aria-label="English" style="font-family:'JetBrains Mono',monospace;cursor:pointer;border:0;background:rgba(34,211,238,0.16);color:#22d3ee;padding:5px 11px;font-size:11px;letter-spacing:1px;">EN</button>
+      <button id="langVI" type="button" aria-label="Tiếng Việt" style="font-family:'JetBrains Mono',monospace;cursor:pointer;border:0;background:transparent;color:#6b6b88;padding:5px 11px;font-size:11px;letter-spacing:1px;">VI</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ============ MAIN ============ -->
+<main id="top" style="position:relative;z-index:1;font-family:'Inter',sans-serif;color:#e8e8f0;max-width:1180px;margin:0 auto;padding:0 24px 100px;">
+
+  <!-- ===== HERO / PLAYER CARD ===== -->
+  <header style="min-height:100vh;display:flex;align-items:center;padding:120px 0 40px;">
+    <div style="display:grid;grid-template-columns:1.2fr 0.8fr;gap:34px;width:100%;" id="heroGrid">
+
+      <div data-reveal style="position:relative;padding:38px 38px 34px;background:linear-gradient(135deg,rgba(22,16,40,0.66),rgba(10,8,20,0.5));backdrop-filter:blur(12px);border:1px solid rgba(176,38,255,0.32);clip-path:polygon(0 0,calc(100% - 26px) 0,100% 26px,100% 100%,26px 100%,0 calc(100% - 26px));box-shadow:inset 0 0 40px rgba(176,38,255,0.06),0 24px 70px rgba(0,0,0,0.55);">
+        <div style="position:absolute;top:14px;left:14px;width:20px;height:20px;border-top:2px solid #22d3ee;border-left:2px solid #22d3ee;"></div>
+        <div style="position:absolute;bottom:14px;right:14px;width:20px;height:20px;border-bottom:2px solid #b026ff;border-right:2px solid #b026ff;"></div>
+
+        <div style="display:flex;align-items:center;gap:12px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:3px;color:#8b8ba7;margin-bottom:22px;">
+          <span style="width:7px;height:7px;border-radius:50%;background:#4ade80;box-shadow:0 0 10px #4ade80;animation:pulseGlow 1.6s infinite;"></span>
+          <span data-vi="TRẠNG THÁI: TRỰC TUYẾN">STATUS: ONLINE</span>
+          <span style="color:#3a3a52;">//</span>
+          <span data-vi="HỒ SƠ NHÂN VẬT">CHARACTER SHEET</span>
+        </div>
+
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:4px;color:#b026ff;margin-bottom:6px;" data-vi="NGƯỜI CHƠI">PLAYER</div>
+        <h1 id="glitchName" data-text="[YOUR NAME]" style="position:relative;margin:0;font-family:'Orbitron',sans-serif;font-weight:900;font-size:clamp(38px,7vw,76px);line-height:0.95;letter-spacing:1px;color:#fff;text-shadow:0 0 24px rgba(176,38,255,0.45);">[YOUR NAME]</h1>
+
+        <div style="display:flex;align-items:baseline;gap:10px;margin-top:14px;font-family:'JetBrains Mono',monospace;font-size:clamp(15px,2.4vw,22px);">
+          <span style="color:#5c5c78;letter-spacing:2px;" data-vi="LỚP:">CLASS:</span>
+          <span id="typer" style="color:#22d3ee;font-weight:500;text-shadow:0 0 12px rgba(34,211,238,0.5);">[Creative Developer]</span><span id="caret" style="color:#22d3ee;animation:blink 1s step-end infinite;">_</span>
+        </div>
+
+        <p data-vi="[Một câu giới thiệu ngắn về bạn. Mô tả vai trò, thế mạnh và điều bạn xây dựng — tất cả đều là chỗ điền sẵn, dễ thay.]" style="margin:22px 0 0;max-width:46ch;color:#a8a8c2;font-size:15.5px;line-height:1.65;">[A one-line tagline about you — your craft, your edge, what you build. All placeholder copy, ready to swap.]</p>
+
+        <!-- XP BAR -->
+        <div style="margin-top:26px;">
+          <div style="display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;color:#6b6b88;margin-bottom:7px;">
+            <span data-vi="KINH NGHIỆM">XP</span>
+            <span><span id="xpNow">0</span> / 10,000</span>
+          </div>
+          <div style="position:relative;height:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(176,38,255,0.3);clip-path:polygon(0 0,100% 0,100% 100%,6px 100%,0 calc(100% - 6px));overflow:hidden;">
+            <div id="xpFill" style="height:100%;width:0%;background:linear-gradient(90deg,#22d3ee,#b026ff,#ff2d9b);box-shadow:0 0 16px rgba(176,38,255,0.7);transition:width 2s cubic-bezier(.2,.8,.2,1);"></div>
+          </div>
+        </div>
+
+        <!-- CTAs + socials -->
+        <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-top:28px;">
+          <a href="#missions" data-vi="XEM NHIỆM VỤ" style="text-decoration:none;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:2px;color:#08070f;font-weight:700;background:linear-gradient(135deg,#22d3ee,#b026ff);padding:13px 24px;clip-path:polygon(0 0,100% 0,100% 70%,calc(100% - 12px) 100%,0 100%);box-shadow:0 0 24px rgba(176,38,255,0.4);transition:transform .15s,box-shadow .2s;" style-hover="transform:translateY(-2px);box-shadow:0 0 36px rgba(34,211,238,0.6);">VIEW MISSIONS ▸</a>
+          <a href="#contact" data-vi="KẾT NỐI" style="text-decoration:none;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:2px;color:#22d3ee;font-weight:600;border:1px solid rgba(34,211,238,0.5);padding:12px 22px;clip-path:polygon(0 0,100% 0,100% 70%,calc(100% - 12px) 100%,0 100%);transition:background .2s,box-shadow .2s;" style-hover="background:rgba(34,211,238,0.1);box-shadow:0 0 24px rgba(34,211,238,0.3);">PARTY UP</a>
+          <div style="display:flex;gap:8px;margin-left:auto;">
+            <sc-for list="{{ socials }}" as="s" hint-placeholder-count="4">
+              <a href="{{ s.href }}" title="{{ s.name }}" aria-label="{{ s.name }}" style="text-decoration:none;display:inline-flex;width:38px;height:38px;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#9a9ab8;border:1px solid rgba(176,38,255,0.3);clip-path:polygon(0 0,100% 0,100% 70%,70% 100%,0 100%);transition:color .2s,border-color .2s,box-shadow .2s;" style-hover="color:#22d3ee;border-color:#22d3ee;box-shadow:0 0 16px rgba(34,211,238,0.4);">{{ s.label }}</a>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+
+      <!-- AVATAR / LVL PANEL -->
+      <div data-reveal style="position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:34px;background:linear-gradient(160deg,rgba(34,211,238,0.06),rgba(10,8,20,0.4));backdrop-filter:blur(10px);border:1px solid rgba(34,211,238,0.25);clip-path:polygon(0 0,calc(100% - 22px) 0,100% 22px,100% 100%,22px 100%,0 calc(100% - 22px));">
+        <div style="position:relative;width:170px;height:170px;display:flex;align-items:center;justify-content:center;animation:floatY 6s ease-in-out infinite;">
+          <div style="position:absolute;inset:-10px;border:1px dashed rgba(176,38,255,0.4);border-radius:50%;animation:sweep 16s linear infinite;"></div>
+          <div style="width:140px;height:140px;clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);background:linear-gradient(160deg,#1a1230,#0c0a16);border:1px solid rgba(176,38,255,0.5);box-shadow:inset 0 0 30px rgba(176,38,255,0.2),0 0 30px rgba(176,38,255,0.25);display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;font-size:42px;color:#b026ff;text-shadow:0 0 18px rgba(176,38,255,0.8);">⬡</div>
+        </div>
+        <div style="text-align:center;font-family:'JetBrains Mono',monospace;">
+          <div style="font-size:10px;letter-spacing:3px;color:#6b6b88;" data-vi="CẤP ĐỘ">LEVEL</div>
+          <div style="font-family:'Orbitron',sans-serif;font-weight:900;font-size:54px;line-height:1;color:#ffd23f;text-shadow:0 0 22px rgba(255,210,63,0.6);"><span id="lvlNum">0</span></div>
+          <div style="font-size:10px;letter-spacing:2px;color:#22d3ee;margin-top:4px;" data-vi="HẠNG · HUYỀN THOẠI">RANK · LEGENDARY</div>
+        </div>
+        <div style="position:absolute;bottom:14px;left:14px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;color:#3a3a52;">[ REGION: REMOTE ]</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== ABOUT / PROFILE ===== -->
+  <section id="about" style="padding:80px 0;">
+    <div data-reveal style="margin-bottom:38px;">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:4px;color:#b026ff;margin-bottom:8px;">[ 01 ] <span data-vi="HỒ SƠ">PROFILE</span></div>
+      <h2 style="margin:0;font-family:'Orbitron',sans-serif;font-weight:700;font-size:clamp(26px,4vw,40px);color:#fff;letter-spacing:1px;" data-vi="GIỚI THIỆU NHÂN VẬT">CHARACTER DOSSIER</h2>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1.1fr 0.9fr;gap:24px;" id="aboutGrid">
+      <!-- terminal -->
+      <div data-reveal style="position:relative;padding:0;background:linear-gradient(135deg,rgba(20,16,38,0.7),rgba(10,8,20,0.6));backdrop-filter:blur(12px);border:1px solid rgba(176,38,255,0.3);clip-path:polygon(0 0,calc(100% - 18px) 0,100% 18px,100% 100%,18px 100%,0 calc(100% - 18px));overflow:hidden;">
+        <div style="display:flex;align-items:center;gap:8px;padding:11px 16px;background:rgba(0,0,0,0.4);border-bottom:1px solid rgba(176,38,255,0.2);font-family:'JetBrains Mono',monospace;font-size:11px;color:#6b6b88;">
+          <span style="width:9px;height:9px;border-radius:50%;background:#ff2d9b;"></span>
+          <span style="width:9px;height:9px;border-radius:50%;background:#ffd23f;"></span>
+          <span style="width:9px;height:9px;border-radius:50%;background:#4ade80;"></span>
+          <span style="margin-left:8px;letter-spacing:1px;">~/profile/bio.log</span>
+        </div>
+        <div id="terminal" style="padding:22px 22px 26px;font-family:'JetBrains Mono',monospace;font-size:13.5px;line-height:1.9;color:#a8a8c2;min-height:200px;">
+          <div><span style="color:#22d3ee;">$</span> <span data-vi="khởi_chạy hồ_sơ --đầy_đủ">init profile --verbose</span></div>
+          <div style="color:#e8e8f0;" data-vi="&gt; [Đoạn giới thiệu chỗ điền. Viết 2–3 câu về hành trình, điều bạn đam mê xây dựng, và phong cách làm việc của bạn.]">&gt; [Placeholder bio. Write 2–3 sentences about your journey, what you love to build, and how you work.]</div>
+          <div style="color:#e8e8f0;" data-vi="&gt; [Thêm một dòng nữa về mục tiêu hoặc giá trị cốt lõi của bạn.]">&gt; [Add one more line about your goals or core values here.]</div>
+          <div><span style="color:#22d3ee;">$</span> <span style="color:#4ade80;" data-vi="trạng_thái: SẴN_SÀNG_KHỞI_HÀNH ▸">status: READY_TO_DEPLOY ▸</span></div>
+        </div>
+      </div>
+
+      <!-- radar stats -->
+      <div data-reveal style="position:relative;padding:22px;background:linear-gradient(160deg,rgba(34,211,238,0.05),rgba(10,8,20,0.5));backdrop-filter:blur(10px);border:1px solid rgba(34,211,238,0.25);clip-path:polygon(0 0,calc(100% - 18px) 0,100% 18px,100% 100%,18px 100%,0 calc(100% - 18px));">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:3px;color:#22d3ee;margin-bottom:8px;" data-vi="CHỈ SỐ NHÂN VẬT">CHARACTER STATS</div>
+        <canvas id="radar" width="440" height="380" style="width:100%;height:auto;display:block;"></canvas>
+      </div>
+    </div>
+
+    <!-- counters -->
+    <div data-reveal style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:24px;" id="counterGrid">
+      <div style="text-align:center;padding:22px 10px;border:1px solid rgba(176,38,255,0.2);clip-path:polygon(0 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%);background:rgba(12,10,22,0.5);">
+        <div class="cnum" data-count="48" style="font-family:'Orbitron',sans-serif;font-weight:900;font-size:34px;color:#22d3ee;text-shadow:0 0 16px rgba(34,211,238,0.5);">0</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;color:#6b6b88;margin-top:4px;" data-vi="DỰ ÁN">PROJECTS</div>
+      </div>
+      <div style="text-align:center;padding:22px 10px;border:1px solid rgba(176,38,255,0.2);clip-path:polygon(0 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%);background:rgba(12,10,22,0.5);">
+        <div class="cnum" data-count="7" data-suffix="+" style="font-family:'Orbitron',sans-serif;font-weight:900;font-size:34px;color:#b026ff;text-shadow:0 0 16px rgba(176,38,255,0.5);">0</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;color:#6b6b88;margin-top:4px;" data-vi="NĂM KINH NGHIỆM">YEARS XP</div>
+      </div>
+      <div style="text-align:center;padding:22px 10px;border:1px solid rgba(176,38,255,0.2);clip-path:polygon(0 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%);background:rgba(12,10,22,0.5);">
+        <div class="cnum" data-count="12400" style="font-family:'Orbitron',sans-serif;font-weight:900;font-size:34px;color:#ff2d9b;text-shadow:0 0 16px rgba(255,45,155,0.5);">0</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;color:#6b6b88;margin-top:4px;" data-vi="LẦN COMMIT">COMMITS</div>
+      </div>
+      <div style="text-align:center;padding:22px 10px;border:1px solid rgba(176,38,255,0.2);clip-path:polygon(0 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%);background:rgba(12,10,22,0.5);">
+        <div class="cnum" data-count="99" data-suffix="%" style="font-family:'Orbitron',sans-serif;font-weight:900;font-size:34px;color:#ffd23f;text-shadow:0 0 16px rgba(255,210,63,0.5);">0</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;color:#6b6b88;margin-top:4px;" data-vi="ĐỘ HÀI LÒNG">SATISFACTION</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== MISSIONS ===== -->
+  <section id="missions" style="padding:80px 0;">
+    <div data-reveal style="margin-bottom:38px;">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:4px;color:#b026ff;margin-bottom:8px;">[ 02 ] <span data-vi="NHẬT KÝ NHIỆM VỤ">MISSION LOG</span></div>
+      <h2 style="margin:0;font-family:'Orbitron',sans-serif;font-weight:700;font-size:clamp(26px,4vw,40px);color:#fff;letter-spacing:1px;" data-vi="NHIỆM VỤ ĐÃ HOÀN THÀNH">COMPLETED MISSIONS</h2>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:22px;" id="missionGrid">
+      <sc-for list="{{ missions }}" as="m" hint-placeholder-count="4">
+        <article data-reveal data-tilt style="position:relative;padding:26px;background:linear-gradient(135deg,rgba(22,16,40,0.66),rgba(10,8,20,0.55));backdrop-filter:blur(12px);border:1px solid rgba(176,38,255,0.28);clip-path:polygon(0 0,calc(100% - 20px) 0,100% 20px,100% 100%,20px 100%,0 calc(100% - 20px));box-shadow:0 14px 40px rgba(0,0,0,0.45);transition:box-shadow .3s,border-color .3s;transform-style:preserve-3d;" style-hover="border-color:rgba(34,211,238,0.6);box-shadow:0 0 40px rgba(176,38,255,0.3);">
+          <div style="position:absolute;top:12px;right:12px;width:16px;height:16px;border-top:2px solid rgba(34,211,238,0.6);border-right:2px solid rgba(34,211,238,0.6);"></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;margin-bottom:14px;">
+            <span style="color:#b026ff;">{{ m.code }}</span>
+            <span style="display:inline-flex;align-items:center;gap:6px;color:{{ m.statusColor }};"><span style="width:6px;height:6px;border-radius:50%;background:{{ m.statusColor }};box-shadow:0 0 8px {{ m.statusColor }};"></span><span data-vi="{{ m.statusVi }}">{{ m.status }}</span></span>
+          </div>
+          <h3 data-vi="{{ m.titleVi }}" style="margin:0 0 10px;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:21px;color:#fff;">{{ m.title }}</h3>
+          <p data-vi="{{ m.objectiveVi }}" style="margin:0 0 16px;color:#9a9ab8;font-size:13.5px;line-height:1.6;">{{ m.objective }}</p>
+          <div style="display:flex;justify-content:space-between;align-items:center;font-family:'JetBrains Mono',monospace;font-size:11px;margin-bottom:16px;padding:10px 0;border-top:1px solid rgba(255,255,255,0.06);border-bottom:1px solid rgba(255,255,255,0.06);">
+            <span style="color:#6b6b88;"><span data-vi="ĐỘ KHÓ">DIFFICULTY</span> <span style="color:#ffd23f;letter-spacing:1px;">{{ m.diff }}</span></span>
+            <span style="color:#22d3ee;">▸ {{ m.impact }}</span>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:7px;">
+            <sc-for list="{{ m.loadout }}" as="t" hint-placeholder-count="3">
+              <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px;color:#a8a8c2;padding:4px 9px;border:1px solid rgba(176,38,255,0.3);background:rgba(176,38,255,0.06);">{{ t }}</span>
+            </sc-for>
+          </div>
+        </article>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- ===== INVENTORY / SKILLS ===== -->
+  <section id="inventory" style="padding:80px 0;">
+    <div data-reveal style="margin-bottom:38px;">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:4px;color:#b026ff;margin-bottom:8px;">[ 03 ] <span data-vi="KHO KỸ NĂNG">SKILL INVENTORY</span></div>
+      <h2 style="margin:0 0 10px;font-family:'Orbitron',sans-serif;font-weight:700;font-size:clamp(26px,4vw,40px);color:#fff;letter-spacing:1px;" data-vi="TRANG BỊ & KỸ NĂNG">EQUIPPED LOADOUT</h2>
+      <div style="display:flex;flex-wrap:wrap;gap:16px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px;color:#6b6b88;">
+        <span><span style="color:#6b7280;">■</span> COMMON</span>
+        <span><span style="color:#22d3ee;">■</span> RARE</span>
+        <span><span style="color:#b026ff;">■</span> EPIC</span>
+        <span><span style="color:#ffd23f;">■</span> LEGENDARY</span>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:28px;">
+      <sc-for list="{{ skillGroups }}" as="g" hint-placeholder-count="3">
+        <div data-reveal>
+          <div data-vi="{{ g.nameVi }}" style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:3px;color:#22d3ee;margin-bottom:14px;border-left:2px solid #22d3ee;padding-left:10px;">{{ g.name }}</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;">
+            <sc-for list="{{ g.items }}" as="it" hint-placeholder-count="5">
+              <div title="{{ it.tip }}" style="position:relative;cursor:default;padding:16px 14px;background:rgba(12,10,22,0.6);border:1px solid {{ it.color }};clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));box-shadow:inset 0 0 18px {{ it.glow }};transition:transform .2s,box-shadow .25s;" style-hover="transform:translateY(-4px);box-shadow:0 0 24px {{ it.glow }},inset 0 0 18px {{ it.glow }};">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                  <span style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:15px;color:#fff;">{{ it.n }}</span>
+                  <span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;color:{{ it.color }};text-transform:uppercase;">{{ it.r }}</span>
+                </div>
+                <div style="height:5px;background:rgba(255,255,255,0.06);overflow:hidden;">
+                  <div class="skillbar" data-fill="{{ it.lvl }}" style="height:100%;width:0%;background:{{ it.color }};box-shadow:0 0 10px {{ it.glow }};transition:width 1.3s cubic-bezier(.2,.8,.2,1);"></div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- ===== TROPHIES / ACHIEVEMENTS ===== -->
+  <section id="trophies" style="padding:80px 0;">
+    <div data-reveal style="margin-bottom:38px;">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:4px;color:#b026ff;margin-bottom:8px;">[ 04 ] <span data-vi="THÀNH TỰU">ACHIEVEMENTS</span></div>
+      <h2 style="margin:0;font-family:'Orbitron',sans-serif;font-weight:700;font-size:clamp(26px,4vw,40px);color:#fff;letter-spacing:1px;" data-vi="DANH HIỆU ĐÃ MỞ KHÓA">TROPHIES UNLOCKED</h2>
+    </div>
+
+    <div style="position:relative;padding-left:34px;">
+      <div style="position:absolute;left:9px;top:6px;bottom:6px;width:2px;background:linear-gradient(180deg,#22d3ee,#b026ff,#ff2d9b);box-shadow:0 0 12px rgba(176,38,255,0.6);"></div>
+      <div style="display:flex;flex-direction:column;gap:18px;">
+        <sc-for list="{{ achievements }}" as="a" hint-placeholder-count="5">
+          <div data-reveal data-trophy style="position:relative;padding:20px 22px;background:linear-gradient(135deg,rgba(20,16,38,0.66),rgba(10,8,20,0.5));backdrop-filter:blur(10px);border:1px solid {{ a.color }};clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,16px 100%,0 calc(100% - 16px));box-shadow:inset 0 0 20px {{ a.glow }};">
+            <div style="position:absolute;left:-34px;top:22px;width:18px;height:18px;background:#0a0a12;border:2px solid {{ a.color }};border-radius:50%;box-shadow:0 0 12px {{ a.glow }};"></div>
+            <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;">
+              <h3 data-vi="{{ a.titleVi }}" style="margin:0;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:18px;color:#fff;display:flex;align-items:center;gap:9px;"><span style="color:{{ a.color }};">★</span>{{ a.title }}</h3>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;color:{{ a.color }};">{{ a.year }}</span>
+            </div>
+            <p data-vi="{{ a.descVi }}" style="margin:8px 0 0;color:#9a9ab8;font-size:13.5px;line-height:1.6;">{{ a.desc }}</p>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CONTACT / PARTY UP ===== -->
+  <section id="contact" style="padding:80px 0 40px;">
+    <div data-reveal style="position:relative;text-align:center;padding:54px 32px;background:linear-gradient(160deg,rgba(176,38,255,0.1),rgba(34,211,238,0.05),rgba(10,8,20,0.5));backdrop-filter:blur(12px);border:1px solid rgba(176,38,255,0.35);clip-path:polygon(0 0,calc(100% - 28px) 0,100% 28px,100% 100%,28px 100%,0 calc(100% - 28px));box-shadow:inset 0 0 50px rgba(176,38,255,0.08),0 20px 60px rgba(0,0,0,0.5);">
+      <div style="position:absolute;top:16px;left:16px;width:22px;height:22px;border-top:2px solid #22d3ee;border-left:2px solid #22d3ee;"></div>
+      <div style="position:absolute;bottom:16px;right:16px;width:22px;height:22px;border-bottom:2px solid #ff2d9b;border-right:2px solid #ff2d9b;"></div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:4px;color:#22d3ee;margin-bottom:14px;">[ 05 ] <span data-vi="MỜI VÀO ĐỘI">PARTY UP</span></div>
+      <h2 data-vi="SẴN SÀNG NHẬN NHIỆM VỤ TIẾP THEO" style="margin:0 auto 14px;max-width:18ch;font-family:'Orbitron',sans-serif;font-weight:700;font-size:clamp(28px,4.5vw,46px);color:#fff;letter-spacing:1px;text-shadow:0 0 24px rgba(176,38,255,0.4);">READY FOR THE NEXT QUEST</h2>
+      <p data-vi="[Một dòng kêu gọi hành động. Mời nhà tuyển dụng hoặc cộng tác viên liên hệ với bạn.]" style="margin:0 auto 28px;max-width:48ch;color:#a8a8c2;font-size:16px;line-height:1.6;">[A closing call to action. Invite recruiters or collaborators to reach out and team up.]</p>
+      <div style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center;align-items:center;">
+        <a href="mailto:hello@example.com" style="text-decoration:none;font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:2px;color:#08070f;font-weight:700;background:linear-gradient(135deg,#22d3ee,#b026ff);padding:15px 30px;clip-path:polygon(0 0,100% 0,100% 70%,calc(100% - 14px) 100%,0 100%);box-shadow:0 0 28px rgba(176,38,255,0.45);transition:transform .15s,box-shadow .2s;" style-hover="transform:translateY(-2px);box-shadow:0 0 40px rgba(34,211,238,0.6);">[hello@example.com] ▸</a>
+        <div style="display:flex;gap:9px;">
+          <sc-for list="{{ socials }}" as="s" hint-placeholder-count="4">
+            <a href="{{ s.href }}" title="{{ s.name }}" aria-label="{{ s.name }}" style="text-decoration:none;display:inline-flex;width:44px;height:44px;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#9a9ab8;border:1px solid rgba(34,211,238,0.3);clip-path:polygon(0 0,100% 0,100% 70%,70% 100%,0 100%);transition:color .2s,border-color .2s,box-shadow .2s;" style-hover="color:#22d3ee;border-color:#22d3ee;box-shadow:0 0 16px rgba(34,211,238,0.4);">{{ s.label }}</a>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ===== FOOTER ===== -->
+<footer style="position:relative;z-index:1;border-top:1px solid rgba(176,38,255,0.2);padding:22px 24px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:2px;color:#4a4a64;background:rgba(8,7,15,0.6);animation:flick 6s infinite;">
+  <span data-vi="ĐÃ TẢI XONG. KHÔNG CÓ BẢN QUYỀN BỊ XÂM PHẠM.">SYSTEM LOADED. NO PIXELS HARMED.</span> · BUILD v2.4.0 · © 2026 [YOUR_HANDLE] · <span style="color:#22d3ee;">RENDERED @ 60FPS</span>
+</footer>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    this.lang = 'en';
+    this.rafs = [];
+    this.cleanup = [];
+  }
+
+  renderVals(){
+    const RARITY = { common:'#6b7280', rare:'#22d3ee', epic:'#b026ff', legendary:'#ffd23f' };
+    const GLOW = { common:'rgba(107,114,128,0.25)', rare:'rgba(34,211,238,0.25)', epic:'rgba(176,38,255,0.28)', legendary:'rgba(255,210,63,0.28)' };
+
+    const missions = [
+      { code:'MSN_01', title:'[Mission Title One]', titleVi:'[Tên Nhiệm Vụ Một]',
+        objective:'[Brief mission objective — what problem you solved and the result. Pure placeholder copy.]',
+        objectiveVi:'[Mô tả ngắn mục tiêu nhiệm vụ — vấn đề bạn giải quyết và kết quả. Đây là chỗ điền sẵn.]',
+        diff:'★★★★★', impact:'+2.4k USERS', loadout:['React','TypeScript','WebGL'],
+        status:'COMPLETE', statusVi:'HOÀN THÀNH', statusColor:'#4ade80' },
+      { code:'MSN_02', title:'[Mission Title Two]', titleVi:'[Tên Nhiệm Vụ Hai]',
+        objective:'[Another placeholder objective. Describe scope, your role, and the outcome you shipped.]',
+        objectiveVi:'[Một mục tiêu chỗ điền khác. Mô tả phạm vi, vai trò của bạn và kết quả đạt được.]',
+        diff:'★★★★☆', impact:'+38% PERF', loadout:['Node','Postgres','Redis'],
+        status:'COMPLETE', statusVi:'HOÀN THÀNH', statusColor:'#4ade80' },
+      { code:'MSN_03', title:'[Mission Title Three]', titleVi:'[Tên Nhiệm Vụ Ba]',
+        objective:'[Placeholder briefing. Highlight a technical challenge and how you overcame it.]',
+        objectiveVi:'[Bản tóm tắt chỗ điền. Nêu bật một thách thức kỹ thuật và cách bạn vượt qua.]',
+        diff:'★★★☆☆', impact:'1ST PLACE', loadout:['Python','PyTorch','LLM'],
+        status:'COMPLETE', statusVi:'HOÀN THÀNH', statusColor:'#4ade80' },
+      { code:'MSN_04', title:'[Mission Title Four]', titleVi:'[Tên Nhiệm Vụ Bốn]',
+        objective:'[Final placeholder mission. Note the impact, scale, or recognition this project earned.]',
+        objectiveVi:'[Nhiệm vụ chỗ điền cuối. Ghi chú tác động, quy mô hoặc sự ghi nhận của dự án này.]',
+        diff:'★★★★☆', impact:'IN PROGRESS', loadout:['Solidity','Ethers','Next'],
+        status:'ACTIVE', statusVi:'ĐANG CHẠY', statusColor:'#ffd23f' }
+    ];
+
+    const mk = (n, r, lvl, tip) => ({ n, r, lvl, tip, color:RARITY[r], glow:GLOW[r] });
+    const skillGroups = [
+      { name:'FRONTEND // COMBAT', nameVi:'GIAO DIỆN // CẬN CHIẾN', items:[
+        mk('React','legendary',95,'[Primary weapon]'), mk('TypeScript','epic',88,'[Type-safe blade]'),
+        mk('CSS / Anim','epic',85,'[Motion magic]'), mk('Three.js','rare',72,'[3D conjuring]'),
+        mk('Vue','rare',68,'[Sidearm]') ]},
+      { name:'BACKEND // ENGINEERING', nameVi:'HẬU CẦN // KỸ THUẬT', items:[
+        mk('Node.js','epic',86,'[Server core]'), mk('Python','epic',82,'[Utility tool]'),
+        mk('PostgreSQL','rare',75,'[Data vault]'), mk('Docker','rare',70,'[Container kit]'),
+        mk('GraphQL','common',60,'[Query rune]') ]},
+      { name:'AI · WEB3 // ARCANE', nameVi:'AI · WEB3 // PHÉP THUẬT', items:[
+        mk('LLM / RAG','epic',80,'[Arcane focus]'), mk('PyTorch','rare',66,'[Spellbook]'),
+        mk('Solidity','rare',64,'[Chain glyph]'), mk('Vector DB','common',58,'[Memory shard]'),
+        mk('Prompting','legendary',92,'[Mastered art]') ]}
+    ];
+
+    const ach = (year,title,titleVi,desc,descVi,r)=>({year,title,titleVi,desc,descVi,color:RARITY[r],glow:GLOW[r]});
+    const achievements = [
+      ach('2026','[Achievement Unlocked]','[Mở Khóa Thành Tựu]','[Placeholder milestone — an award, launch, or recognition.]','[Cột mốc chỗ điền — một giải thưởng, sản phẩm ra mắt hoặc sự ghi nhận.]','legendary'),
+      ach('2025','[Milestone Reached]','[Đạt Cột Mốc]','[Describe a notable accomplishment from this period.]','[Mô tả một thành tựu đáng chú ý trong giai đoạn này.]','epic'),
+      ach('2024','[Quest Cleared]','[Hoàn Thành Thử Thách]','[Another placeholder achievement to swap with real content.]','[Một thành tựu chỗ điền khác để thay bằng nội dung thật.]','epic'),
+      ach('2023','[Level Up]','[Lên Cấp]','[A turning point or skill you mastered. Placeholder text.]','[Một bước ngoặt hoặc kỹ năng bạn thành thạo. Chỗ điền sẵn.]','rare'),
+      ach('2022','[Journey Started]','[Khởi Đầu Hành Trình]','[Where it all began — your origin story placeholder.]','[Nơi mọi thứ bắt đầu — câu chuyện khởi nguồn chỗ điền.]','common')
+    ];
+
+    const navItems = [
+      { id:'about', en:'PROFILE', vi:'HỒ SƠ' },
+      { id:'missions', en:'MISSIONS', vi:'NHIỆM VỤ' },
+      { id:'inventory', en:'INVENTORY', vi:'KHO ĐỒ' },
+      { id:'trophies', en:'TROPHIES', vi:'THÀNH TỰU' },
+      { id:'contact', en:'CONTACT', vi:'LIÊN HỆ' }
+    ];
+
+    const socials = [
+      { label:'GH', name:'GitHub', href:'#' },
+      { label:'IN', name:'LinkedIn', href:'#' },
+      { label:'TW', name:'X / Twitter', href:'#' },
+      { label:'DR', name:'Dribbble', href:'#' }
+    ];
+
+    return { missions, skillGroups, achievements, navItems, socials };
+  }
+
+  componentDidMount(){
+    this.reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    // roles for the class typer (EN / VI)
+    this.roles = {
+      en:['[Creative Developer]','[Frontend Engineer]','[Game UI Designer]','[Full-Stack Builder]','[Motion Crafter]'],
+      vi:['[Lập Trình Sáng Tạo]','[Kỹ Sư Frontend]','[Thiết Kế Game UI]','[Full-Stack Builder]','[Nghệ Sĩ Chuyển Động]']
+    };
+    this.statLabels = {
+      en:['FRONTEND','BACKEND','AI / ML','WEB3','INFRA'],
+      vi:['GIAO DIỆN','HẬU CẦN','AI / ML','WEB3','HẠ TẦNG']
+    };
+    this.statVals = [95,82,78,64,72];
+
+    requestAnimationFrame(()=>{
+      this.initLang();
+      this.initBackground();
+      this.initCursor();
+      this.initScroll();
+      this.initObservers();
+      this.initTyper();
+      this.initTilt();
+      this.initTelemetry();
+      this.fillXP();
+    });
+  }
+
+  componentWillUnmount(){
+    this.rafs.forEach(id=>cancelAnimationFrame(id));
+    this.cleanup.forEach(fn=>{ try{ fn(); }catch(e){} });
+  }
+
+  // ---------- language ----------
+  initLang(){
+    const en = document.getElementById('langEN');
+    const vi = document.getElementById('langVI');
+    if(!en||!vi) return;
+    // snapshot EN text for every translatable node
+    document.querySelectorAll('[data-vi]').forEach(node=>{
+      if(node.getAttribute('data-en')===null) node.setAttribute('data-en', node.textContent);
+    });
+    const setActive = (lang)=>{
+      en.style.background = lang==='en' ? 'rgba(34,211,238,0.16)' : 'transparent';
+      en.style.color = lang==='en' ? '#22d3ee' : '#6b6b88';
+      vi.style.background = lang==='vi' ? 'rgba(34,211,238,0.16)' : 'transparent';
+      vi.style.color = lang==='vi' ? '#22d3ee' : '#6b6b88';
+    };
+    const swap = (lang)=>{
+      this.lang = lang;
+      document.documentElement.lang = lang;
+      document.querySelectorAll('[data-vi]').forEach(node=>{
+        const t = lang==='vi' ? node.getAttribute('data-vi') : node.getAttribute('data-en');
+        if(t!==null) node.textContent = t;
+      });
+      setActive(lang);
+      this.restartTyper();
+    };
+    en.addEventListener('click', ()=>swap('en'));
+    vi.addEventListener('click', ()=>swap('vi'));
+    setActive('en');
+  }
+
+  // ---------- particle background ----------
+  initBackground(){
+    const c = document.getElementById('bgCanvas');
+    if(!c) return;
+    const ctx = c.getContext('2d');
+    let w,h,parts=[];
+    const N = 70;
+    const resize = ()=>{
+      const dpr = Math.min(window.devicePixelRatio||1, 2);
+      w = c.clientWidth; h = c.clientHeight;
+      c.width = w*dpr; c.height = h*dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
+    };
+    resize();
+    window.addEventListener('resize', resize);
+    this.cleanup.push(()=>window.removeEventListener('resize', resize));
+    for(let i=0;i<N;i++){
+      parts.push({ x:Math.random()*w, y:Math.random()*h, vx:(Math.random()-.5)*.25, vy:(Math.random()-.5)*.25, r:Math.random()*1.6+.4, col: Math.random()>.5?'34,211,238':'176,38,255' });
+    }
+    const draw = ()=>{
+      ctx.clearRect(0,0,w,h);
+      for(const p of parts){
+        if(!this.reduce){ p.x+=p.vx; p.y+=p.vy; }
+        if(p.x<0)p.x=w; if(p.x>w)p.x=0; if(p.y<0)p.y=h; if(p.y>h)p.y=0;
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+        ctx.fillStyle='rgba('+p.col+',0.7)';
+        ctx.shadowColor='rgba('+p.col+',0.9)';
+        ctx.shadowBlur=6;
+        ctx.fill();
+      }
+      ctx.shadowBlur=0;
+      if(!this.reduce){ this.rafs.push(requestAnimationFrame(draw)); }
+    };
+    draw();
+  }
+
+  // ---------- cursor reticle + trail ----------
+  initCursor(){
+    if(this.reduce || ('ontouchstart' in window)) return;
+    const ret = document.getElementById('reticle');
+    const c = document.getElementById('cursorCanvas');
+    if(!c||!ret) return;
+    const ctx = c.getContext('2d');
+    let w,h, trail=[], mx=-100,my=-100, rx=-100,ry=-100, active=false;
+    const resize=()=>{ const dpr=Math.min(window.devicePixelRatio||1,2); w=c.clientWidth;h=c.clientHeight;c.width=w*dpr;c.height=h*dpr;ctx.setTransform(dpr,0,0,dpr,0,0); };
+    resize();
+    window.addEventListener('resize',resize);
+    const move=(e)=>{ mx=e.clientX;my=e.clientY; active=true; ret.style.opacity='1'; trail.push({x:mx,y:my,a:1}); if(trail.length>22)trail.shift(); };
+    const leave=()=>{ ret.style.opacity='0'; };
+    window.addEventListener('mousemove',move);
+    window.addEventListener('mouseout',leave);
+    this.cleanup.push(()=>{ window.removeEventListener('resize',resize); window.removeEventListener('mousemove',move); window.removeEventListener('mouseout',leave); });
+    const draw=()=>{
+      ctx.clearRect(0,0,w,h);
+      rx+=(mx-rx)*0.18; ry+=(my-ry)*0.18;
+      ret.style.transform='translate('+rx+'px,'+ry+'px)';
+      for(let i=0;i<trail.length;i++){
+        const p=trail[i]; p.a*=0.9;
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,Math.max(0.5,3*(i/trail.length)),0,Math.PI*2);
+        ctx.fillStyle='rgba(34,211,238,'+(p.a*0.5)+')';
+        ctx.shadowColor='rgba(176,38,255,0.8)'; ctx.shadowBlur=8;
+        ctx.fill();
+      }
+      ctx.shadowBlur=0;
+      this.rafs.push(requestAnimationFrame(draw));
+    };
+    draw();
+  }
+
+  // ---------- scroll progress ----------
+  initScroll(){
+    const bar = document.getElementById('scrollBar');
+    if(!bar) return;
+    const onScroll=()=>{
+      const h = document.documentElement.scrollHeight - window.innerHeight;
+      const p = h>0 ? (window.scrollY/h)*100 : 0;
+      bar.style.width = p.toFixed(2)+'%';
+    };
+    window.addEventListener('scroll', onScroll, {passive:true});
+    this.cleanup.push(()=>window.removeEventListener('scroll', onScroll));
+    onScroll();
+  }
+
+  // ---------- intersection observers ----------
+  initObservers(){
+    // reveal setup
+    const reveals = Array.from(document.querySelectorAll('[data-reveal]'));
+    if(this.reduce){
+      reveals.forEach(el=>{ el.style.opacity='1'; });
+    } else {
+      reveals.forEach((el,i)=>{ el.style.opacity='0'; el.style.transform='translateY(34px)'; el.style.transition='opacity .7s ease, transform .7s cubic-bezier(.2,.8,.2,1)'; });
+    }
+    const fired = new Set();
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{
+        if(!e.isIntersecting) return;
+        const el = e.target;
+        if(!this.reduce){ el.style.opacity='1'; el.style.transform='translateY(0)'; }
+        // skill bars
+        el.querySelectorAll('.skillbar').forEach(b=>{ b.style.width=(b.getAttribute('data-fill')||0)+'%'; });
+        // counters
+        el.querySelectorAll('.cnum').forEach(n=>{ if(!fired.has(n)){ fired.add(n); this.animateCount(n); } });
+        io.unobserve(el);
+      });
+    }, { threshold:0.18, rootMargin:'0px 0px -8% 0px' });
+    reveals.forEach(el=>io.observe(el));
+
+    // radar (separate, needs its own trigger)
+    const radar = document.getElementById('radar');
+    if(radar){
+      const rio = new IntersectionObserver((entries)=>{
+        entries.forEach(e=>{ if(e.isIntersecting){ this.animateRadar(); rio.unobserve(radar); } });
+      }, { threshold:0.3 });
+      rio.observe(radar);
+    }
+
+    // trophy toast — fire once when trophies section enters
+    const trophies = document.querySelectorAll('[data-trophy]');
+    let toastShown = false;
+    if(trophies.length){
+      const tio = new IntersectionObserver((entries)=>{
+        entries.forEach(e=>{
+          if(e.isIntersecting && !toastShown){
+            toastShown = true;
+            const title = e.target.querySelector('h3');
+            this.showToast(title ? title.textContent.replace('★','').trim() : '[Milestone reached]');
+            tio.disconnect();
+          }
+        });
+      }, { threshold:0.5 });
+      trophies.forEach(t=>tio.observe(t));
+    }
+  }
+
+  animateCount(node){
+    const target = parseInt(node.getAttribute('data-count'),10)||0;
+    const suffix = node.getAttribute('data-suffix')||'';
+    if(this.reduce){ node.textContent = target.toLocaleString()+suffix; return; }
+    const dur = 1500, t0 = performance.now();
+    const step=(now)=>{
+      const p = Math.min(1,(now-t0)/dur);
+      const eased = 1-Math.pow(1-p,3);
+      node.textContent = Math.round(target*eased).toLocaleString()+suffix;
+      if(p<1) this.rafs.push(requestAnimationFrame(step));
+    };
+    this.rafs.push(requestAnimationFrame(step));
+  }
+
+  // ---------- radar / pentagon stat chart ----------
+  animateRadar(){
+    const c = document.getElementById('radar');
+    if(!c) return;
+    const ctx = c.getContext('2d');
+    const dpr = Math.min(window.devicePixelRatio||1,2);
+    const W=440,H=380;
+    c.width=W*dpr; c.height=H*dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
+    const cx=W/2, cy=H/2+6, R=125, n=5;
+    const vals=this.statVals.map(v=>v/100);
+    const ang=(i)=>(-Math.PI/2)+(i*2*Math.PI/n);
+    const labels = ()=> this.statLabels[this.lang]||this.statLabels.en;
+
+    const render=(t)=>{
+      ctx.clearRect(0,0,W,H);
+      // rings
+      for(let ring=1;ring<=4;ring++){
+        const rr=R*ring/4;
+        ctx.beginPath();
+        for(let i=0;i<=n;i++){ const a=ang(i%n); const x=cx+Math.cos(a)*rr, y=cy+Math.sin(a)*rr; i?ctx.lineTo(x,y):ctx.moveTo(x,y); }
+        ctx.strokeStyle='rgba(176,38,255,0.14)'; ctx.lineWidth=1; ctx.stroke();
+      }
+      // spokes + labels
+      ctx.font="10px 'JetBrains Mono', monospace";
+      ctx.fillStyle='#8b8ba7'; ctx.textAlign='center'; ctx.textBaseline='middle';
+      const L=labels();
+      for(let i=0;i<n;i++){
+        const a=ang(i);
+        ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+Math.cos(a)*R,cy+Math.sin(a)*R);
+        ctx.strokeStyle='rgba(34,211,238,0.12)'; ctx.stroke();
+        const lx=cx+Math.cos(a)*(R+22), ly=cy+Math.sin(a)*(R+18);
+        ctx.fillStyle='#9a9ab8'; ctx.fillText(L[i]||'', lx, ly);
+      }
+      // value polygon
+      ctx.beginPath();
+      for(let i=0;i<=n;i++){ const idx=i%n; const a=ang(idx); const rr=R*vals[idx]*t; const x=cx+Math.cos(a)*rr, y=cy+Math.sin(a)*rr; i?ctx.lineTo(x,y):ctx.moveTo(x,y); }
+      ctx.closePath();
+      const grad=ctx.createLinearGradient(cx-R,cy-R,cx+R,cy+R);
+      grad.addColorStop(0,'rgba(34,211,238,0.4)'); grad.addColorStop(1,'rgba(176,38,255,0.4)');
+      ctx.fillStyle=grad; ctx.fill();
+      ctx.strokeStyle='#22d3ee'; ctx.lineWidth=2; ctx.shadowColor='rgba(34,211,238,0.7)'; ctx.shadowBlur=12; ctx.stroke(); ctx.shadowBlur=0;
+      // vertices
+      for(let i=0;i<n;i++){ const a=ang(i); const rr=R*vals[i]*t; const x=cx+Math.cos(a)*rr,y=cy+Math.sin(a)*rr; ctx.beginPath(); ctx.arc(x,y,3.5,0,Math.PI*2); ctx.fillStyle='#b026ff'; ctx.shadowColor='#b026ff'; ctx.shadowBlur=10; ctx.fill(); ctx.shadowBlur=0; }
+    };
+
+    if(this.reduce){ render(1); this._radarDone=true; return; }
+    const dur=1100, t0=performance.now();
+    const step=(now)=>{ const p=Math.min(1,(now-t0)/dur); render(1-Math.pow(1-p,3)); if(p<1) this.rafs.push(requestAnimationFrame(step)); else this._radarDone=true; };
+    this.rafs.push(requestAnimationFrame(step));
+    // re-render on language change handled by restartTyper? add a small repaint
+    this._radarRender = ()=>render(1);
+  }
+
+  // ---------- typed role cycler ----------
+  initTyper(){ this.typerState={i:0,build:true,pos:0}; this.runTyper(); }
+  restartTyper(){ /* roles change with language; next tick picks new lang */ }
+  runTyper(){
+    const el = document.getElementById('typer');
+    if(!el) return;
+    if(this.reduce){ el.textContent = (this.roles[this.lang]||this.roles.en)[0]; return; }
+    const tick=()=>{
+      const list = this.roles[this.lang]||this.roles.en;
+      const s = this.typerState;
+      const word = list[s.i % list.length];
+      if(s.build){ s.pos++; el.textContent=word.slice(0,s.pos); if(s.pos>=word.length){ s.build=false; this._t=setTimeout(tick,1400); return; } }
+      else { s.pos--; el.textContent=word.slice(0,s.pos); if(s.pos<=0){ s.build=true; s.i++; } }
+      this._t=setTimeout(tick, s.build?70:35);
+    };
+    tick();
+    this.cleanup.push(()=>clearTimeout(this._t));
+  }
+
+  // ---------- 3D tilt ----------
+  initTilt(){
+    if(this.reduce) return;
+    document.querySelectorAll('[data-tilt]').forEach(card=>{
+      const enter=()=>{ card.style.transition='transform .1s ease'; };
+      const move=(e)=>{
+        const r=card.getBoundingClientRect();
+        const px=(e.clientX-r.left)/r.width-0.5;
+        const py=(e.clientY-r.top)/r.height-0.5;
+        card.style.transform='perspective(900px) rotateY('+(px*8)+'deg) rotateX('+(-py*8)+'deg) translateZ(0)';
+      };
+      const leave=()=>{ card.style.transition='transform .4s ease'; card.style.transform='perspective(900px) rotateY(0) rotateX(0)'; };
+      card.addEventListener('mouseenter',enter);
+      card.addEventListener('mousemove',move);
+      card.addEventListener('mouseleave',leave);
+    });
+  }
+
+  // ---------- telemetry (fps + ping) ----------
+  initTelemetry(){
+    const tel = document.getElementById('telemetry');
+    const fpsEl = document.getElementById('fps');
+    const pingEl = document.getElementById('ping');
+    if(tel && window.innerWidth>1024) tel.style.display='flex';
+    if(this.reduce){ return; }
+    let last=performance.now(), frames=0;
+    const loop=(now)=>{
+      frames++;
+      if(now-last>=1000){ if(fpsEl) fpsEl.textContent=Math.min(60,frames); frames=0; last=now; }
+      this.rafs.push(requestAnimationFrame(loop));
+    };
+    this.rafs.push(requestAnimationFrame(loop));
+    this._ping=setInterval(()=>{ if(pingEl) pingEl.textContent=18+Math.floor(Math.random()*16); },2200);
+    this.cleanup.push(()=>clearInterval(this._ping));
+  }
+
+  // ---------- XP bar + level ----------
+  fillXP(){
+    const fill=document.getElementById('xpFill');
+    const now=document.getElementById('xpNow');
+    const lvl=document.getElementById('lvlNum');
+    const targetXP=7400, targetLvl=42;
+    if(this.reduce){ if(fill)fill.style.width='74%'; if(now)now.textContent='7,400'; if(lvl)lvl.textContent=targetLvl; return; }
+    setTimeout(()=>{ if(fill) fill.style.width='74%'; },350);
+    const dur=2000, t0=performance.now();
+    const step=(t)=>{ const p=Math.min(1,(t-t0)/dur); const e=1-Math.pow(1-p,3); if(now)now.textContent=Math.round(targetXP*e).toLocaleString(); if(lvl)lvl.textContent=Math.round(targetLvl*e); if(p<1)this.rafs.push(requestAnimationFrame(step)); };
+    setTimeout(()=>this.rafs.push(requestAnimationFrame(step)),350);
+  }
+
+  // ---------- toast ----------
+  showToast(text){
+    const t=document.getElementById('toast');
+    const b=document.getElementById('toastBody');
+    if(!t) return;
+    if(b) b.textContent=text;
+    t.style.display='block';
+    t.style.animation='none';
+    void t.offsetWidth;
+    t.style.animation='toastIn 4s cubic-bezier(.2,.8,.2,1) forwards';
+    clearTimeout(this._toastT);
+    this._toastT=setTimeout(()=>{ t.style.display='none'; },4200);
+  }
+}
+</script>
+</body>
+</html>
