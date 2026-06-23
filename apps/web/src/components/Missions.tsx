@@ -1,5 +1,5 @@
 "use client";
-import { missions, type Mission } from "@/data/profile";
+import type { Mission } from "@portfolio/types";
 import { useTilt } from "@/hooks/useTilt";
 import { SectionHeader } from "./SectionHeader";
 
@@ -38,7 +38,7 @@ function MissionCard({ m }: { m: Mission }) {
       </p>
       <div className="mt-4 flex gap-6 text-[11px]" style={{ fontFamily: "var(--font-mono), monospace" }}>
         <span style={{ color: "#9a9ab8" }}>
-          DIFFICULTY <span style={{ color: "#ffd23f" }}>{m.diff}</span>
+          DIFFICULTY <span style={{ color: "#ffd23f" }}>{m.difficulty}</span>
         </span>
         <span style={{ color: "#9a9ab8" }}>
           IMPACT <span style={{ color: "#22d3ee" }}>{m.impact}</span>
@@ -63,7 +63,7 @@ function MissionCard({ m }: { m: Mission }) {
   );
 }
 
-export function Missions() {
+export function Missions({ missions }: { missions: Mission[] }) {
   return (
     <section id="missions" className="mx-auto max-w-[1180px] px-6 py-20">
       <SectionHeader index="02" label="MISSION LOG" title="COMPLETED MISSIONS" />

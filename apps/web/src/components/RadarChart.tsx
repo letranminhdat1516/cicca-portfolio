@@ -1,13 +1,14 @@
 "use client";
 import { useEffect, useRef } from "react";
-import { stats } from "@/data/profile";
+import type { Stat } from "@portfolio/types";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 
-export function RadarChart() {
+export function RadarChart({ stats }: { stats: Stat[] }) {
   const ref = useRef<HTMLCanvasElement>(null);
   const reduced = useReducedMotion();
 
   useEffect(() => {
+    if (stats.length === 0) return;
     const canvas = ref.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -126,7 +127,7 @@ export function RadarChart() {
       cancelAnimationFrame(raf);
       obs.disconnect();
     };
-  }, [reduced]);
+  }, [reduced, stats]);
 
   return <canvas ref={ref} aria-label="Skill radar chart" className="mx-auto" />;
 }

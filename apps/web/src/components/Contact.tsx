@@ -1,7 +1,7 @@
-import { profile, socials } from "@/data/profile";
+import type { Profile, Social } from "@portfolio/types";
 import { SectionHeader } from "./SectionHeader";
 
-export function Contact() {
+export function Contact({ profile, socials }: { profile: Profile; socials: Social[] }) {
   return (
     <section id="contact" className="mx-auto max-w-[820px] px-6 py-24 text-center">
       <SectionHeader index="05" label="PARTY UP" center />

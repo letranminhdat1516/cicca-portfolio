@@ -1,14 +1,12 @@
 "use client";
-import { profile, socials } from "@/data/profile";
+import type { Profile, Social } from "@portfolio/types";
 import { useTypewriter } from "@/hooks/useTypewriter";
 import { useCountUp } from "@/hooks/useCountUp";
 import { XpBar } from "./XpBar";
 
-const CHAMFER =
-  "polygon(0 0,calc(100% - 18px) 0,100% 18px,100% 100%,18px 100%,0 calc(100% - 18px))";
 const HEX = "polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%)";
 
-export function Hero() {
+export function Hero({ profile, socials }: { profile: Profile; socials: Social[] }) {
   const role = useTypewriter(profile.roles);
   const { value: level, ref: levelRef } = useCountUp<HTMLDivElement>(profile.level, 2000);
 

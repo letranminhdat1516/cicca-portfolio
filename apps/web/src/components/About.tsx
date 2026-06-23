@@ -1,4 +1,4 @@
-import { profile } from "@/data/profile";
+import type { Profile, Stat, Counter } from "@portfolio/types";
 import { SectionHeader } from "./SectionHeader";
 import { RadarChart } from "./RadarChart";
 import { Counters } from "./Counters";
@@ -6,7 +6,15 @@ import { Counters } from "./Counters";
 const CHAMFER =
   "polygon(0 0,calc(100% - 18px) 0,100% 18px,100% 100%,18px 100%,0 calc(100% - 18px))";
 
-export function About() {
+export function About({
+  profile,
+  stats,
+  counters,
+}: {
+  profile: Profile;
+  stats: Stat[];
+  counters: Counter[];
+}) {
   return (
     <section id="about" className="mx-auto max-w-[1180px] px-6 py-20">
       <SectionHeader index="01" label="PROFILE" title="CHARACTER DOSSIER" />
@@ -39,10 +47,10 @@ export function About() {
           </div>
         </div>
         <div>
-          <RadarChart />
+          <RadarChart stats={stats} />
         </div>
       </div>
-      <Counters />
+      <Counters counters={counters} />
     </section>
   );
 }

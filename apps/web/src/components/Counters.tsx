@@ -1,8 +1,8 @@
 "use client";
-import { counters } from "@/data/profile";
+import type { Counter as CounterType } from "@portfolio/types";
 import { useCountUp } from "@/hooks/useCountUp";
 
-function Counter({ label, value, suffix, color }: (typeof counters)[number]) {
+function Counter({ label, value, suffix, color }: CounterType) {
   const { value: n, ref } = useCountUp<HTMLDivElement>(value, 1500);
   return (
     <div
@@ -31,7 +31,7 @@ function Counter({ label, value, suffix, color }: (typeof counters)[number]) {
   );
 }
 
-export function Counters() {
+export function Counters({ counters }: { counters: CounterType[] }) {
   return (
     <div className="mt-10 grid grid-cols-1 gap-4 [@media(min-width:560px)]:grid-cols-2 [@media(min-width:900px)]:grid-cols-4">
       {counters.map((c) => (

@@ -1,7 +1,7 @@
-import { achievements } from "@/data/profile";
+import type { Achievement } from "@portfolio/types";
 import { SectionHeader } from "./SectionHeader";
 
-export function Trophies() {
+export function Trophies({ achievements }: { achievements: Achievement[] }) {
   return (
     <section id="trophies" className="mx-auto max-w-[1180px] px-6 py-20">
       <SectionHeader index="04" label="ACHIEVEMENTS" title="TROPHIES UNLOCKED" />
@@ -31,7 +31,7 @@ export function Trophies() {
                 </span>
               </div>
               <p className="mt-1 text-[13.5px] leading-6" style={{ color: "#a8a8c2" }}>
-                {a.desc}
+                {a.description}
               </p>
             </div>
           ))}

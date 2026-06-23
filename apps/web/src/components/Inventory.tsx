@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { skillGroups, RARITY } from "@/data/profile";
+import type { SkillGroup } from "@portfolio/types";
+import { RARITY } from "@/data/profile";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { SectionHeader } from "./SectionHeader";
 
@@ -45,7 +46,7 @@ function SkillBar({ lvl, color, glow }: { lvl: number; color: string; glow: stri
   );
 }
 
-export function Inventory() {
+export function Inventory({ skillGroups }: { skillGroups: SkillGroup[] }) {
   return (
     <section id="inventory" className="mx-auto max-w-[1180px] px-6 py-20">
       <SectionHeader index="03" label="SKILL INVENTORY" title="EQUIPPED LOADOUT" />

@@ -1,0 +1,103 @@
+import { PrismaClient, Rarity, MissionStatus } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
+async function main() {
+  await prisma.profile.upsert({
+    where: { id: 1 },
+    update: {},
+    create: {
+      id: 1,
+      name: '[YOUR NAME]',
+      classRole: 'Creative Developer',
+      roles: ['Creative Developer', 'Full-stack Engineer', 'UI Alchemist', 'Problem Solver'],
+      tagline: '[A one-line tagline about you — what you build and why it matters.]',
+      bio: "[Placeholder bio. Write 2–3 sentences about who you are, what you build, and what you're chasing next.]",
+      level: 42,
+      rank: 'LEGENDARY',
+      region: 'REMOTE',
+      email: 'hello@example.com',
+      xpCurrent: 7400,
+      xpMax: 10000,
+    },
+  });
+
+  await prisma.stat.deleteMany();
+  await prisma.stat.createMany({
+    data: [
+      { label: 'FRONTEND', value: 95, order: 0 },
+      { label: 'BACKEND', value: 82, order: 1 },
+      { label: 'AI/ML', value: 78, order: 2 },
+      { label: 'WEB3', value: 64, order: 3 },
+      { label: 'INFRA', value: 72, order: 4 },
+    ],
+  });
+
+  await prisma.counter.deleteMany();
+  await prisma.counter.createMany({
+    data: [
+      { label: 'PROJECTS', value: 48, color: '#22d3ee', order: 0 },
+      { label: 'YEARS XP', value: 7, suffix: '+', color: '#b026ff', order: 1 },
+      { label: 'COMMITS', value: 12400, color: '#ff2d9b', order: 2 },
+      { label: 'SATISFACTION', value: 99, suffix: '%', color: '#ffd23f', order: 3 },
+    ],
+  });
+
+  await prisma.project.deleteMany();
+  await prisma.project.createMany({
+    data: [
+      { code: 'MSN_01', slug: 'realtime-collab-canvas', title: 'Realtime Collab Canvas', objective: 'Built a multiplayer design canvas with CRDT sync and sub-50ms cursor presence.', difficulty: '★★★★☆', impact: '+2.4k USERS', status: MissionStatus.COMPLETE, statusColor: '#4ade80', loadout: ['React', 'TypeScript', 'WebGL', 'WebSocket'], order: 0 },
+      { code: 'MSN_02', slug: 'ai-code-reviewer', title: 'AI Code Reviewer', objective: 'Shipped an LLM pipeline that reviews PRs and proposes fixes inline.', difficulty: '★★★★★', impact: '1ST PLACE', status: MissionStatus.COMPLETE, statusColor: '#4ade80', loadout: ['Next.js', 'NestJS', 'LLM', 'Postgres'], order: 1 },
+      { code: 'MSN_03', slug: 'onchain-identity-wallet', title: 'Onchain Identity Wallet', objective: 'Self-custodial wallet with social recovery and gasless onboarding.', difficulty: '★★★★☆', impact: '+800 WALLETS', status: MissionStatus.ACTIVE, statusColor: '#ffd23f', loadout: ['Solidity', 'Viem', 'React', 'IPFS'], order: 2 },
+      { code: 'MSN_04', slug: 'edge-analytics-engine', title: 'Edge Analytics Engine', objective: 'Privacy-first analytics running on the edge with zero cookies.', difficulty: '★★★☆☆', impact: '10M EVENTS/DAY', status: MissionStatus.ACTIVE, statusColor: '#ffd23f', loadout: ['Rust', 'WASM', 'ClickHouse'], order: 3 },
+    ],
+  });
+
+  await prisma.skill.deleteMany();
+  await prisma.skill.createMany({
+    data: [
+      { groupName: 'FRONTEND // COMBAT', name: 'React', rarity: Rarity.legendary, level: 95, tip: 'Years of battle-tested component design.', order: 0 },
+      { groupName: 'FRONTEND // COMBAT', name: 'TypeScript', rarity: Rarity.legendary, level: 92, tip: 'Strict mode everywhere.', order: 1 },
+      { groupName: 'FRONTEND // COMBAT', name: 'Tailwind', rarity: Rarity.epic, level: 88, tip: 'Design systems at speed.', order: 2 },
+      { groupName: 'FRONTEND // COMBAT', name: 'WebGL', rarity: Rarity.rare, level: 70, tip: 'Shaders & creative coding.', order: 3 },
+      { groupName: 'BACKEND // ENGINEERING', name: 'NestJS', rarity: Rarity.epic, level: 86, tip: 'Modular APIs.', order: 4 },
+      { groupName: 'BACKEND // ENGINEERING', name: 'Postgres', rarity: Rarity.epic, level: 84, tip: 'Schema design & tuning.', order: 5 },
+      { groupName: 'BACKEND // ENGINEERING', name: 'Node.js', rarity: Rarity.legendary, level: 90, tip: 'Event-loop fluent.', order: 6 },
+      { groupName: 'BACKEND // ENGINEERING', name: 'Redis', rarity: Rarity.rare, level: 68, tip: 'Caching & queues.', order: 7 },
+      { groupName: 'PLATFORM // SUPPORT', name: 'Docker', rarity: Rarity.epic, level: 80, tip: 'Repeatable environments.', order: 8 },
+      { groupName: 'PLATFORM // SUPPORT', name: 'AWS', rarity: Rarity.rare, level: 66, tip: 'Core services.', order: 9 },
+      { groupName: 'PLATFORM // SUPPORT', name: 'CI/CD', rarity: Rarity.rare, level: 72, tip: 'Ship safely, often.', order: 10 },
+      { groupName: 'PLATFORM // SUPPORT', name: 'Rust', rarity: Rarity.common, level: 40, tip: 'Learning in progress.', order: 11 },
+    ],
+  });
+
+  await prisma.achievement.deleteMany();
+  await prisma.achievement.createMany({
+    data: [
+      { year: '2026', title: 'Open Source Maintainer', description: 'Maintained a library crossing 5k stars.', color: '#ffd23f', glow: 'rgba(255,210,63,0.65)', order: 0 },
+      { year: '2025', title: 'Hackathon Champion', description: '1st place out of 200+ teams.', color: '#b026ff', glow: 'rgba(176,38,255,0.6)', order: 1 },
+      { year: '2024', title: 'Conference Speaker', description: 'Spoke on realtime architecture.', color: '#22d3ee', glow: 'rgba(34,211,238,0.6)', order: 2 },
+      { year: '2023', title: 'Shipped at Scale', description: 'Led a launch serving millions.', color: '#22d3ee', glow: 'rgba(34,211,238,0.6)', order: 3 },
+      { year: '2022', title: 'First Production AI Feature', description: 'Took an ML feature from PoC to prod.', color: '#6b7280', glow: 'rgba(107,114,128,0.5)', order: 4 },
+    ],
+  });
+
+  await prisma.social.deleteMany();
+  await prisma.social.createMany({
+    data: [
+      { label: 'GH', name: 'GitHub', href: '#', order: 0 },
+      { label: 'IN', name: 'LinkedIn', href: '#', order: 1 },
+      { label: 'TW', name: 'Twitter', href: '#', order: 2 },
+      { label: 'DR', name: 'Dribbble', href: '#', order: 3 },
+    ],
+  });
+
+  console.log('Seed complete.');
+}
+
+main()
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(() => prisma.$disconnect());
