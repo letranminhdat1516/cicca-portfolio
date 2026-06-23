@@ -109,9 +109,54 @@ async function main() {
   await prisma.experience.deleteMany();
   await prisma.experience.createMany({
     data: [
-      { title: 'Senior Full-stack Engineer', org: 'Acme Realtime', period: '2024 — Now', description: 'Lead the web platform: realtime collab, design systems, and performance.', order: 0 },
-      { title: 'Frontend Engineer', org: 'Pixel Forge Studio', period: '2021 — 2024', description: 'Shipped interactive product experiences and a component library used across teams.', order: 1 },
-      { title: 'Freelance Developer', org: 'Self-employed', period: '2019 — 2021', description: 'Built websites and tools for startups and creators across web and web3.', order: 2 },
+      {
+        title: 'Accounting / ERP Application Developer',
+        org: 'Hướng Nghiệp Á Âu · Freelance',
+        period: 'Present',
+        description:
+          'Building a Vietnamese-compliant accounting/ERP app aligned with Circular 99/2025/TT-BTC. Authored the full SRS (business rules, user stories, 164 compliance test cases), designed double-entry logic and a VAS-compliant chart of accounts, and built a strictly-typed React + TanStack frontend on a layered query-key/fetcher/hook architecture.',
+        order: 0,
+      },
+      {
+        title: 'AI Consultant Agent Developer',
+        org: 'Hướng Nghiệp Á Âu · Freelance',
+        period: 'Present',
+        description:
+          'Built a virtual enrollment advisor (Claude Agent SDK) embedded as a website chat widget for a 19-branch academy network serving 100,000+ prospective learners. Grounded answers with a RAG knowledge base (PostgreSQL + pgvector) over the live course catalog, added a Telegram Human-in-the-Loop bot for advisor takeover, and routed high-intent leads to sales.',
+        order: 1,
+      },
+      {
+        title: 'AI Ordering Agent Developer',
+        org: 'Ăng ê Coffee · Contract',
+        period: 'Present',
+        description:
+          'Built an AI front-of-house agent that takes orders and recommends drinks, with a phased rollout from text chat to real-time bidirectional voice over HTTP streaming. Used a multi-LLM fallback (Gemini Flash-Lite → Groq Llama) for cost/reliability and a self-learning RAG loop (PostgreSQL + pgvector) that keeps improving recommendations.',
+        order: 2,
+      },
+      {
+        title: 'Application Developer — IPBMS',
+        org: 'Whammy Tech · Contract',
+        period: 'Jun 2025 – Jan 2026',
+        description:
+          'Built an AI real-time patient monitoring system analyzing live RTSP camera streams to detect falls and seizures. Implemented YOLO pose detection and skeleton-based motion analysis, a 5-frame validation strategy to cut false positives, and an event-driven alert pipeline (Normal/Warning/Danger) with WebSocket/Supabase Realtime notifications over a PostgreSQL schema.',
+        order: 3,
+      },
+      {
+        title: 'Freelance Software Engineer',
+        org: 'NEURADAO · Freelance',
+        period: 'Oct 2025',
+        description:
+          'Led a 3-person team to ship a production-ready AI trading web platform in 20 days. Owned hosting infrastructure, backend/API architecture, the AI trading engine, and an in-app trading-assistant chatbot — through to domain setup and production release.',
+        order: 4,
+      },
+      {
+        title: 'IT Support Technician',
+        org: 'University IT · Part-time',
+        period: 'Jan 2022 – Dec 2024',
+        description:
+          'Supported university-wide IT operations across Academic Affairs, Examinations, HR, Accounting and Administration for cohorts K15–K20. Troubleshot hardware, networks, classroom and exam systems, handled user accounts, and later helped coordinate and onboard new student IT support members.',
+        order: 5,
+      },
     ],
   });
 
