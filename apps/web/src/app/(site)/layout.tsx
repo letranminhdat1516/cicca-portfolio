@@ -1,5 +1,6 @@
 import { CinematicBg } from "@/components/CinematicBg";
 import { HudNav } from "@/components/HudNav";
+import { CursorFx } from "@/components/CursorFx";
 
 export default function SiteLayout({
   children,
@@ -7,6 +8,7 @@ export default function SiteLayout({
   return (
     <>
       <CinematicBg />
+      <CursorFx />
       <HudNav />
       <div className="relative z-10">{children}</div>
     </>

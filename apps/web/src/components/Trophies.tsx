@@ -1,9 +1,11 @@
 import type { Achievement } from "@portfolio/types";
 import { SectionHeader } from "./SectionHeader";
+import { AchievementToast } from "./AchievementToast";
 
 export function Trophies({ achievements }: { achievements: Achievement[] }) {
   return (
-    <section id="trophies" className="mx-auto max-w-[1180px] px-6 py-20">
+    <section id="trophies" className="relative mx-auto max-w-[1180px] px-6 py-20">
+      {achievements[0] && <AchievementToast title={achievements[0].title} />}
       <SectionHeader index="04" label="ACHIEVEMENTS" title="TROPHIES UNLOCKED" />
       <div className="relative pl-8">
         <div
