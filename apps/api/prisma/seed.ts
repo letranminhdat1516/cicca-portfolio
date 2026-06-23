@@ -60,28 +60,33 @@ async function main() {
   await prisma.project.deleteMany();
   await prisma.project.createMany({
     data: [
-      { code: 'MSN_01', slug: 'realtime-collab-canvas', title: 'Realtime Collab Canvas', objective: 'Built a multiplayer design canvas with CRDT sync and sub-50ms cursor presence.', difficulty: '★★★★☆', impact: '+2.4k USERS', status: MissionStatus.COMPLETE, statusColor: '#4ade80', loadout: ['React', 'TypeScript', 'WebGL', 'WebSocket'], order: 0 },
-      { code: 'MSN_02', slug: 'ai-code-reviewer', title: 'AI Code Reviewer', objective: 'Shipped an LLM pipeline that reviews PRs and proposes fixes inline.', difficulty: '★★★★★', impact: '1ST PLACE', status: MissionStatus.COMPLETE, statusColor: '#4ade80', loadout: ['Next.js', 'NestJS', 'LLM', 'Postgres'], order: 1 },
-      { code: 'MSN_03', slug: 'onchain-identity-wallet', title: 'Onchain Identity Wallet', objective: 'Self-custodial wallet with social recovery and gasless onboarding.', difficulty: '★★★★☆', impact: '+800 WALLETS', status: MissionStatus.ACTIVE, statusColor: '#ffd23f', loadout: ['Solidity', 'Viem', 'React', 'IPFS'], order: 2 },
-      { code: 'MSN_04', slug: 'edge-analytics-engine', title: 'Edge Analytics Engine', objective: 'Privacy-first analytics running on the edge with zero cookies.', difficulty: '★★★☆☆', impact: '10M EVENTS/DAY', status: MissionStatus.ACTIVE, statusColor: '#ffd23f', loadout: ['Rust', 'WASM', 'ClickHouse'], order: 3 },
+      { code: 'MSN_01', slug: 'neuradao-ai-trading', title: 'NEURADAO — AI Trading Platform', objective: 'Led a 3-dev team to ship a production AI trading platform in 20 days: trading engine, in-app assistant chatbot, full backend/API and hosting.', difficulty: '★★★★★', impact: 'SHIPPED IN 20 DAYS', status: MissionStatus.COMPLETE, statusColor: '#4ade80', loadout: ['AI Trading', 'Chatbot', 'Backend/API', 'Deployment'], order: 0 },
+      { code: 'MSN_02', slug: 'ipbms-patient-monitoring', title: 'IPBMS — AI Patient Monitoring', objective: 'Real-time fall & seizure detection from live RTSP camera streams using YOLO pose + skeleton motion analysis with a multi-frame validation pipeline.', difficulty: '★★★★★', impact: 'REAL-TIME ALERTS', status: MissionStatus.COMPLETE, statusColor: '#4ade80', loadout: ['YOLO', 'OpenCV', 'WebSocket', 'PostgreSQL'], order: 1 },
+      { code: 'MSN_03', slug: 'ai-enrollment-advisor', title: 'AI Enrollment Advisor Agent', objective: 'Virtual course advisor (Claude Agent SDK) over a RAG catalog with Telegram human-in-the-loop, serving 100,000+ learners across 19 branches.', difficulty: '★★★★☆', impact: '100k+ LEARNERS', status: MissionStatus.ACTIVE, statusColor: '#ffd23f', loadout: ['Claude Agent SDK', 'RAG', 'pgvector', 'Telegram HITL'], order: 2 },
+      { code: 'MSN_04', slug: 'vas-accounting-erp', title: 'VAS Accounting / ERP System', objective: 'Vietnamese-compliant accounting/ERP aligned with Circular 99/2025/TT-BTC: SRS with 164 test cases, double-entry logic, React + TanStack frontend.', difficulty: '★★★★☆', impact: '164 COMPLIANCE TESTS', status: MissionStatus.ACTIVE, statusColor: '#ffd23f', loadout: ['React', 'TanStack', 'TypeScript', 'VAS'], order: 3 },
+      { code: 'MSN_05', slug: 'ai-ordering-agent', title: 'AI Ordering & Drink Advisor', objective: 'Front-of-house AI agent: text→real-time voice ordering with a multi-LLM fallback (Gemini → Groq) and a self-learning RAG recommendation loop.', difficulty: '★★★★☆', impact: 'VOICE + SELF-LEARNING RAG', status: MissionStatus.ACTIVE, statusColor: '#ffd23f', loadout: ['Gemini', 'Groq', 'pgvector', 'Realtime Voice'], order: 4 },
     ],
   });
 
   await prisma.skill.deleteMany();
   await prisma.skill.createMany({
     data: [
-      { groupName: 'FRONTEND // COMBAT', name: 'React', rarity: Rarity.legendary, level: 95, tip: 'Years of battle-tested component design.', order: 0 },
-      { groupName: 'FRONTEND // COMBAT', name: 'TypeScript', rarity: Rarity.legendary, level: 92, tip: 'Strict mode everywhere.', order: 1 },
-      { groupName: 'FRONTEND // COMBAT', name: 'Tailwind', rarity: Rarity.epic, level: 88, tip: 'Design systems at speed.', order: 2 },
-      { groupName: 'FRONTEND // COMBAT', name: 'WebGL', rarity: Rarity.rare, level: 70, tip: 'Shaders & creative coding.', order: 3 },
-      { groupName: 'BACKEND // ENGINEERING', name: 'NestJS', rarity: Rarity.epic, level: 86, tip: 'Modular APIs.', order: 4 },
-      { groupName: 'BACKEND // ENGINEERING', name: 'Postgres', rarity: Rarity.epic, level: 84, tip: 'Schema design & tuning.', order: 5 },
-      { groupName: 'BACKEND // ENGINEERING', name: 'Node.js', rarity: Rarity.legendary, level: 90, tip: 'Event-loop fluent.', order: 6 },
-      { groupName: 'BACKEND // ENGINEERING', name: 'Redis', rarity: Rarity.rare, level: 68, tip: 'Caching & queues.', order: 7 },
-      { groupName: 'PLATFORM // SUPPORT', name: 'Docker', rarity: Rarity.epic, level: 80, tip: 'Repeatable environments.', order: 8 },
-      { groupName: 'PLATFORM // SUPPORT', name: 'AWS', rarity: Rarity.rare, level: 66, tip: 'Core services.', order: 9 },
-      { groupName: 'PLATFORM // SUPPORT', name: 'CI/CD', rarity: Rarity.rare, level: 72, tip: 'Ship safely, often.', order: 10 },
-      { groupName: 'PLATFORM // SUPPORT', name: 'Rust', rarity: Rarity.common, level: 40, tip: 'Learning in progress.', order: 11 },
+      { groupName: 'AI & AGENTS // SPECIALTY', name: 'Claude Agent SDK', rarity: Rarity.legendary, level: 92, tip: 'Production conversational agents with HITL.', order: 0 },
+      { groupName: 'AI & AGENTS // SPECIALTY', name: 'RAG + pgvector', rarity: Rarity.legendary, level: 90, tip: 'Semantic retrieval over live catalogs.', order: 1 },
+      { groupName: 'AI & AGENTS // SPECIALTY', name: 'LLM Orchestration', rarity: Rarity.epic, level: 85, tip: 'Multi-LLM fallback (Gemini, Groq).', order: 2 },
+      { groupName: 'AI & AGENTS // SPECIALTY', name: 'Computer Vision', rarity: Rarity.epic, level: 82, tip: 'YOLO pose + skeleton motion analysis.', order: 3 },
+      { groupName: 'FRONTEND // COMBAT', name: 'React', rarity: Rarity.legendary, level: 92, tip: 'Component architecture at scale.', order: 4 },
+      { groupName: 'FRONTEND // COMBAT', name: 'TypeScript', rarity: Rarity.legendary, level: 90, tip: 'Strict typing across the codebase.', order: 5 },
+      { groupName: 'FRONTEND // COMBAT', name: 'TanStack Router/Query', rarity: Rarity.epic, level: 85, tip: 'Layered query keys, fetchers, hooks.', order: 6 },
+      { groupName: 'FRONTEND // COMBAT', name: 'Tailwind', rarity: Rarity.epic, level: 80, tip: 'Design systems at speed.', order: 7 },
+      { groupName: 'BACKEND // ENGINEERING', name: 'NestJS', rarity: Rarity.epic, level: 86, tip: 'Modular APIs & services.', order: 8 },
+      { groupName: 'BACKEND // ENGINEERING', name: 'PostgreSQL', rarity: Rarity.legendary, level: 88, tip: 'Schema design, scaling, pgvector.', order: 9 },
+      { groupName: 'BACKEND // ENGINEERING', name: 'Realtime / WebSocket', rarity: Rarity.epic, level: 82, tip: 'Event-driven alerts, Supabase Realtime.', order: 10 },
+      { groupName: 'BACKEND // ENGINEERING', name: 'Python', rarity: Rarity.epic, level: 80, tip: 'CV pipelines & AI services.', order: 11 },
+      { groupName: 'PLATFORM // SUPPORT', name: 'System Architecture', rarity: Rarity.epic, level: 84, tip: 'Event-driven, end-to-end delivery.', order: 12 },
+      { groupName: 'PLATFORM // SUPPORT', name: 'Deployment / Hosting', rarity: Rarity.epic, level: 80, tip: 'Infra, domains, production releases.', order: 13 },
+      { groupName: 'PLATFORM // SUPPORT', name: 'Git Workflow', rarity: Rarity.rare, level: 82, tip: 'Collaborative version control.', order: 14 },
+      { groupName: 'PLATFORM // SUPPORT', name: 'IT Operations', rarity: Rarity.rare, level: 78, tip: 'Hands-on support across departments.', order: 15 },
     ],
   });
 
