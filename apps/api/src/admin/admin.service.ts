@@ -11,6 +11,7 @@ const MODELS = {
   counters: 'counter',
   experiences: 'experience',
   resources: 'resource',
+  blog: 'blogPost',
 } as const;
 
 type ModelKey = keyof typeof MODELS;
@@ -26,7 +27,9 @@ export class AdminService {
   }
 
   list(model: string) {
-    return this.delegate(model).findMany({ orderBy: { order: 'asc' } });
+    const orderBy =
+      model === 'blog' ? { createdAt: 'desc' as const } : { order: 'asc' as const };
+    return this.delegate(model).findMany({ orderBy });
   }
 
   create(model: string, data: Record<string, unknown>) {

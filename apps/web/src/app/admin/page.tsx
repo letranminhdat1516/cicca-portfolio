@@ -14,6 +14,7 @@ const COLLECTIONS: { model: string; label: string }[] = [
   { model: "socials", label: "Socials" },
   { model: "experiences", label: "Experiences" },
   { model: "resources", label: "Resources" },
+  { model: "blog", label: "Blog Posts" },
 ];
 
 export default function AdminDashboard() {

@@ -106,6 +106,32 @@ async function main() {
     ],
   });
 
+  await prisma.blogPost.deleteMany();
+  await prisma.blogPost.create({
+    data: {
+      slug: 'hello-world',
+      title: 'Hello, World — Why I Built This Portfolio',
+      excerpt: 'A game-themed dev portfolio with a real backend. Here is the why and the how.',
+      content:
+        '## Why\n\nI wanted a portfolio that felt like a **character sheet** — levels, missions, loadouts.\n\n## The Stack\n\n- **Next.js** for the SEO-friendly frontend\n- **NestJS + Postgres** for a real backend\n- An **admin panel** so I can add content without touching code\n\n```ts\nconsole.log("welcome, player one");\n```\n\nMore missions incoming. ▸',
+      tags: ['meta', 'nextjs', 'nestjs'],
+      published: true,
+      publishedAt: new Date('2026-06-01T00:00:00Z'),
+    },
+  });
+  await prisma.blogPost.create({
+    data: {
+      slug: 'shipping-realtime-features',
+      title: 'Shipping Realtime Features Without Losing Your Mind',
+      excerpt: 'Lessons from building multiplayer presence at sub-50ms.',
+      content:
+        '## Presence is hard\n\nKeeping cursors in sync feels easy until it is not.\n\n1. Debounce, but not too much\n2. Use CRDTs for conflict-free merges\n3. Measure p99, not averages\n\nThat is the difference between a demo and a product.',
+      tags: ['realtime', 'engineering'],
+      published: true,
+      publishedAt: new Date('2026-05-10T00:00:00Z'),
+    },
+  });
+
   console.log('Seed complete.');
 }
 

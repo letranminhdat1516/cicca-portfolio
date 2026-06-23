@@ -58,7 +58,7 @@ export function HudNav() {
           {navItems.map((item) => (
             <li key={item.id}>
               <a
-                href={`#${item.id}`}
+                href={`/#${item.id}`}
                 className="group relative text-[12px] tracking-widest text-[#9a9ab8] no-underline transition-colors hover:text-[#22d3ee]"
                 style={{ fontFamily: "var(--font-mono), monospace" }}
               >
@@ -67,6 +67,16 @@ export function HudNav() {
               </a>
             </li>
           ))}
+          <li>
+            <a
+              href="/blog"
+              className="group relative text-[12px] tracking-widest text-[#9a9ab8] no-underline transition-colors hover:text-[#22d3ee]"
+              style={{ fontFamily: "var(--font-mono), monospace" }}
+            >
+              BLOG
+              <span className="absolute -bottom-1 left-0 h-px w-0 bg-[#22d3ee] transition-all group-hover:w-full" />
+            </a>
+          </li>
         </ul>
       </nav>
     </header>

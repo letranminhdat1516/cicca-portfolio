@@ -66,6 +66,23 @@ export interface Social {
   href: string;
 }
 
+export interface BlogPostSummary {
+  slug: string;
+  title: string;
+  excerpt: string;
+  tags: string[];
+  coverImage: string | null;
+  publishedAt: string | null;
+}
+
+export interface BlogPost extends BlogPostSummary {
+  id: string;
+  content: string;
+  published: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Portfolio {
   profile: Profile;
   stats: Stat[];
