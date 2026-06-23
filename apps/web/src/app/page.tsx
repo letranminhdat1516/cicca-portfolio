@@ -1,18 +1,9 @@
-import { apiGet } from '@/lib/api';
-import { colors } from '@portfolio/design-tokens';
+import { Hero } from "@/components/Hero";
 
-export default async function Home() {
-  let health = 'unknown';
-  try {
-    const h = await apiGet<{ status: string }>('/health', { cache: 'no-store' });
-    health = h.status;
-  } catch {
-    health = 'unreachable';
-  }
+export default function Home() {
   return (
-    <main style={{ padding: 40, fontFamily: 'monospace' }}>
-      <h1 style={{ color: colors.cyan }}>PLAYER_01.sys — scaffold OK</h1>
-      <p>API health: {health}</p>
+    <main>
+      <Hero />
     </main>
   );
 }
