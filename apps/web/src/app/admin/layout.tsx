@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { AdminShell } from "@/components/admin/AdminShell";
 
 export const metadata: Metadata = {
   title: "Admin — PLAYER_01.sys",
@@ -8,9 +9,5 @@ export const metadata: Metadata = {
 export default function AdminLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  return (
-    <div style={{ minHeight: "100vh", background: "#0a0a12", color: "#e8e8f0" }}>
-      {children}
-    </div>
-  );
+  return <AdminShell>{children}</AdminShell>;
 }

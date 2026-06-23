@@ -1,54 +1,63 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { getToken, clearToken } from "@/lib/adminApi";
-import { ProfileEditor } from "@/components/admin/ProfileEditor";
-import { CollectionEditor } from "@/components/admin/CollectionEditor";
-
-const COLLECTIONS: { model: string; label: string }[] = [
-  { model: "stats", label: "Stats" },
-  { model: "counters", label: "Counters" },
-  { model: "projects", label: "Projects (Missions)" },
-  { model: "skills", label: "Skills" },
-  { model: "achievements", label: "Achievements" },
-  { model: "socials", label: "Socials" },
-  { model: "experiences", label: "Experiences" },
-  { model: "resources", label: "Resources" },
-  { model: "blog", label: "Blog Posts" },
-];
+import Link from "next/link";
+import { adminApi } from "@/lib/adminApi";
+import { ENTITIES } from "@/lib/adminSchema";
 
 export default function AdminDashboard() {
-  const router = useRouter();
-  const [ready, setReady] = useState(false);
+  const [counts, setCounts] = useState<Record<string, number>>({});
 
   useEffect(() => {
-    if (!getToken()) router.replace("/admin/login");
-    else setReady(true);
-  }, [router]);
-
-  if (!ready) return null;
+    let alive = true;
+    (async () => {
+      const entries = await Promise.all(
+        ENTITIES.map(async (e) => {
+          try {
+            const rows = (await adminApi.list(e.model)) as unknown[];
+            return [e.model, rows.length] as const;
+          } catch {
+            return [e.model, 0] as const;
+          }
+        }),
+      );
+      if (alive) setCounts(Object.fromEntries(entries));
+    })();
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-8">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold" style={{ color: "#22d3ee" }}>
-          CONTROL PANEL
-        </h1>
-        <button
-          onClick={() => {
-            clearToken();
-            router.replace("/admin/login");
-          }}
-          className="rounded px-3 py-1 text-xs font-bold"
-          style={{ border: "1px solid rgba(255,45,155,0.5)", color: "#ff2d9b" }}
-        >
-          Log out
-        </button>
+    <div>
+      <h1 className="mb-1 text-2xl font-bold text-white">▦ Dashboard</h1>
+      <p className="mb-6 text-sm text-[#9a9ab8]">Manage every section of your portfolio.</p>
+
+      <Link
+        href="/admin/profile"
+        className="mb-4 flex items-center justify-between rounded-xl border border-[#b026ff]/30 bg-[#08070f] p-5 no-underline transition-colors hover:border-[#22d3ee]/50"
+      >
+        <div>
+          <div className="text-lg font-semibold text-white">👤 Profile & Hero</div>
+          <div className="text-sm text-[#9a9ab8]">Name, tagline, roles, XP, socials links live here.</div>
+        </div>
+        <span className="text-[#22d3ee]">Edit →</span>
+      </Link>
+
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        {ENTITIES.map((e) => (
+          <Link
+            key={e.model}
+            href={`/admin/${e.model}`}
+            className="rounded-xl border border-white/10 bg-[#08070f] p-4 no-underline transition-colors hover:border-[#22d3ee]/50"
+          >
+            <div className="text-2xl">{e.icon}</div>
+            <div className="mt-2 font-semibold text-white">{e.label}</div>
+            <div className="text-sm text-[#9a9ab8]">
+              {counts[e.model] ?? "…"} item(s)
+            </div>
+          </Link>
+        ))}
       </div>
-      <ProfileEditor />
-      {COLLECTIONS.map((c) => (
-        <CollectionEditor key={c.model} model={c.model} label={c.label} />
-      ))}
-    </main>
+    </div>
   );
 }
