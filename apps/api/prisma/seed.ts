@@ -1,8 +1,22 @@
 import { PrismaClient, Rarity, MissionStatus } from '@prisma/client';
+import * as bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
 async function main() {
+  // Single admin, credentials from env (defaults for local dev only).
+  const adminEmail = process.env.ADMIN_EMAIL ?? 'admin@example.com';
+  const adminPassword = process.env.ADMIN_PASSWORD ?? 'changeme123';
+  await prisma.user.upsert({
+    where: { email: adminEmail },
+    update: {},
+    create: {
+      email: adminEmail,
+      passwordHash: await bcrypt.hash(adminPassword, 10),
+      role: 'admin',
+    },
+  });
+
   await prisma.profile.upsert({
     where: { id: 1 },
     update: {},

@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Orbitron, Space_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import { CinematicBg } from "@/components/CinematicBg";
-import { HudNav } from "@/components/HudNav";
 
 const orbitron = Orbitron({
   variable: "--font-title",
@@ -41,11 +39,7 @@ export default function RootLayout({
       lang="en"
       className={`${orbitron.variable} ${spaceGrotesk.variable} ${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full">
-        <CinematicBg />
-        <HudNav />
-        <div className="relative z-10">{children}</div>
-      </body>
+      <body className="min-h-full">{children}</body>
     </html>
   );
 }
