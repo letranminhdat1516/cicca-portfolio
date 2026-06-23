@@ -6,8 +6,13 @@ import remarkGfm from "remark-gfm";
 import { getPost, getPosts } from "@/lib/blog";
 
 export async function generateStaticParams() {
-  const posts = await getPosts();
-  return posts.map((p) => ({ slug: p.slug }));
+  try {
+    const posts = await getPosts();
+    return posts.map((p) => ({ slug: p.slug }));
+  } catch {
+    // API unreachable at build time — pages render on demand via ISR instead.
+    return [];
+  }
 }
 
 export async function generateMetadata({

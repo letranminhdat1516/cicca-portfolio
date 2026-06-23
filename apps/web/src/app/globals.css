@@ -33,6 +33,12 @@ body {
   color: #fff;
 }
 
+/* visible keyboard focus for accessibility */
+:focus-visible {
+  outline: 2px solid #22d3ee;
+  outline-offset: 2px;
+}
+
 /* thin neon scrollbar */
 ::-webkit-scrollbar {
   width: 10px;
