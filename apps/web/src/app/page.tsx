@@ -1,4 +1,5 @@
 import { apiGet } from '@/lib/api';
+import { colors } from '@portfolio/design-tokens';
 
 export default async function Home() {
   let health = 'unknown';
@@ -10,7 +11,7 @@ export default async function Home() {
   }
   return (
     <main style={{ padding: 40, fontFamily: 'monospace' }}>
-      <h1>PLAYER_01.sys — scaffold OK</h1>
+      <h1 style={{ color: colors.cyan }}>PLAYER_01.sys — scaffold OK</h1>
       <p>API health: {health}</p>
     </main>
   );
