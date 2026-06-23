@@ -30,24 +30,19 @@ export function ProfileForm() {
     }
   }
 
-  if (!values) return <p className="text-[#9a9ab8]">Loading…</p>;
+  if (!values) return <p style={{ color: "#9b9890" }}>Loading…</p>;
 
   return (
     <div>
-      <h1 className="mb-1 text-2xl font-bold text-white">👤 Profile</h1>
-      <p className="mb-6 text-sm text-[#9a9ab8]">Your hero card & identity.</p>
-      {status && <p className="mb-4 text-sm text-[#ffd23f]">{status}</p>}
-      <div className="grid grid-cols-1 gap-4 rounded-xl border border-[#b026ff]/30 bg-[#08070f] p-5 sm:grid-cols-2">
+      <h1 className="mb-1 text-[26px] font-semibold" style={{ color: "#23211c" }}>👤 Profile</h1>
+      <p className="mb-6 text-sm" style={{ color: "#9b9890" }}>Your hero card &amp; identity.</p>
+      {status && <p className="mb-4 text-sm" style={{ color: "#c2613f" }}>{status}</p>}
+      <div className="grid grid-cols-1 gap-4 rounded-2xl p-6 sm:grid-cols-2" style={{ background: "#ffffff", border: "1px solid #ece9e1", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
         {PROFILE_FIELDS.map((f) => (
-          <Field
-            key={f.name}
-            spec={f}
-            value={values[f.name]}
-            onChange={(v) => setValues((prev) => ({ ...prev!, [f.name]: v }))}
-          />
+          <Field key={f.name} spec={f} value={values[f.name]} onChange={(v) => setValues((prev) => ({ ...prev!, [f.name]: v }))} />
         ))}
       </div>
-      <button onClick={save} className="mt-5 rounded-md bg-[#22d3ee] px-4 py-2 text-sm font-bold text-[#08070f]">
+      <button onClick={save} className="mt-5 rounded-lg px-4 py-2 text-sm font-semibold text-white hover:brightness-95" style={{ background: "#d97757" }}>
         Save profile
       </button>
     </div>

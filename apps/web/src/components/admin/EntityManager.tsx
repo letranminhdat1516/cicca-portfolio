@@ -16,6 +16,8 @@ function buildPayload(fields: FieldSpec[], values: Record<string, unknown>) {
   return out;
 }
 
+const card = { background: "#ffffff", border: "1px solid #ece9e1" } as const;
+
 export function EntityManager({ schema }: { schema: EntitySchema }) {
   const [rows, setRows] = useState<Row[]>([]);
   const [editing, setEditing] = useState<Record<string, unknown> | null>(null);
@@ -78,73 +80,61 @@ export function EntityManager({ schema }: { schema: EntitySchema }) {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">
+          <h1 className="text-[26px] font-semibold" style={{ color: "#23211c" }}>
             {schema.icon} {schema.label}
           </h1>
-          <p className="text-sm text-[#9a9ab8]">{rows.length} item(s)</p>
+          <p className="text-sm" style={{ color: "#9b9890" }}>{rows.length} item(s)</p>
         </div>
         {!editing && (
-          <button
-            onClick={startCreate}
-            className="rounded-md px-4 py-2 text-sm font-bold text-[#08070f]"
-            style={{ background: "linear-gradient(135deg,#22d3ee,#b026ff)" }}
-          >
+          <button onClick={startCreate} className="rounded-lg px-4 py-2 text-sm font-semibold text-white transition-colors hover:brightness-95" style={{ background: "#d97757" }}>
             + New {schema.singular}
           </button>
         )}
       </div>
 
-      {status && <p className="mb-4 text-sm text-[#ffd23f]">{status}</p>}
+      {status && <p className="mb-4 text-sm" style={{ color: "#c2613f" }}>{status}</p>}
 
       {editing ? (
-        <div className="rounded-xl border border-[#b026ff]/30 bg-[#08070f] p-5">
-          <h2 className="mb-4 text-lg font-semibold text-[#22d3ee]">
+        <div className="rounded-2xl p-6" style={{ ...card, boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
+          <h2 className="mb-5 text-lg font-semibold" style={{ color: "#23211c" }}>
             {editingId ? `Edit ${schema.singular}` : `New ${schema.singular}`}
           </h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {schema.fields.map((f) => (
-              <Field
-                key={f.name}
-                spec={f}
-                value={editing[f.name]}
-                onChange={(v) => setEditing((prev) => ({ ...prev!, [f.name]: v }))}
-              />
+              <Field key={f.name} spec={f} value={editing[f.name]} onChange={(v) => setEditing((prev) => ({ ...prev!, [f.name]: v }))} />
             ))}
           </div>
-          <div className="mt-5 flex gap-3">
-            <button onClick={save} className="rounded-md bg-[#22d3ee] px-4 py-2 text-sm font-bold text-[#08070f]">
+          <div className="mt-6 flex gap-3">
+            <button onClick={save} className="rounded-lg px-4 py-2 text-sm font-semibold text-white hover:brightness-95" style={{ background: "#d97757" }}>
               Save
             </button>
-            <button onClick={cancel} className="rounded-md border border-white/15 px-4 py-2 text-sm text-[#9a9ab8]">
+            <button onClick={cancel} className="rounded-lg border px-4 py-2 text-sm" style={{ borderColor: "#e0ddd3", color: "#73726c" }}>
               Cancel
             </button>
           </div>
         </div>
       ) : loading ? (
-        <p className="text-[#9a9ab8]">Loading…</p>
+        <p style={{ color: "#9b9890" }}>Loading…</p>
       ) : (
         <div className="flex flex-col gap-2">
-          {rows.length === 0 && <p className="text-[#9a9ab8]">No items yet — add one.</p>}
+          {rows.length === 0 && <p style={{ color: "#9b9890" }}>No items yet — add one.</p>}
           {rows.map((row) => (
-            <div
-              key={row.id}
-              className="flex items-center justify-between rounded-lg border border-white/10 bg-[#08070f] px-4 py-3 hover:border-[#22d3ee]/40"
-            >
+            <div key={row.id} className="flex items-center justify-between rounded-xl px-4 py-3 transition-colors" style={card}>
               <div className="min-w-0">
-                <div className="truncate font-medium text-white">
+                <div className="truncate font-medium" style={{ color: "#23211c" }}>
                   {String(row[schema.titleField] ?? "(untitled)")}
                 </div>
                 {schema.subtitleField && (
-                  <div className="truncate text-xs text-[#9a9ab8]">
+                  <div className="truncate text-xs" style={{ color: "#9b9890" }}>
                     {String(row[schema.subtitleField] ?? "")}
                   </div>
                 )}
               </div>
-              <div className="flex shrink-0 gap-2">
-                <button onClick={() => startEdit(row)} className="rounded px-3 py-1 text-xs font-semibold text-[#22d3ee] hover:bg-[#22d3ee]/10">
+              <div className="flex shrink-0 gap-1">
+                <button onClick={() => startEdit(row)} className="rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors hover:bg-[#f3f1ea]" style={{ color: "#c2613f" }}>
                   Edit
                 </button>
-                <button onClick={() => remove(row.id)} className="rounded px-3 py-1 text-xs font-semibold text-[#ff2d9b] hover:bg-[#ff2d9b]/10">
+                <button onClick={() => remove(row.id)} className="rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors hover:bg-[#f9efec]" style={{ color: "#b5503a" }}>
                   Delete
                 </button>
               </div>
