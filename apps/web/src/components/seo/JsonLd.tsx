@@ -19,11 +19,10 @@ export function JsonLd({ data }: { data: object | object[] }) {
 
 export function homeJsonLd(portfolio: Portfolio): object[] {
   const seo = seoOf(portfolio);
-  const { profile, socials, skillGroups, github } = portfolio;
-  const sameAs = [
-    ...(socials ?? []).map((s) => s.href),
-    github ? `https://github.com/${github.username}` : null,
-  ].filter((v): v is string => Boolean(v));
+  const { profile, socials, skillGroups } = portfolio;
+  const sameAs = [...(socials ?? []).map((s) => s.href)].filter(
+    (v): v is string => Boolean(v) && v !== "#",
+  );
   const skills = (skillGroups ?? []).flatMap((g) => g.items.map((i) => i.n));
 
   const person = {

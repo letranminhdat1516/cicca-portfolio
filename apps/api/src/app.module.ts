@@ -9,7 +9,6 @@ import { AuthModule } from './auth/auth.module';
 import { AdminModule } from './admin/admin.module';
 import { BlogModule } from './blog/blog.module';
 import { AnalyticsModule } from './analytics/analytics.module';
-import { GithubModule } from './github/github.module';
 
 @Module({
   imports: [
@@ -20,7 +19,6 @@ import { GithubModule } from './github/github.module';
     AdminModule,
     BlogModule,
     AnalyticsModule,
-    GithubModule,
   ],
   controllers: [AppController, HealthController],
   providers: [AppService],

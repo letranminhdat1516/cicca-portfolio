@@ -1,14 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { GithubService } from '../github/github.service';
-import { rarityFromLevel } from '../github/rarity';
 
 @Injectable()
 export class ContentService {
-  constructor(
-    private prisma: PrismaService,
-    private github: GithubService,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   async getPortfolio() {
     const [
@@ -35,8 +30,6 @@ export class ContentService {
       this.prisma.seoSettings.findUnique({ where: { id: 1 } }),
     ]);
 
-    const github = await this.github.getStats().catch(() => null);
-
     // group skills by groupName, preserving first-seen order
     const groupOrder: string[] = [];
     const grouped = new Map<string, typeof skills>();
@@ -51,11 +44,7 @@ export class ContentService {
       name,
       items: grouped.get(name)!.map((s) => ({
         n: s.name,
-        r: rarityFromLevel(s.level),
-        lvl: s.level,
         tip: s.tip ?? '',
-        source: s.source,
-        basis: s.basis ?? '',
       })),
     }));
 
@@ -70,7 +59,6 @@ export class ContentService {
       experiences,
       resources,
       seo,
-      github,
     };
   }
 }

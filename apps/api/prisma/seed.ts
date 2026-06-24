@@ -57,6 +57,7 @@ async function main() {
       email: 'hello@example.com',
       xpCurrent: 7400,
       xpMax: 10000,
+      avatarUrl: '/cicca-03.png',
     },
   });
 
@@ -128,7 +129,7 @@ async function main() {
   await prisma.social.deleteMany();
   await prisma.social.createMany({
     data: [
-      { label: 'GH', name: 'GitHub', href: '#', order: 0 },
+      { label: 'GH', name: 'GitHub', href: 'https://github.com/letranminhdat1516', order: 0 },
       { label: 'IN', name: 'LinkedIn', href: '#', order: 1 },
       { label: 'TW', name: 'Twitter', href: '#', order: 2 },
       { label: 'DR', name: 'Dribbble', href: '#', order: 3 },

@@ -35,31 +35,14 @@ export interface EntitySchema {
 
 const orderField: FieldSpec = { name: "order", label: "ORDER", type: "number" };
 
-export const RARITY: Record<string, string> = {
-  common: "#6b7280",
-  rare: "#22d3ee",
-  epic: "#b026ff",
-  legendary: "#ffd23f",
-};
-export const RARITY_GLOW: Record<string, string> = {
-  common: "rgba(107,114,128,0.3)",
-  rare: "rgba(34,211,238,0.3)",
-  epic: "rgba(176,38,255,0.32)",
-  legendary: "rgba(255,210,63,0.32)",
-};
-
 export const PROFILE_FIELDS: FieldSpec[] = [
   { name: "name", label: "NAME", type: "text" },
   { name: "classRole", label: "CLASS / ROLE", type: "text" },
   { name: "roles", label: "ROLES", type: "tags", full: true },
   { name: "tagline", label: "TAGLINE", type: "textarea", full: true },
   { name: "bio", label: "BIO", type: "textarea", full: true },
-  { name: "level", label: "LEVEL", type: "number" },
-  { name: "rank", label: "RANK", type: "text" },
   { name: "region", label: "REGION", type: "text" },
   { name: "email", label: "EMAIL", type: "text" },
-  { name: "xpCurrent", label: "XP CURRENT", type: "number" },
-  { name: "xpMax", label: "XP MAX", type: "number" },
   { name: "avatarUrl", label: "AVATAR URL", type: "text", full: true },
 ];
 
@@ -97,10 +80,6 @@ export const ENTITIES: EntitySchema[] = [
     fields: [
       { name: "groupName", label: "GROUP NAME", type: "text", placeholder: "AI & AGENTS // SPECIALTY", full: true },
       { name: "name", label: "NAME", type: "text" },
-      { name: "rarity", label: "RARITY (auto from level)", type: "select", options: ["common", "rare", "epic", "legendary"] },
-      { name: "level", label: "LEVEL", type: "number" },
-      { name: "source", label: "SOURCE", type: "select", options: ["evidence", "github", "self"] },
-      { name: "basis", label: "BASIS (why this rank)", type: "text", full: true },
       { name: "tip", label: "TIP", type: "text", full: true },
       orderField,
     ],
@@ -151,19 +130,6 @@ export const ENTITIES: EntitySchema[] = [
       { name: "url", label: "URL", type: "text" },
       { name: "repoUrl", label: "REPO URL", type: "text" },
       { name: "tags", label: "TAGS", type: "tags", full: true },
-      orderField,
-    ],
-  },
-  {
-    model: "stats",
-    label: "Radar Stats",
-    singular: "Stat",
-    icon: "radar",
-    titleField: "label",
-    preview: "generic",
-    fields: [
-      { name: "label", label: "LABEL", type: "text" },
-      { name: "value", label: "VALUE", type: "number" },
       orderField,
     ],
   },

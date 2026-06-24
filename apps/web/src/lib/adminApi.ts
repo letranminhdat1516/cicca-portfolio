@@ -60,13 +60,4 @@ export const adminApi = {
   analyticsSummary: (range = "30d") =>
     authed(`/analytics/summary?range=${range}`),
   seoHealth: () => authed(`/analytics/seo-health`),
-  githubRefresh: () => authed(`/admin/github/refresh`, { method: "POST" }),
 };
-
-const PUBLIC_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
-export async function fetchGithubSnapshot() {
-  const res = await fetch(`${PUBLIC_BASE}/content`);
-  if (!res.ok) return null;
-  const data = await res.json();
-  return data.github ?? null;
-}

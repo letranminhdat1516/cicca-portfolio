@@ -1,14 +1,11 @@
 "use client";
 import type { Profile, Social } from "@portfolio/types";
 import { useTypewriter } from "@/hooks/useTypewriter";
-import { useCountUp } from "@/hooks/useCountUp";
-import { XpBar } from "./XpBar";
 
 const HEX = "polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%)";
 
 export function Hero({ profile, socials }: { profile: Profile; socials: Social[] }) {
   const role = useTypewriter(profile.roles);
-  const { value: level, ref: levelRef } = useCountUp<HTMLDivElement>(profile.level, 2000);
 
   return (
     <section
@@ -57,11 +54,7 @@ export function Hero({ profile, socials }: { profile: Profile; socials: Social[]
           {profile.tagline}
         </p>
 
-        <div className="mt-7 max-w-[420px]">
-          <XpBar current={profile.xpCurrent} max={profile.xpMax} />
-        </div>
-
-        <div className="mt-7 flex flex-wrap items-center gap-3">
+        <div className="mt-8 flex flex-wrap items-center gap-3">
           <a
             href="#missions"
             className="px-6 py-3 text-[12px] font-bold tracking-widest no-underline"
@@ -109,10 +102,10 @@ export function Hero({ profile, socials }: { profile: Profile; socials: Social[]
 
       <div className="flex flex-col items-center gap-5">
         <div
-          className="grid place-items-center text-[44px]"
+          className="grid place-items-center overflow-hidden text-[44px]"
           style={{
-            width: 180,
-            height: 200,
+            width: 256,
+            height: 286,
             color: "#22d3ee",
             background: "linear-gradient(160deg,rgba(34,211,238,0.12),rgba(176,38,255,0.12))",
             border: "1px solid rgba(34,211,238,0.4)",
@@ -120,28 +113,25 @@ export function Hero({ profile, socials }: { profile: Profile; socials: Social[]
             animation: "floatY 6s ease-in-out infinite",
           }}
         >
-          ⬡
+          {profile.avatarUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={profile.avatarUrl}
+              alt={profile.name}
+              className="h-full w-full object-contain p-2"
+              // Logo art is dark (black text + crimson dragon). invert() flips the black
+              // text to white so it reads on the dark hexagon; hue-rotate(180deg) swings
+              // the inverted (cyan) dragon back to its original red. White text has no
+              // saturation, so the hue shift leaves it white.
+              style={{ filter: "invert(1) hue-rotate(182deg) saturate(3.4) brightness(0.82) drop-shadow(0 0 8px rgba(160,15,30,0.6))" }}
+            />
+          ) : (
+            "⬡"
+          )}
         </div>
-        <div ref={levelRef} className="text-center">
+        <div className="text-center">
           <div
-            className="font-black"
-            style={{
-              fontFamily: "var(--font-title), sans-serif",
-              fontSize: 54,
-              color: "#ffd23f",
-              textShadow: "0 0 18px rgba(255,210,63,0.5)",
-            }}
-          >
-            {level}
-          </div>
-          <div
-            className="text-[11px] tracking-[3px]"
-            style={{ fontFamily: "var(--font-mono), monospace", color: "#ffd23f" }}
-          >
-            RANK · {profile.rank}
-          </div>
-          <div
-            className="mt-1 text-[10px] tracking-[2px]"
+            className="text-[11px] tracking-[2px]"
             style={{ fontFamily: "var(--font-mono), monospace", color: "#6b6b88" }}
           >
             [REGION: {profile.region}]

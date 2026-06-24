@@ -40,15 +40,9 @@ export interface Mission {
   loadout: string[];
 }
 
-export type SkillSource = "github" | "evidence" | "self";
-
 export interface SkillItem {
   n: string;
-  r: Rarity;
-  lvl: number;
   tip: string;
-  source: SkillSource;
-  basis: string;
 }
 
 export interface SkillGroup {
@@ -113,34 +107,6 @@ export interface SeoSettings {
   llmsTxt: string | null;
 }
 
-export interface GithubLang {
-  name: string;
-  repos: number;
-  pct: number;
-}
-
-export interface GithubRepo {
-  name: string;
-  url: string;
-  stars: number;
-  forks: number;
-  language: string | null;
-  description: string | null;
-}
-
-export interface GithubStats {
-  username: string;
-  name: string | null;
-  avatarUrl: string | null;
-  followers: number;
-  publicRepos: number;
-  totalStars: number;
-  memberSince: string | null;
-  topLanguages: GithubLang[];
-  topRepos: GithubRepo[];
-  fetchedAt: string;
-}
-
 export interface Portfolio {
   profile: Profile;
   stats: Stat[];
@@ -152,5 +118,4 @@ export interface Portfolio {
   experiences: Experience[];
   resources: Resource[];
   seo: SeoSettings | null;
-  github: GithubStats | null;
 }
