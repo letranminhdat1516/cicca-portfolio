@@ -37,6 +37,7 @@ async function main() {
         'typescript',
       ],
       twitterHandle: '@player_01',
+      githubUsername: 'letranminhdat1516',
     },
   });
 

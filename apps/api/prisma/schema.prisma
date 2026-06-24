@@ -81,6 +81,11 @@ model Skill {
   rarity    Rarity
   level     Int
   tip       String?
+  /// How the level is justified: "github" (auto from language data),
+  /// "evidence" (backed by shipped projects), or "self" (pinned, sync skips it).
+  source    String  @default("evidence")
+  /// Short human explanation of the rating, shown on the skill card.
+  basis     String?
   order     Int    @default(0)
 }
 
@@ -161,5 +166,22 @@ model SeoSettings {
   twitterHandle      String?
   gscVerification    String?
   llmsTxt            String?
+  githubUsername     String?
   updatedAt          DateTime @updatedAt
+}
+
+/// Cached snapshot of public GitHub activity (singleton id = 1). Refreshed at
+/// most once per 24h to stay under the unauthenticated 60 req/hr limit.
+model GithubStats {
+  id            Int      @id @default(1)
+  username      String
+  name          String?
+  avatarUrl     String?
+  followers     Int      @default(0)
+  publicRepos   Int      @default(0)
+  totalStars    Int      @default(0)
+  memberSince   String?
+  topLanguages  Json     @default("[]")
+  topRepos      Json     @default("[]")
+  fetchedAt     DateTime @default(now())
 }
