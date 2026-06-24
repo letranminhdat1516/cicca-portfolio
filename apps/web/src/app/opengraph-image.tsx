@@ -48,7 +48,7 @@ export default async function Image() {
             textTransform: "uppercase",
           }}
         >
-          ▸ {name || "Player One"}
+          {name || "Player One"}
         </div>
         <div
           style={{
