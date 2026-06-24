@@ -1,0 +1,64 @@
+# Production stack for the portfolio (DB + API + Web).
+#
+# Everything stays on a private network. Only the web and api are published to
+# 127.0.0.1 (loopback) so a reverse proxy / Cloudflare Tunnel on the same host
+# can reach them — they are NOT exposed to the public internet directly.
+#
+#   web  -> 127.0.0.1:3100  (point cicca.dpdns.org here)
+#   api  -> 127.0.0.1:3101  (point api.cicca.dpdns.org here)
+#
+# Usage:  docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: cicca-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: portfolio
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: portfolio
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U portfolio -d portfolio"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: cicca-api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://portfolio:${POSTGRES_PASSWORD}@postgres:5432/portfolio?schema=public
+      JWT_SECRET: ${JWT_SECRET}
+      CORS_ORIGINS: ${SITE_URL}
+      API_PORT: "3001"
+    ports:
+      - "127.0.0.1:3101:3001"
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        # Public API URL baked into the browser bundle (admin panel calls it).
+        NEXT_PUBLIC_API_URL: ${API_URL}
+    container_name: cicca-web
+    restart: unless-stopped
+    depends_on:
+      - api
+    environment:
+      # Server-side rendering talks to the API over the internal network.
+      API_INTERNAL_URL: http://api:3001
+    ports:
+      - "127.0.0.1:3100:3000"
+
+volumes:
+  pgdata:
