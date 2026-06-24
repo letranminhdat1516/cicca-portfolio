@@ -14,13 +14,18 @@ pnpm dev                           # web :3000 + api :3001
 - Đăng nhập: `ADMIN_EMAIL` / `ADMIN_PASSWORD` (mặc định local: `admin@example.com` / `changeme123`)
 - Sau khi login → trang **CONTROL PANEL**
 
-## 2. Cách thao tác
+## 2. Cách thao tác (giao diện CMS dạng form)
 
-- **Sửa**: đổi nội dung trong ô JSON của mục đó → bấm **Save**.
-- **Xoá**: bấm **Delete** trên mục đó.
-- **Thêm mới**: điền JSON vào ô "New …" ở cuối mỗi nhóm → bấm **+ Add**.
+- **Điều hướng**: sidebar bên trái — Dashboard, Profile, và từng collection (có đếm số mục).
+- **Thêm mới**: bấm **+ {TÊN}** ở góc phải → điền form theo từng trường → **SAVE**.
+- **Sửa**: bấm **EDIT** trên một mục → form hiện ra với dữ liệu sẵn → sửa → **SAVE**.
+- **Xoá**: bấm **DEL** (có hỏi xác nhận).
+- **Sắp xếp**: kéo-thả các dòng trong danh sách để đổi thứ tự (tự lưu `order`).
+- **Live Preview**: khung bên phải xem trước realtime ngay khi bạn gõ.
+- **Export**: nút **Export Résumé** (trang CV in/PDF) và **Export JSON** (tải toàn bộ nội dung) ở chân sidebar.
+- Mỗi loại field có control riêng: text, số, textarea, **markdown**, **dropdown** (enum), **tag** (gõ + Enter), **toggle** bật/tắt, **color picker**, datetime.
 - Thay đổi hiện ra trên trang công khai trong **~60 giây** (ISR) hoặc ngay ở lần tải kế tiếp.
-- `order` là số thứ tự hiển thị (nhỏ → trước). JSON sai cú pháp sẽ báo lỗi đỏ, sửa lại là được.
+- `order` = thứ tự hiển thị (nhỏ → trước).
 
 ## 3. Các trường của từng mục (field reference)
 

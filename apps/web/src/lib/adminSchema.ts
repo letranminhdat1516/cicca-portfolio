@@ -1,4 +1,4 @@
-// Schema that drives the admin forms. Define fields once; forms render from this.
+// Schema driving the Portfolio CMS admin (forms, lists, live preview).
 
 export type FieldType =
   | "text"
@@ -15,22 +15,53 @@ export interface FieldSpec {
   name: string;
   label: string;
   type: FieldType;
-  options?: string[]; // for select
+  options?: string[];
   placeholder?: string;
-  full?: boolean; // span full width in the grid
+  full?: boolean;
 }
 
+export type PreviewKind = "mission" | "skill" | "achievement" | "generic";
+
 export interface EntitySchema {
-  model: string; // API model key
-  label: string; // display name (plural)
+  model: string;
+  label: string;
   singular: string;
-  icon: string; // emoji for the sidebar
-  titleField: string; // which field to show as the row title
+  icon: string;
+  titleField: string;
   subtitleField?: string;
+  preview: PreviewKind;
   fields: FieldSpec[];
 }
 
-const orderField: FieldSpec = { name: "order", label: "Order", type: "number" };
+const orderField: FieldSpec = { name: "order", label: "ORDER", type: "number" };
+
+export const RARITY: Record<string, string> = {
+  common: "#6b7280",
+  rare: "#22d3ee",
+  epic: "#b026ff",
+  legendary: "#ffd23f",
+};
+export const RARITY_GLOW: Record<string, string> = {
+  common: "rgba(107,114,128,0.3)",
+  rare: "rgba(34,211,238,0.3)",
+  epic: "rgba(176,38,255,0.32)",
+  legendary: "rgba(255,210,63,0.32)",
+};
+
+export const PROFILE_FIELDS: FieldSpec[] = [
+  { name: "name", label: "NAME", type: "text" },
+  { name: "classRole", label: "CLASS / ROLE", type: "text" },
+  { name: "roles", label: "ROLES", type: "tags", full: true },
+  { name: "tagline", label: "TAGLINE", type: "textarea", full: true },
+  { name: "bio", label: "BIO", type: "textarea", full: true },
+  { name: "level", label: "LEVEL", type: "number" },
+  { name: "rank", label: "RANK", type: "text" },
+  { name: "region", label: "REGION", type: "text" },
+  { name: "email", label: "EMAIL", type: "text" },
+  { name: "xpCurrent", label: "XP CURRENT", type: "number" },
+  { name: "xpMax", label: "XP MAX", type: "number" },
+  { name: "avatarUrl", label: "AVATAR URL", type: "text", full: true },
+];
 
 export const ENTITIES: EntitySchema[] = [
   {
@@ -40,17 +71,18 @@ export const ENTITIES: EntitySchema[] = [
     icon: "🎯",
     titleField: "title",
     subtitleField: "code",
+    preview: "mission",
     fields: [
-      { name: "code", label: "Code", type: "text", placeholder: "MSN_06" },
-      { name: "slug", label: "Slug (unique)", type: "text", placeholder: "my-project" },
-      { name: "title", label: "Title", type: "text", full: true },
-      { name: "objective", label: "Objective", type: "textarea", full: true },
-      { name: "difficulty", label: "Difficulty", type: "text", placeholder: "★★★★☆" },
-      { name: "impact", label: "Impact", type: "text", placeholder: "100k+ USERS" },
-      { name: "status", label: "Status", type: "select", options: ["COMPLETE", "ACTIVE"] },
-      { name: "statusColor", label: "Status color", type: "color" },
-      { name: "loadout", label: "Loadout (tags)", type: "tags", full: true },
-      { name: "content", label: "Content (markdown, optional)", type: "markdown", full: true },
+      { name: "code", label: "CODE", type: "text", placeholder: "MSN_06" },
+      { name: "slug", label: "SLUG", type: "text", placeholder: "my-project" },
+      { name: "title", label: "TITLE", type: "text", full: true },
+      { name: "objective", label: "OBJECTIVE", type: "textarea", full: true },
+      { name: "difficulty", label: "DIFFICULTY", type: "text", placeholder: "★★★★☆" },
+      { name: "impact", label: "IMPACT", type: "text", placeholder: "100k+ USERS" },
+      { name: "status", label: "STATUS", type: "select", options: ["COMPLETE", "ACTIVE"] },
+      { name: "statusColor", label: "STATUS COLOR", type: "color" },
+      { name: "loadout", label: "LOADOUT", type: "tags", full: true },
+      { name: "content", label: "CONTENT", type: "markdown", full: true },
       orderField,
     ],
   },
@@ -61,12 +93,13 @@ export const ENTITIES: EntitySchema[] = [
     icon: "🧰",
     titleField: "name",
     subtitleField: "groupName",
+    preview: "skill",
     fields: [
-      { name: "groupName", label: "Group", type: "text", placeholder: "AI & AGENTS // SPECIALTY", full: true },
-      { name: "name", label: "Name", type: "text" },
-      { name: "rarity", label: "Rarity", type: "select", options: ["common", "rare", "epic", "legendary"] },
-      { name: "level", label: "Level (0–100)", type: "number" },
-      { name: "tip", label: "Tooltip", type: "text", full: true },
+      { name: "groupName", label: "GROUP NAME", type: "text", placeholder: "AI & AGENTS // SPECIALTY", full: true },
+      { name: "name", label: "NAME", type: "text" },
+      { name: "rarity", label: "RARITY", type: "select", options: ["common", "rare", "epic", "legendary"] },
+      { name: "level", label: "LEVEL", type: "number" },
+      { name: "tip", label: "TIP", type: "text", full: true },
       orderField,
     ],
   },
@@ -77,12 +110,13 @@ export const ENTITIES: EntitySchema[] = [
     icon: "🏆",
     titleField: "title",
     subtitleField: "year",
+    preview: "achievement",
     fields: [
-      { name: "year", label: "Year", type: "text", placeholder: "2026" },
-      { name: "title", label: "Title", type: "text", full: true },
-      { name: "description", label: "Description", type: "textarea", full: true },
-      { name: "color", label: "Color", type: "color" },
-      { name: "glow", label: "Glow (rgba)", type: "text", placeholder: "rgba(255,210,63,0.65)" },
+      { name: "year", label: "YEAR", type: "text", placeholder: "2026" },
+      { name: "title", label: "TITLE", type: "text", full: true },
+      { name: "description", label: "DESCRIPTION", type: "textarea", full: true },
+      { name: "color", label: "COLOR", type: "color" },
+      { name: "glow", label: "GLOW", type: "text", placeholder: "rgba(255,210,63,0.65)" },
       orderField,
     ],
   },
@@ -93,11 +127,12 @@ export const ENTITIES: EntitySchema[] = [
     icon: "💼",
     titleField: "title",
     subtitleField: "org",
+    preview: "generic",
     fields: [
-      { name: "title", label: "Role / Title", type: "text", full: true },
-      { name: "org", label: "Org · Type", type: "text", placeholder: "Company · Freelance", full: true },
-      { name: "period", label: "Period", type: "text", placeholder: "Jan 2025 – Now" },
-      { name: "description", label: "Description", type: "textarea", full: true },
+      { name: "title", label: "TITLE", type: "text", full: true },
+      { name: "org", label: "ORG", type: "text", placeholder: "Company · Freelance", full: true },
+      { name: "period", label: "PERIOD", type: "text", placeholder: "Jan 2025 – Now" },
+      { name: "description", label: "DESCRIPTION", type: "textarea", full: true },
       orderField,
     ],
   },
@@ -107,12 +142,13 @@ export const ENTITIES: EntitySchema[] = [
     singular: "Resource",
     icon: "📦",
     titleField: "title",
+    preview: "generic",
     fields: [
-      { name: "title", label: "Title", type: "text", full: true },
-      { name: "description", label: "Description", type: "textarea", full: true },
-      { name: "url", label: "Live URL", type: "text" },
-      { name: "repoUrl", label: "Repo URL", type: "text" },
-      { name: "tags", label: "Tags", type: "tags", full: true },
+      { name: "title", label: "TITLE", type: "text", full: true },
+      { name: "description", label: "DESCRIPTION", type: "textarea", full: true },
+      { name: "url", label: "URL", type: "text" },
+      { name: "repoUrl", label: "REPO URL", type: "text" },
+      { name: "tags", label: "TAGS", type: "tags", full: true },
       orderField,
     ],
   },
@@ -122,9 +158,10 @@ export const ENTITIES: EntitySchema[] = [
     singular: "Stat",
     icon: "📡",
     titleField: "label",
+    preview: "generic",
     fields: [
-      { name: "label", label: "Label", type: "text" },
-      { name: "value", label: "Value (0–100)", type: "number" },
+      { name: "label", label: "LABEL", type: "text" },
+      { name: "value", label: "VALUE", type: "number" },
       orderField,
     ],
   },
@@ -134,11 +171,12 @@ export const ENTITIES: EntitySchema[] = [
     singular: "Counter",
     icon: "🔢",
     titleField: "label",
+    preview: "generic",
     fields: [
-      { name: "label", label: "Label", type: "text" },
-      { name: "value", label: "Value", type: "number" },
-      { name: "suffix", label: "Suffix", type: "text", placeholder: "+ or %" },
-      { name: "color", label: "Color", type: "color" },
+      { name: "label", label: "LABEL", type: "text" },
+      { name: "value", label: "VALUE", type: "number" },
+      { name: "suffix", label: "SUFFIX", type: "text", placeholder: "+ or %" },
+      { name: "color", label: "COLOR", type: "color" },
       orderField,
     ],
   },
@@ -149,10 +187,11 @@ export const ENTITIES: EntitySchema[] = [
     icon: "🔗",
     titleField: "name",
     subtitleField: "label",
+    preview: "generic",
     fields: [
-      { name: "label", label: "Short label", type: "text", placeholder: "GH" },
-      { name: "name", label: "Name", type: "text", placeholder: "GitHub" },
-      { name: "href", label: "URL", type: "text", full: true },
+      { name: "label", label: "LABEL", type: "text", placeholder: "GH" },
+      { name: "name", label: "NAME", type: "text", placeholder: "GitHub" },
+      { name: "href", label: "HREF", type: "text", full: true },
       orderField,
     ],
   },
@@ -163,52 +202,42 @@ export const ENTITIES: EntitySchema[] = [
     icon: "✍️",
     titleField: "title",
     subtitleField: "slug",
+    preview: "generic",
     fields: [
-      { name: "title", label: "Title", type: "text", full: true },
-      { name: "slug", label: "Slug (unique)", type: "text" },
-      { name: "published", label: "Published", type: "boolean" },
-      { name: "publishedAt", label: "Published at", type: "datetime" },
-      { name: "excerpt", label: "Excerpt", type: "textarea", full: true },
-      { name: "tags", label: "Tags", type: "tags", full: true },
-      { name: "coverImage", label: "Cover image URL", type: "text", full: true },
-      { name: "content", label: "Content (markdown)", type: "markdown", full: true },
+      { name: "title", label: "TITLE", type: "text", full: true },
+      { name: "slug", label: "SLUG", type: "text" },
+      { name: "published", label: "PUBLISHED", type: "boolean" },
+      { name: "publishedAt", label: "PUBLISHED AT", type: "datetime" },
+      { name: "excerpt", label: "EXCERPT", type: "textarea", full: true },
+      { name: "tags", label: "TAGS", type: "tags", full: true },
+      { name: "coverImage", label: "COVER IMAGE", type: "text", full: true },
+      { name: "content", label: "CONTENT", type: "markdown", full: true },
     ],
   },
-];
-
-export const PROFILE_FIELDS: FieldSpec[] = [
-  { name: "name", label: "Name", type: "text" },
-  { name: "classRole", label: "Class / Role", type: "text" },
-  { name: "roles", label: "Roles (typing rotation)", type: "tags", full: true },
-  { name: "tagline", label: "Tagline", type: "textarea", full: true },
-  { name: "bio", label: "Bio", type: "textarea", full: true },
-  { name: "level", label: "Level", type: "number" },
-  { name: "rank", label: "Rank", type: "text" },
-  { name: "region", label: "Region", type: "text" },
-  { name: "email", label: "Email", type: "text" },
-  { name: "xpCurrent", label: "XP current", type: "number" },
-  { name: "xpMax", label: "XP max", type: "number" },
-  { name: "avatarUrl", label: "Avatar URL", type: "text", full: true },
 ];
 
 export function getEntity(model: string): EntitySchema | undefined {
   return ENTITIES.find((e) => e.model === model);
 }
 
-// Build an empty record for a "create" form.
 export function emptyValues(fields: FieldSpec[]): Record<string, unknown> {
   const v: Record<string, unknown> = {};
   for (const f of fields) {
     v[f.name] =
-      f.type === "number"
-        ? 0
-        : f.type === "tags"
-          ? []
-          : f.type === "boolean"
-            ? false
-            : f.type === "color"
-              ? "#22d3ee"
-              : "";
+      f.type === "number" ? 0 : f.type === "tags" ? [] : f.type === "boolean" ? false : f.type === "color" ? "#22d3ee" : "";
   }
   return v;
+}
+
+// Convert form values → API payload with correct types.
+export function coerce(fields: FieldSpec[], values: Record<string, unknown>) {
+  const out: Record<string, unknown> = {};
+  for (const f of fields) {
+    let v = values[f.name];
+    if (f.type === "number") v = Number(v ?? 0);
+    else if (f.type === "boolean") v = Boolean(v);
+    else if (f.type === "datetime" && (v === "" || v == null)) v = null;
+    out[f.name] = v;
+  }
+  return out;
 }
