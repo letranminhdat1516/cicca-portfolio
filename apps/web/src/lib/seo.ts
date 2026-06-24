@@ -53,7 +53,9 @@ export function buildHomeMetadata(portfolio: Portfolio): Metadata {
   const image = ogImage(seo);
 
   return {
-    title,
+    // `absolute` so the root title template ("%s — <brand>") isn't appended —
+    // defaultTitle already contains the brand, which would double it otherwise.
+    title: { absolute: title },
     description,
     keywords: seo.keywords,
     authors: profile?.name ? [{ name: profile.name }] : undefined,
