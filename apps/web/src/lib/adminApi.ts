@@ -54,4 +54,10 @@ export const adminApi = {
   getProfile: () => authed(`/admin/profile`),
   updateProfile: (data: unknown) =>
     authed(`/admin/profile`, { method: "PATCH", body: JSON.stringify(data) }),
+  getSeo: () => authed(`/admin/seo`),
+  updateSeo: (data: unknown) =>
+    authed(`/admin/seo`, { method: "PATCH", body: JSON.stringify(data) }),
+  analyticsSummary: (range = "30d") =>
+    authed(`/analytics/summary?range=${range}`),
+  seoHealth: () => authed(`/analytics/seo-health`),
 };

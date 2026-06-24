@@ -12,6 +12,8 @@ import { adminApi, getToken, clearToken, login } from "@/lib/adminApi";
 import { Field } from "./fields";
 import { Preview } from "./Preview";
 import { ResumeView } from "./ResumeView";
+import { Icon } from "./icons";
+import { AnalyticsDashboard } from "./AnalyticsDashboard";
 
 const mono = { fontFamily: "var(--font-mono), monospace" } as const;
 const ui = { fontFamily: "var(--font-ui), sans-serif" } as const;
@@ -221,17 +223,17 @@ export function AdminApp() {
           </span>
         </button>
         <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto">
-          <NavItem active={route.name === "dashboard"} icon="◳" label="DASHBOARD" onClick={() => go({ name: "dashboard" })} />
-          <NavItem active={route.name === "profile"} icon="⬡" label="PROFILE" onClick={enterProfile} />
+          <NavItem active={route.name === "dashboard"} icon="dashboard" label="DASHBOARD" onClick={() => go({ name: "dashboard" })} />
+          <NavItem active={route.name === "profile"} icon="profile" label="PROFILE" onClick={enterProfile} />
           {ENTITIES.map((e) => (
             <NavItem key={e.model} active={route.model === e.model} icon={e.icon} label={e.label} count={(data[e.model] ?? []).length} onClick={() => go({ name: "collection", model: e.model })} />
           ))}
         </nav>
         <div className="mt-4 flex flex-col gap-1 border-t pt-4 text-[11px]" style={{ borderColor: "rgba(176,38,255,0.2)", ...mono }}>
-          <button onClick={() => go({ name: "resume" })} className="rounded px-3 py-1.5 text-left hover:text-[#22d3ee]" style={{ color: "#9a9ab8" }}>📄 Export Résumé</button>
-          <button onClick={exportJSON} className="rounded px-3 py-1.5 text-left hover:text-[#22d3ee]" style={{ color: "#9a9ab8" }}>⬇ Export JSON</button>
-          <a href="/" target="_blank" className="rounded px-3 py-1.5 no-underline hover:text-[#22d3ee]" style={{ color: "#9a9ab8" }}>↗ View site</a>
-          <button onClick={logout} className="rounded px-3 py-1.5 text-left" style={{ color: "#ff2d9b" }}>⏻ Log out</button>
+          <button onClick={() => go({ name: "resume" })} className="flex items-center gap-2 rounded px-3 py-1.5 text-left hover:text-[#22d3ee]" style={{ color: "#9a9ab8" }}><Icon name="file" size={13} /> Export Résumé</button>
+          <button onClick={exportJSON} className="flex items-center gap-2 rounded px-3 py-1.5 text-left hover:text-[#22d3ee]" style={{ color: "#9a9ab8" }}><Icon name="download" size={13} /> Export JSON</button>
+          <a href="/" target="_blank" className="flex items-center gap-2 rounded px-3 py-1.5 no-underline hover:text-[#22d3ee]" style={{ color: "#9a9ab8" }}><Icon name="external" size={13} /> View site</a>
+          <button onClick={logout} className="flex items-center gap-2 rounded px-3 py-1.5 text-left" style={{ color: "#ff2d9b" }}><Icon name="logout" size={13} /> Log out</button>
         </div>
       </aside>
 
@@ -251,7 +253,7 @@ export function AdminApp() {
 
         {route.name === "profile" && (
           <Editor
-            kicker="IDENTITY" icon="⬡" title="Profile"
+            kicker="IDENTITY" icon="profile" title="Profile"
             previewKind="profile" previewValues={values}
           >
             <FormCard heading="Edit Profile" saving={saving} onSave={saveProfile}>
@@ -283,8 +285,8 @@ export function AdminApp() {
       </main>
 
       {flash && (
-        <div className="fixed bottom-6 right-6 z-50 px-5 py-3 text-sm font-semibold" style={{ background: "rgba(12,8,18,0.95)", border: "1px solid rgba(34,211,238,0.5)", color: "#22d3ee", clipPath: chamfer }}>
-          ✓ {flash}
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-5 py-3 text-sm font-semibold" style={{ background: "rgba(12,8,18,0.95)", border: "1px solid rgba(34,211,238,0.5)", color: "#22d3ee", clipPath: chamfer }}>
+          <Icon name="check" size={15} /> {flash}
         </div>
       )}
     </div>
@@ -294,7 +296,7 @@ export function AdminApp() {
 function NavItem({ active, icon, label, count, onClick }: { active: boolean; icon: string; label: string; count?: number; onClick: () => void }) {
   return (
     <button onClick={onClick} className="flex items-center gap-2.5 rounded px-3 py-2 text-left text-[12px] tracking-wider transition-colors" style={{ ...mono, background: active ? "rgba(34,211,238,0.12)" : "transparent", color: active ? "#22d3ee" : "#9a9ab8" }}>
-      <span className="w-4 text-center">{icon}</span>
+      <Icon name={icon} size={15} />
       <span className="flex-1">{label}</span>
       {count != null && <span className="text-[10px]" style={{ color: "#6b6b88" }}>{count}</span>}
     </button>
@@ -317,8 +319,8 @@ function Header({ kicker, icon, title, count, newLabel, onNew }: { kicker: strin
     <div className="mb-6 flex items-end justify-between">
       <div>
         <div className="text-[10px] tracking-[3px]" style={{ ...mono, color: "#b026ff" }}>{kicker}</div>
-        <h1 className="mt-1 text-[28px] font-bold" style={{ fontFamily: "var(--font-title), sans-serif", color: "#fff" }}>
-          <span className="mr-2">{icon}</span>{title}{count != null && <span className="ml-2 text-[14px]" style={{ ...mono, color: "#6b6b88" }}>{count}</span>}
+        <h1 className="mt-1 flex items-center gap-2.5 text-[28px] font-bold" style={{ fontFamily: "var(--font-title), sans-serif", color: "#fff" }}>
+          <Icon name={icon} size={26} style={{ color: "#22d3ee" }} />{title}{count != null && <span className="ml-1 text-[14px]" style={{ ...mono, color: "#6b6b88" }}>{count}</span>}
         </h1>
       </div>
       {onNew && <button onClick={onNew} className="px-4 py-2 text-[12px] font-bold tracking-widest" style={{ ...mono, ...btnPrimary, clipPath: "polygon(0 0,100% 0,100% 70%,calc(100% - 10px) 100%,0 100%)" }}>+ {newLabel}</button>}
@@ -395,18 +397,24 @@ function CollectionView(props: {
 function Dashboard({ profile, data, onProfile, onModel }: { profile: Record<string, unknown>; data: Record<string, Row[]>; onProfile: () => void; onModel: (m: string) => void }) {
   return (
     <>
-      <Header kicker="OVERVIEW" icon="◳" title="Dashboard" />
+      <Header kicker="OVERVIEW" icon="dashboard" title="Dashboard" />
+
+      <AnalyticsDashboard />
+
       <button onClick={onProfile} className="mb-4 flex w-full items-center justify-between p-5 text-left" style={{ background: "linear-gradient(135deg,rgba(176,38,255,0.12),rgba(34,211,238,0.05))", border: "1px solid rgba(176,38,255,0.3)", clipPath: chamfer }}>
-        <div>
-          <div className="text-[16px] font-semibold" style={{ ...ui, color: "#fff" }}>⬡ {String(profile.name ?? "[YOUR NAME]")}</div>
-          <div className="text-[12px]" style={{ ...mono, color: "#9a9ab8" }}>Edit profile, hero & identity</div>
+        <div className="flex items-center gap-2.5">
+          <Icon name="profile" size={18} style={{ color: "#b026ff" }} />
+          <div>
+            <div className="text-[16px] font-semibold" style={{ ...ui, color: "#fff" }}>{String(profile.name ?? "[YOUR NAME]")}</div>
+            <div className="text-[12px]" style={{ ...mono, color: "#9a9ab8" }}>Edit profile, hero &amp; identity</div>
+          </div>
         </div>
-        <span className="text-[12px]" style={{ ...mono, color: "#22d3ee" }}>EDIT →</span>
+        <span className="flex items-center gap-1 text-[12px]" style={{ ...mono, color: "#22d3ee" }}>EDIT <Icon name="arrow" size={13} /></span>
       </button>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {ENTITIES.map((e) => (
           <button key={e.model} onClick={() => onModel(e.model)} className="p-4 text-left transition-transform hover:-translate-y-0.5" style={{ background: "rgba(10,8,20,0.6)", border: "1px solid rgba(176,38,255,0.2)", clipPath: chamfer }}>
-            <div className="text-2xl">{e.icon}</div>
+            <Icon name={e.icon} size={22} style={{ color: "#22d3ee" }} />
             <div className="mt-2 text-[14px] font-semibold" style={{ ...ui, color: "#fff" }}>{e.label}</div>
             <div className="text-[11px]" style={{ ...mono, color: "#6b6b88" }}>{(data[e.model] ?? []).length} item(s)</div>
           </button>
