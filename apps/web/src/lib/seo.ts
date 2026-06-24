@@ -8,7 +8,7 @@ const FALLBACK: SeoSettings = {
   siteName: "Lê Trần Minh Đạt",
   defaultTitle: "Lê Trần Minh Đạt — Creative Developer & AI Engineer",
   defaultDescription:
-    "Creative full-stack & AI developer. I build production AI agents (Claude Agent SDK, RAG/pgvector), real-time systems, and full-stack web apps — from trading platforms to ERP.",
+    "Creative full-stack & AI developer building production AI agents (Claude Agent SDK, RAG), real-time systems, and full-stack web apps — from trading to ERP.",
   keywords: [
     "Lê Trần Minh Đạt",
     "creative developer",

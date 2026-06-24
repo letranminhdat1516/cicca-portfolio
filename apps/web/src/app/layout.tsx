@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     template: "%s — Lê Trần Minh Đạt",
   },
   description:
-    "Creative full-stack & AI developer. I build production AI agents (Claude Agent SDK, RAG/pgvector), real-time systems, and full-stack web apps — from trading platforms to ERP.",
+    "Creative full-stack & AI developer building production AI agents (Claude Agent SDK, RAG), real-time systems, and full-stack web apps — from trading to ERP.",
   openGraph: {
     type: "website",
     siteName: "Lê Trần Minh Đạt",
