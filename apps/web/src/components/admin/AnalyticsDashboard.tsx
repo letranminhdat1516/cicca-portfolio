@@ -144,9 +144,9 @@ export function AnalyticsDashboard() {
               <p className="text-[12px] leading-relaxed" style={{ ...ui, color: "#9a9ab8" }}>
                 Search ranking, impressions, clicks and the actual keywords people
                 search are only available for a deployed, verified domain. When you
-                deploy, add your Search Console verification code in{" "}
-                <span style={{ color: "#22d3ee" }}>Profile → SEO settings</span> and
-                this panel will light up.
+                deploy, add your Search Console verification code in the{" "}
+                <span style={{ color: "#22d3ee" }}>SEO</span> tab and this panel
+                will light up.
               </p>
               <div className="grid grid-cols-3 gap-2 opacity-50">
                 {["Impressions", "Clicks", "Avg position"].map((m) => (

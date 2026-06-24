@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ENTITIES,
   PROFILE_FIELDS,
+  SEO_FIELDS,
   getEntity,
   emptyValues,
   coerce,
@@ -18,7 +19,7 @@ import { AnalyticsDashboard } from "./AnalyticsDashboard";
 const mono = { fontFamily: "var(--font-mono), monospace" } as const;
 const ui = { fontFamily: "var(--font-ui), sans-serif" } as const;
 type Row = { id: string; [k: string]: unknown };
-type Route = { name: "dashboard" | "profile" | "collection" | "resume"; model?: string };
+type Route = { name: "dashboard" | "profile" | "seo" | "collection" | "resume"; model?: string };
 
 const chamfer = "polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,16px 100%,0 calc(100% - 16px))";
 const btnPrimary = { background: "linear-gradient(135deg,#22d3ee,#b026ff)", color: "#08070f" } as const;
@@ -26,6 +27,7 @@ const btnPrimary = { background: "linear-gradient(135deg,#22d3ee,#b026ff)", colo
 function parseHash(): Route {
   const h = (typeof window !== "undefined" ? window.location.hash : "").replace(/^#\/?/, "");
   if (h === "profile") return { name: "profile" };
+  if (h === "seo") return { name: "seo" };
   if (h === "resume") return { name: "resume" };
   if (h && getEntity(h)) return { name: "collection", model: h };
   return { name: "dashboard" };
@@ -37,6 +39,7 @@ export function AdminApp() {
   const [route, setRoute] = useState<Route>({ name: "dashboard" });
 
   const [profile, setProfile] = useState<Record<string, unknown>>({});
+  const [seo, setSeo] = useState<Record<string, unknown>>({});
   const [data, setData] = useState<Record<string, Row[]>>({});
   const [flash, setFlash] = useState("");
 
@@ -54,11 +57,13 @@ export function AdminApp() {
 
   const loadAll = useCallback(async () => {
     try {
-      const [prof, ...lists] = await Promise.all([
+      const [prof, seoData, ...lists] = await Promise.all([
         adminApi.getProfile(),
+        adminApi.getSeo(),
         ...ENTITIES.map((e) => adminApi.list(e.model)),
       ]);
       setProfile((prof as Record<string, unknown>) ?? {});
+      setSeo((seoData as Record<string, unknown>) ?? {});
       const next: Record<string, Row[]> = {};
       ENTITIES.forEach((e, i) => (next[e.model] = (lists[i] as Row[]) ?? []));
       setData(next);
@@ -93,6 +98,15 @@ export function AdminApp() {
     setValues(v);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [route.name, profile]);
+
+  // hydrate the SEO form when entering the SEO view
+  useEffect(() => {
+    if (route.name !== "seo" || formOpen) return;
+    const v: Record<string, unknown> = {};
+    for (const f of SEO_FIELDS) v[f.name] = seo[f.name] ?? (f.type === "tags" ? [] : "");
+    setValues(v);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [route.name, seo]);
 
   function go(r: Route) {
     setFormOpen(false);
@@ -146,6 +160,20 @@ export function AdminApp() {
     try {
       await adminApi.updateProfile(coerce(PROFILE_FIELDS, values));
       flashMsg("Profile saved");
+    } catch (e) {
+      flashMsg(`Error: ${e}`);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function saveSeo() {
+    setSaving(true);
+    try {
+      await adminApi.updateSeo(coerce(SEO_FIELDS, values));
+      const s = await adminApi.getSeo();
+      setSeo((s as Record<string, unknown>) ?? {});
+      flashMsg("SEO saved");
     } catch (e) {
       flashMsg(`Error: ${e}`);
     } finally {
@@ -225,6 +253,7 @@ export function AdminApp() {
         <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto">
           <NavItem active={route.name === "dashboard"} icon="dashboard" label="DASHBOARD" onClick={() => go({ name: "dashboard" })} />
           <NavItem active={route.name === "profile"} icon="profile" label="PROFILE" onClick={enterProfile} />
+          <NavItem active={route.name === "seo"} icon="shield" label="SEO" onClick={() => go({ name: "seo" })} />
           {ENTITIES.map((e) => (
             <NavItem key={e.model} active={route.model === e.model} icon={e.icon} label={e.label} count={(data[e.model] ?? []).length} onClick={() => go({ name: "collection", model: e.model })} />
           ))}
@@ -243,6 +272,7 @@ export function AdminApp() {
         <div className="mb-4 flex gap-1 overflow-x-auto md:hidden">
           <MobileTab active={route.name === "dashboard"} label="DASH" onClick={() => go({ name: "dashboard" })} />
           <MobileTab active={route.name === "profile"} label="PROFILE" onClick={enterProfile} />
+          <MobileTab active={route.name === "seo"} label="SEO" onClick={() => go({ name: "seo" })} />
           {ENTITIES.map((e) => <MobileTab key={e.model} active={route.model === e.model} label={e.label} onClick={() => go({ name: "collection", model: e.model })} />)}
           <MobileTab active={false} label="LOGOUT" onClick={logout} />
         </div>
@@ -259,6 +289,25 @@ export function AdminApp() {
             <FormCard heading="Edit Profile" saving={saving} onSave={saveProfile}>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 {PROFILE_FIELDS.map((f) => <Field key={f.name} spec={f} value={values[f.name]} onChange={(v) => setValues((p) => ({ ...p, [f.name]: v }))} />)}
+              </div>
+            </FormCard>
+          </Editor>
+        )}
+
+        {route.name === "seo" && (
+          <Editor
+            kicker="DISCOVERY" icon="shield" title="SEO settings"
+            previewKind="generic"
+            previewValues={{
+              title: values.defaultTitle,
+              groupName: values.siteName,
+              description: values.defaultDescription,
+              tags: values.keywords,
+            }}
+          >
+            <FormCard heading="Search engine & social" saving={saving} onSave={saveSeo}>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                {SEO_FIELDS.map((f) => <Field key={f.name} spec={f} value={values[f.name]} onChange={(v) => setValues((p) => ({ ...p, [f.name]: v }))} />)}
               </div>
             </FormCard>
           </Editor>

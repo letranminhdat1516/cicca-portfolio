@@ -46,6 +46,17 @@ export const PROFILE_FIELDS: FieldSpec[] = [
   { name: "avatarUrl", label: "AVATAR URL", type: "text", full: true },
 ];
 
+export const SEO_FIELDS: FieldSpec[] = [
+  { name: "siteName", label: "SITE NAME", type: "text" },
+  { name: "defaultTitle", label: "DEFAULT TITLE (30–60 chars)", type: "text", full: true },
+  { name: "defaultDescription", label: "META DESCRIPTION (70–160 chars)", type: "textarea", full: true },
+  { name: "keywords", label: "KEYWORDS", type: "tags", full: true },
+  { name: "ogImageUrl", label: "OG IMAGE URL (blank = auto)", type: "text", full: true },
+  { name: "twitterHandle", label: "TWITTER / X HANDLE", type: "text", placeholder: "@username" },
+  { name: "gscVerification", label: "GOOGLE SEARCH CONSOLE CODE", type: "text", placeholder: "paste verification meta content", full: true },
+  { name: "llmsTxt", label: "LLMS.TXT OVERRIDE (blank = auto)", type: "textarea", full: true },
+];
+
 export const ENTITIES: EntitySchema[] = [
   {
     model: "projects",
