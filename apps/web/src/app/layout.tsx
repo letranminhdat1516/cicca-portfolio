@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Orbitron, Space_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import { SITE_URL } from "@/lib/seo";
 
 const orbitron = Orbitron({
   variable: "--font-title",
@@ -24,9 +25,20 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PLAYER_01.sys — Portfolio",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "PLAYER_01.sys — Portfolio",
+    template: "%s — PLAYER_01.sys",
+  },
   description:
     "A game-themed developer portfolio: missions, skills, achievements, and a blog.",
+  openGraph: {
+    type: "website",
+    siteName: "PLAYER_01.sys",
+    url: SITE_URL,
+  },
+  twitter: { card: "summary_large_image" },
+  robots: { index: true, follow: true },
 };
 
 export default function RootLayout({

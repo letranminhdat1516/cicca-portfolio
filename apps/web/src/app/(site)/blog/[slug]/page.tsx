@@ -4,6 +4,12 @@ import { notFound } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { getPost, getPosts } from "@/lib/blog";
+import { getPortfolio } from "@/lib/portfolio";
+import {
+  JsonLd,
+  articleJsonLd,
+  breadcrumbJsonLd,
+} from "@/components/seo/JsonLd";
 
 export async function generateStaticParams() {
   try {
@@ -24,14 +30,24 @@ export async function generateMetadata({
   try {
     const post = await getPost(slug);
     return {
-      title: `${post.title} — PLAYER_01.sys`,
+      title: post.title,
       description: post.excerpt,
+      keywords: post.tags,
+      alternates: { canonical: `/blog/${slug}` },
       openGraph: {
         title: post.title,
         description: post.excerpt,
         type: "article",
+        url: `/blog/${slug}`,
         publishedTime: post.publishedAt ?? undefined,
+        modifiedTime: post.updatedAt ?? undefined,
+        tags: post.tags,
         images: post.coverImage ? [post.coverImage] : undefined,
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: post.title,
+        description: post.excerpt,
       },
     };
   } catch {
@@ -52,21 +68,21 @@ export default async function BlogPostPage({
     notFound();
   }
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BlogPosting",
-    headline: post.title,
-    description: post.excerpt,
-    datePublished: post.publishedAt ?? undefined,
-    keywords: post.tags.join(", "),
-  };
+  const authorName = await getPortfolio()
+    .then((d) => d.profile?.name)
+    .catch(() => undefined);
 
   return (
     <main className="mx-auto max-w-[760px] px-6 pt-32 pb-24">
-      <script
-        type="application/ld+json"
-        // Escape `<` so admin-authored fields can't break out of the script tag.
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
+      <JsonLd
+        data={[
+          articleJsonLd(post, authorName),
+          breadcrumbJsonLd([
+            { name: "Home", path: "/" },
+            { name: "Blog", path: "/blog" },
+            { name: post.title, path: `/blog/${slug}` },
+          ]),
+        ]}
       />
       <Link
         href="/blog"

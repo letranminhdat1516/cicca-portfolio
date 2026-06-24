@@ -1,4 +1,7 @@
+import type { Metadata } from "next";
 import { getPortfolio } from "@/lib/portfolio";
+import { buildHomeMetadata } from "@/lib/seo";
+import { JsonLd, homeJsonLd } from "@/components/seo/JsonLd";
 import { Hero } from "@/components/Hero";
 import { About } from "@/components/About";
 import { Missions } from "@/components/Missions";
@@ -9,10 +12,16 @@ import { Resources } from "@/components/Resources";
 import { Contact } from "@/components/Contact";
 import { Footer } from "@/components/Footer";
 
+export async function generateMetadata(): Promise<Metadata> {
+  const data = await getPortfolio();
+  return buildHomeMetadata(data);
+}
+
 export default async function Home() {
   const data = await getPortfolio();
   return (
     <main>
+      <JsonLd data={homeJsonLd(data)} />
       <Hero profile={data.profile} socials={data.socials} />
       <About profile={data.profile} stats={data.stats} counters={data.counters} />
       <Missions missions={data.missions} />

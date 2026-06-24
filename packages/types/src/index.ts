@@ -98,6 +98,17 @@ export interface Resource {
   tags: string[];
 }
 
+export interface SeoSettings {
+  siteName: string;
+  defaultTitle: string;
+  defaultDescription: string;
+  keywords: string[];
+  ogImageUrl: string | null;
+  twitterHandle: string | null;
+  gscVerification: string | null;
+  llmsTxt: string | null;
+}
+
 export interface Portfolio {
   profile: Profile;
   stats: Stat[];
@@ -108,4 +119,5 @@ export interface Portfolio {
   socials: Social[];
   experiences: Experience[];
   resources: Resource[];
+  seo: SeoSettings | null;
 }

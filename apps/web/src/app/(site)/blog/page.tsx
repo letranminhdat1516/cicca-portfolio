@@ -4,8 +4,15 @@ import { getPosts } from "@/lib/blog";
 import { SectionHeader } from "@/components/SectionHeader";
 
 export const metadata: Metadata = {
-  title: "Blog — PLAYER_01.sys",
+  title: "Blog",
   description: "Dev logs, mission write-ups, and notes from the field.",
+  alternates: { canonical: "/blog" },
+  openGraph: {
+    title: "Blog — PLAYER_01.sys",
+    description: "Dev logs, mission write-ups, and notes from the field.",
+    type: "website",
+    url: "/blog",
+  },
 };
 
 export default async function BlogIndex() {
