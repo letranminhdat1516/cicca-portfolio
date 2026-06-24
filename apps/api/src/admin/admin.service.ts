@@ -51,4 +51,20 @@ export class AdminService {
   updateProfile(data: Record<string, unknown>) {
     return this.prisma.profile.update({ where: { id: 1 }, data });
   }
+
+  getSeo() {
+    return this.prisma.seoSettings.upsert({
+      where: { id: 1 },
+      update: {},
+      create: { id: 1, keywords: [] },
+    });
+  }
+
+  updateSeo(data: Record<string, unknown>) {
+    return this.prisma.seoSettings.upsert({
+      where: { id: 1 },
+      update: data,
+      create: { id: 1, keywords: [], ...data },
+    });
+  }
 }

@@ -134,3 +134,32 @@ model BlogPost {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 }
+
+/// First-party, anonymous pageview record. No PII: sessionHash is a salted
+/// daily hash of IP+UA used only to estimate unique visitors.
+model PageView {
+  id          String   @id @default(cuid())
+  path        String
+  referrer    String?
+  country     String?
+  device      String?
+  sessionHash String?
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([path])
+}
+
+/// Singleton (id = 1) holding site-wide SEO/GEO settings, editable in admin.
+model SeoSettings {
+  id                 Int      @id @default(1)
+  siteName           String   @default("PLAYER_01.sys")
+  defaultTitle       String   @default("PLAYER_01.sys — Portfolio")
+  defaultDescription String   @default("A game-themed developer portfolio: missions, skills, achievements, and a blog.")
+  keywords           String[]
+  ogImageUrl         String?
+  twitterHandle      String?
+  gscVerification    String?
+  llmsTxt            String?
+  updatedAt          DateTime @updatedAt
+}

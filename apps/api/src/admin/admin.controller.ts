@@ -26,6 +26,16 @@ export class AdminController {
     return this.admin.updateProfile(data);
   }
 
+  @Get('seo')
+  getSeo() {
+    return this.admin.getSeo();
+  }
+
+  @Patch('seo')
+  updateSeo(@Body() data: Record<string, unknown>) {
+    return this.admin.updateSeo(data);
+  }
+
   @Get(':model')
   list(@Param('model') model: string) {
     return this.admin.list(model);

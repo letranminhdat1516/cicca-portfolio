@@ -17,6 +17,29 @@ async function main() {
     },
   });
 
+  // Site-wide SEO/GEO settings (singleton). Editable later in /admin.
+  await prisma.seoSettings.upsert({
+    where: { id: 1 },
+    update: {},
+    create: {
+      id: 1,
+      siteName: 'PLAYER_01.sys',
+      defaultTitle: 'PLAYER_01.sys — Creative Developer Portfolio',
+      defaultDescription:
+        'Game-themed portfolio of a creative full-stack developer: missions, skills, achievements, and a blog on building fast, beautiful web products.',
+      keywords: [
+        'creative developer',
+        'full-stack engineer',
+        'next.js',
+        'nestjs',
+        'portfolio',
+        'frontend',
+        'typescript',
+      ],
+      twitterHandle: '@player_01',
+    },
+  });
+
   await prisma.profile.upsert({
     where: { id: 1 },
     update: {},

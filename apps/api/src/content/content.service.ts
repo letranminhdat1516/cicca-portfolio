@@ -16,6 +16,7 @@ export class ContentService {
       socials,
       experiences,
       resources,
+      seo,
     ] = await Promise.all([
       this.prisma.profile.findUnique({ where: { id: 1 } }),
       this.prisma.stat.findMany({ orderBy: { order: 'asc' } }),
@@ -26,6 +27,7 @@ export class ContentService {
       this.prisma.social.findMany({ orderBy: { order: 'asc' } }),
       this.prisma.experience.findMany({ orderBy: { order: 'asc' } }),
       this.prisma.resource.findMany({ orderBy: { order: 'asc' } }),
+      this.prisma.seoSettings.findUnique({ where: { id: 1 } }),
     ]);
 
     // group skills by groupName, preserving first-seen order
@@ -58,6 +60,7 @@ export class ContentService {
       socials,
       experiences,
       resources,
+      seo,
     };
   }
 }
