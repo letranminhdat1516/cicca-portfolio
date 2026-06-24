@@ -2,22 +2,23 @@ import { ImageResponse } from "next/og";
 import { getPortfolio } from "@/lib/portfolio";
 import { seoOf } from "@/lib/seo";
 
-export const alt = "PLAYER_01.sys — Developer Portfolio";
+export const alt = "Lê Trần Minh Đạt — Creative Developer & AI Engineer";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 // Branded neon Open Graph card, generated from CMS content. Falls back to
 // static text if the API is unreachable at build/runtime.
 export default async function Image() {
-  let siteName = "PLAYER_01.sys";
-  let tagline = "Creative Developer Portfolio";
-  let name = "";
+  let name = "Lê Trần Minh Đạt";
+  let role = "Creative Developer & AI Engineer";
+  let tagline =
+    "Production AI agents, real-time systems, and full-stack web apps.";
   try {
     const data = await getPortfolio();
     const seo = seoOf(data);
-    siteName = seo.siteName;
-    tagline = data.profile?.tagline || data.profile?.classRole || tagline;
-    name = data.profile?.name ?? "";
+    name = data.profile?.name || seo.siteName || name;
+    role = data.profile?.classRole || role;
+    tagline = data.profile?.tagline || seo.defaultDescription || tagline;
   } catch {
     // keep fallbacks
   }
@@ -48,19 +49,19 @@ export default async function Image() {
             textTransform: "uppercase",
           }}
         >
-          {name || "Player One"}
+          {role}
         </div>
         <div
           style={{
             display: "flex",
-            fontSize: 104,
+            fontSize: 76,
             fontWeight: 800,
             marginTop: 12,
             color: "#f0f6ff",
             textShadow: "0 0 40px rgba(34,211,238,0.55)",
           }}
         >
-          {siteName}
+          {name}
         </div>
         <div
           style={{

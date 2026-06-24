@@ -55,9 +55,11 @@ export async function GET() {
     }
   } catch {
     lines.length = 0;
-    lines.push("# PLAYER_01.sys");
+    lines.push("# Lê Trần Minh Đạt");
     lines.push("");
-    lines.push("> A game-themed developer portfolio.");
+    lines.push(
+      "> Creative full-stack & AI developer — production AI agents, real-time systems, and full-stack web apps.",
+    );
   }
 
   return new Response(lines.join("\n"), {

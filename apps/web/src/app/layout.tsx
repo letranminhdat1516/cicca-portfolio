@@ -27,14 +27,14 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "PLAYER_01.sys — Portfolio",
-    template: "%s — PLAYER_01.sys",
+    default: "Lê Trần Minh Đạt — Creative Developer & AI Engineer",
+    template: "%s — Lê Trần Minh Đạt",
   },
   description:
-    "A game-themed developer portfolio: missions, skills, achievements, and a blog.",
+    "Creative full-stack & AI developer. I build production AI agents (Claude Agent SDK, RAG/pgvector), real-time systems, and full-stack web apps — from trading platforms to ERP.",
   openGraph: {
     type: "website",
-    siteName: "PLAYER_01.sys",
+    siteName: "Lê Trần Minh Đạt",
     url: SITE_URL,
   },
   twitter: { card: "summary_large_image" },

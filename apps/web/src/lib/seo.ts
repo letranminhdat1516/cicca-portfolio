@@ -5,11 +5,25 @@ export const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
 const FALLBACK: SeoSettings = {
-  siteName: "PLAYER_01.sys",
-  defaultTitle: "PLAYER_01.sys — Portfolio",
+  siteName: "Lê Trần Minh Đạt",
+  defaultTitle: "Lê Trần Minh Đạt — Creative Developer & AI Engineer",
   defaultDescription:
-    "A game-themed developer portfolio: missions, skills, achievements, and a blog.",
-  keywords: [],
+    "Creative full-stack & AI developer. I build production AI agents (Claude Agent SDK, RAG/pgvector), real-time systems, and full-stack web apps — from trading platforms to ERP.",
+  keywords: [
+    "Lê Trần Minh Đạt",
+    "creative developer",
+    "full-stack developer",
+    "AI engineer",
+    "AI agents",
+    "Claude Agent SDK",
+    "RAG",
+    "Next.js",
+    "NestJS",
+    "React",
+    "TypeScript",
+    "PostgreSQL",
+    "portfolio",
+  ],
   ogImageUrl: null,
   twitterHandle: null,
   gscVerification: null,
