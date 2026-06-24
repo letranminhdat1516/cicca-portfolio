@@ -67,14 +67,16 @@ export function Inventory({ skillGroups }: { skillGroups: SkillGroup[] }) {
             <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill,minmax(150px,1fr))" }}>
               {group.items.map((s) => {
                 const r = RARITY[s.r];
+                const isGh = s.source === "github";
+                const basisText = s.basis || s.tip;
                 return (
                   <div
                     key={s.n}
-                    title={s.tip}
-                    className="p-3 transition-transform hover:-translate-y-1"
+                    title={basisText}
+                    className="flex flex-col p-3 transition-transform hover:-translate-y-1"
                     style={{ background: "rgba(10,10,18,0.7)", border: `1px solid ${r.glow}` }}
                   >
-                    <div className="flex items-baseline justify-between">
+                    <div className="flex items-baseline justify-between gap-1">
                       <span className="text-[15px] font-bold" style={{ fontFamily: "var(--font-ui), sans-serif", color: "#fff" }}>
                         {s.n}
                       </span>
@@ -83,6 +85,24 @@ export function Inventory({ skillGroups }: { skillGroups: SkillGroup[] }) {
                       </span>
                     </div>
                     <SkillBar lvl={s.lvl} color={r.color} glow={r.glow} />
+                    {basisText && (
+                      <div className="mt-2 flex items-start gap-1.5">
+                        <span
+                          className="mt-px shrink-0 px-1 text-[8px] font-bold tracking-wider"
+                          title={isGh ? "Measured from public GitHub activity" : "Backed by shipped projects"}
+                          style={{
+                            fontFamily: "var(--font-mono), monospace",
+                            color: isGh ? "#22d3ee" : "#b026ff",
+                            border: `1px solid ${isGh ? "rgba(34,211,238,0.4)" : "rgba(176,38,255,0.4)"}`,
+                          }}
+                        >
+                          {isGh ? "GH" : "✦"}
+                        </span>
+                        <span className="text-[9px] leading-[1.3]" style={{ fontFamily: "var(--font-mono), monospace", color: "#6b6b88" }}>
+                          {basisText}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 );
               })}

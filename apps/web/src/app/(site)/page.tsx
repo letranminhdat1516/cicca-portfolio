@@ -6,6 +6,7 @@ import { Hero } from "@/components/Hero";
 import { About } from "@/components/About";
 import { Missions } from "@/components/Missions";
 import { Inventory } from "@/components/Inventory";
+import { GithubRecord } from "@/components/GithubRecord";
 import { Trophies } from "@/components/Trophies";
 import { Experiences } from "@/components/Experiences";
 import { Resources } from "@/components/Resources";
@@ -26,6 +27,7 @@ export default async function Home() {
       <About profile={data.profile} stats={data.stats} counters={data.counters} />
       <Missions missions={data.missions} />
       <Inventory skillGroups={data.skillGroups} />
+      <GithubRecord github={data.github} />
       <Trophies achievements={data.achievements} />
       <Experiences experiences={data.experiences} />
       <Resources resources={data.resources} />
