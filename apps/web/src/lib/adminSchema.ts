@@ -97,8 +97,10 @@ export const ENTITIES: EntitySchema[] = [
     fields: [
       { name: "groupName", label: "GROUP NAME", type: "text", placeholder: "AI & AGENTS // SPECIALTY", full: true },
       { name: "name", label: "NAME", type: "text" },
-      { name: "rarity", label: "RARITY", type: "select", options: ["common", "rare", "epic", "legendary"] },
+      { name: "rarity", label: "RARITY (auto from level)", type: "select", options: ["common", "rare", "epic", "legendary"] },
       { name: "level", label: "LEVEL", type: "number" },
+      { name: "source", label: "SOURCE", type: "select", options: ["evidence", "github", "self"] },
+      { name: "basis", label: "BASIS (why this rank)", type: "text", full: true },
       { name: "tip", label: "TIP", type: "text", full: true },
       orderField,
     ],

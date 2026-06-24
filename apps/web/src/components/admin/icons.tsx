@@ -24,6 +24,9 @@ import {
   ArrowUpRight,
   Gauge,
   ShieldCheck,
+  Code2,
+  RefreshCw,
+  Star,
   type LucideIcon,
 } from "lucide-react";
 
@@ -54,6 +57,9 @@ export const ICONS: Record<string, LucideIcon> = {
   arrow: ArrowUpRight,
   gauge: Gauge,
   shield: ShieldCheck,
+  github: Code2,
+  refresh: RefreshCw,
+  star: Star,
 };
 
 export function Icon({

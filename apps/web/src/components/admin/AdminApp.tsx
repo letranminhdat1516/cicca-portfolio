@@ -14,11 +14,12 @@ import { Preview } from "./Preview";
 import { ResumeView } from "./ResumeView";
 import { Icon } from "./icons";
 import { AnalyticsDashboard } from "./AnalyticsDashboard";
+import { GithubSettings } from "./GithubSettings";
 
 const mono = { fontFamily: "var(--font-mono), monospace" } as const;
 const ui = { fontFamily: "var(--font-ui), sans-serif" } as const;
 type Row = { id: string; [k: string]: unknown };
-type Route = { name: "dashboard" | "profile" | "collection" | "resume"; model?: string };
+type Route = { name: "dashboard" | "profile" | "collection" | "resume" | "github"; model?: string };
 
 const chamfer = "polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,16px 100%,0 calc(100% - 16px))";
 const btnPrimary = { background: "linear-gradient(135deg,#22d3ee,#b026ff)", color: "#08070f" } as const;
@@ -27,6 +28,7 @@ function parseHash(): Route {
   const h = (typeof window !== "undefined" ? window.location.hash : "").replace(/^#\/?/, "");
   if (h === "profile") return { name: "profile" };
   if (h === "resume") return { name: "resume" };
+  if (h === "github") return { name: "github" };
   if (h && getEntity(h)) return { name: "collection", model: h };
   return { name: "dashboard" };
 }
@@ -225,6 +227,7 @@ export function AdminApp() {
         <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto">
           <NavItem active={route.name === "dashboard"} icon="dashboard" label="DASHBOARD" onClick={() => go({ name: "dashboard" })} />
           <NavItem active={route.name === "profile"} icon="profile" label="PROFILE" onClick={enterProfile} />
+          <NavItem active={route.name === "github"} icon="github" label="GITHUB" onClick={() => go({ name: "github" })} />
           {ENTITIES.map((e) => (
             <NavItem key={e.model} active={route.model === e.model} icon={e.icon} label={e.label} count={(data[e.model] ?? []).length} onClick={() => go({ name: "collection", model: e.model })} />
           ))}
@@ -243,12 +246,20 @@ export function AdminApp() {
         <div className="mb-4 flex gap-1 overflow-x-auto md:hidden">
           <MobileTab active={route.name === "dashboard"} label="DASH" onClick={() => go({ name: "dashboard" })} />
           <MobileTab active={route.name === "profile"} label="PROFILE" onClick={enterProfile} />
+          <MobileTab active={route.name === "github"} label="GITHUB" onClick={() => go({ name: "github" })} />
           {ENTITIES.map((e) => <MobileTab key={e.model} active={route.model === e.model} label={e.label} onClick={() => go({ name: "collection", model: e.model })} />)}
           <MobileTab active={false} label="LOGOUT" onClick={logout} />
         </div>
 
         {route.name === "dashboard" && (
           <Dashboard profile={profile} data={data} onProfile={enterProfile} onModel={(m) => go({ name: "collection", model: m })} />
+        )}
+
+        {route.name === "github" && (
+          <>
+            <Header kicker="OPEN SOURCE" icon="github" title="GitHub" />
+            <GithubSettings onFlash={flashMsg} />
+          </>
         )}
 
         {route.name === "profile" && (
