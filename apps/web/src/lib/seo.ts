@@ -1,28 +1,30 @@
 import type { Metadata } from "next";
 import type { Portfolio, SeoSettings } from "@portfolio/types";
 
-export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+export const SITE_URL = (
+  process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
+).replace(/\/+$/, "");
+
+export const CV_PDF_PATH = "/cv/letranminhdat-cv.pdf";
 
 const FALLBACK: SeoSettings = {
-  siteName: "Lê Trần Minh Đạt",
-  defaultTitle: "Lê Trần Minh Đạt — Creative Developer & AI Engineer",
+  siteName: "Le Tran Minh Dat",
+  defaultTitle: "Le Tran Minh Dat — AI-Native Full-Stack Developer",
   defaultDescription:
-    "Creative full-stack & AI developer building production AI agents (Claude Agent SDK, RAG), real-time systems, and full-stack web apps — from trading to ERP.",
+    "AI-native full-stack developer in Ho Chi Minh City. Shipped 6 production systems: a bank LLM gateway, RAG agents, a VAS ERP and real-time computer vision.",
   keywords: [
+    "Le Tran Minh Dat",
     "Lê Trần Minh Đạt",
-    "creative developer",
-    "full-stack developer",
-    "AI engineer",
-    "AI agents",
-    "Claude Agent SDK",
+    "AI-native full-stack developer",
+    "LLM gateway engineer",
+    "AI agent engineer",
     "RAG",
-    "Next.js",
     "NestJS",
     "React",
     "TypeScript",
     "PostgreSQL",
-    "portfolio",
+    "Kubernetes",
+    "resume",
   ],
   ogImageUrl: null,
   twitterHandle: null,
@@ -34,14 +36,15 @@ export function seoOf(p?: Portfolio | null): SeoSettings {
   return p?.seo ?? FALLBACK;
 }
 
+/** Turn a site-relative path into an absolute URL; absolute URLs pass through. */
+export function absoluteUrl(pathOrUrl: string): string {
+  if (/^https?:\/\//.test(pathOrUrl)) return pathOrUrl;
+  return `${SITE_URL}${pathOrUrl.startsWith("/") ? "" : "/"}${pathOrUrl}`;
+}
+
 /** Absolute URL for an OG image — custom if set, else the dynamic /opengraph-image. */
 export function ogImage(seo: SeoSettings): string {
-  if (seo.ogImageUrl) {
-    return seo.ogImageUrl.startsWith("http")
-      ? seo.ogImageUrl
-      : `${SITE_URL}${seo.ogImageUrl}`;
-  }
-  return `${SITE_URL}/opengraph-image`;
+  return absoluteUrl(seo.ogImageUrl || "/opengraph-image");
 }
 
 /** Full <head> metadata for the home page, sourced from CMS SeoSettings + profile. */
@@ -58,15 +61,16 @@ export function buildHomeMetadata(portfolio: Portfolio): Metadata {
     title: { absolute: title },
     description,
     keywords: seo.keywords,
-    authors: profile?.name ? [{ name: profile.name }] : undefined,
+    authors: profile?.name ? [{ name: profile.name, url: SITE_URL }] : undefined,
     creator: profile?.name,
     alternates: { canonical: "/" },
     openGraph: {
-      type: "website",
+      type: "profile",
       url: SITE_URL,
       siteName: seo.siteName,
       title,
       description,
+      locale: "en_US",
       images: [{ url: image, width: 1200, height: 630, alt: seo.siteName }],
     },
     twitter: {

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { getPost, getPosts } from "@/lib/blog";
+import { getPost } from "@/lib/blog";
 import { getPortfolio } from "@/lib/portfolio";
 import {
   JsonLd,
@@ -11,15 +11,7 @@ import {
   breadcrumbJsonLd,
 } from "@/components/seo/JsonLd";
 
-export async function generateStaticParams() {
-  try {
-    const posts = await getPosts();
-    return posts.map((p) => ({ slug: p.slug }));
-  } catch {
-    // API unreachable at build time — pages render on demand via ISR instead.
-    return [];
-  }
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,

@@ -1,5 +1,6 @@
 import type { Experience } from "@portfolio/types";
 import { SectionHeader } from "./SectionHeader";
+import { splitDescription } from "@/lib/llms";
 
 const CHAMFER =
   "polygon(0 0,calc(100% - 18px) 0,100% 18px,100% 100%,18px 100%,0 calc(100% - 18px))";
@@ -32,13 +33,34 @@ export function Experiences({ experiences = [] }: { experiences?: Experience[] }
               <h3 className="text-[18px] font-bold" style={{ fontFamily: "var(--font-ui), sans-serif", color: "#fff" }}>
                 {e.title}
               </h3>
-              <p className="mt-1 text-[13.5px] leading-6" style={{ color: "#a8a8c2" }}>
-                {e.description}
-              </p>
+              <ExperienceBody description={e.description} />
             </div>
           </div>
         ))}
       </div>
     </section>
+  );
+}
+
+function ExperienceBody({ description }: { description: string }) {
+  const { lead, bullets } = splitDescription(description);
+  return (
+    <>
+      {lead && (
+        <p className="mt-1 text-[13px] leading-6" style={{ color: "#9a9ab8" }}>
+          {lead}
+        </p>
+      )}
+      {bullets.length > 0 && (
+        <ul className="mt-2 flex list-none flex-col gap-1.5 p-0">
+          {bullets.map((b) => (
+            <li key={b} className="relative pl-4 text-[13.5px] leading-6" style={{ color: "#a8a8c2" }}>
+              <span className="absolute left-0" style={{ color: "#22d3ee" }}>▸</span>
+              {b}
+            </li>
+          ))}
+        </ul>
+      )}
+    </>
   );
 }

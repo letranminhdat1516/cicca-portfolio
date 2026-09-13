@@ -2,17 +2,18 @@ import { ImageResponse } from "next/og";
 import { getPortfolio } from "@/lib/portfolio";
 import { seoOf } from "@/lib/seo";
 
-export const alt = "Lê Trần Minh Đạt — Creative Developer & AI Engineer";
+export const alt = "Le Tran Minh Dat — AI-Native Full-Stack Developer";
+export const revalidate = 3600;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 // Branded neon Open Graph card, generated from CMS content. Falls back to
 // static text if the API is unreachable at build/runtime.
 export default async function Image() {
-  let name = "Lê Trần Minh Đạt";
-  let role = "Creative Developer & AI Engineer";
+  let name = "Le Tran Minh Dat";
+  let role = "AI-Native Full-Stack Developer";
   let tagline =
-    "Production AI agents, real-time systems, and full-stack web apps.";
+    "LLM gateways, RAG agents, ERP and computer vision — shipped to production.";
   try {
     const data = await getPortfolio();
     const seo = seoOf(data);

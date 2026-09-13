@@ -27,18 +27,30 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Lê Trần Minh Đạt — Creative Developer & AI Engineer",
-    template: "%s — Lê Trần Minh Đạt",
+    default: "Le Tran Minh Dat — AI-Native Full-Stack Developer",
+    template: "%s — Le Tran Minh Dat",
   },
   description:
-    "Creative full-stack & AI developer building production AI agents (Claude Agent SDK, RAG), real-time systems, and full-stack web apps — from trading to ERP.",
+    "AI-native full-stack developer in Ho Chi Minh City. Shipped 6 production systems: a bank LLM gateway, RAG agents, a VAS ERP and real-time computer vision.",
+  applicationName: "Le Tran Minh Dat",
+  authors: [{ name: "Le Tran Minh Dat", url: SITE_URL }],
+  creator: "Le Tran Minh Dat",
+  category: "technology",
   openGraph: {
     type: "website",
-    siteName: "Lê Trần Minh Đạt",
+    siteName: "Le Tran Minh Dat",
     url: SITE_URL,
+    locale: "en_US",
   },
   twitter: { card: "summary_large_image" },
-  robots: { index: true, follow: true },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
+  },
+  alternates: {
+    types: { "text/plain": [{ url: "/llms.txt", title: "LLM-readable profile" }] },
+  },
 };
 
 export default function RootLayout({

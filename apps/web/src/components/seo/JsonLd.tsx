@@ -1,5 +1,5 @@
 import type { BlogPost, Portfolio } from "@portfolio/types";
-import { SITE_URL, ogImage, seoOf } from "@/lib/seo";
+import { CV_PDF_PATH, SITE_URL, absoluteUrl, ogImage, seoOf } from "@/lib/seo";
 
 /**
  * Structured data (schema.org JSON-LD). This is the single highest-leverage signal
@@ -17,45 +17,124 @@ export function JsonLd({ data }: { data: object | object[] }) {
   );
 }
 
-export function homeJsonLd(portfolio: Portfolio): object[] {
-  const seo = seoOf(portfolio);
-  const { profile, socials, skillGroups } = portfolio;
-  const sameAs = [...(socials ?? []).map((s) => s.href)].filter(
-    (v): v is string => Boolean(v) && v !== "#",
-  );
-  const skills = (skillGroups ?? []).flatMap((g) => g.items.map((i) => i.n));
+export const PERSON_ID = `${SITE_URL}/#person`;
+const WEBSITE_ID = `${SITE_URL}/#website`;
 
-  const person = {
+// Parse "B.Eng. Software Engineering — FPT University" style achievement titles.
+const EDUCATION_RE = /^(.+?)\s+—\s+(.*University.*)$/i;
+
+/** The Person entity every page references by @id. */
+export function personJsonLd(portfolio: Portfolio): object {
+  const seo = seoOf(portfolio);
+  const { profile, socials, skillGroups, achievements, experiences } = portfolio;
+  const sameAs = (socials ?? [])
+    .map((s) => s.href)
+    .filter((h): h is string => Boolean(h) && /^https?:\/\//.test(h));
+
+  const groups = skillGroups ?? [];
+  const spoken = groups.find((g) => /spoken|language/i.test(g.name));
+  const skills = groups
+    .filter((g) => g !== spoken)
+    .flatMap((g) => g.items.map((i) => i.n));
+  const languages = (spoken?.items ?? []).map((i) => i.n.replace(/\s*\(.*\)$/, ""));
+
+  const education = (achievements ?? [])
+    .map((a) => a.title.match(EDUCATION_RE))
+    .filter((m): m is RegExpMatchArray => Boolean(m));
+  const awards = (achievements ?? [])
+    .filter((a) => /award/i.test(a.year) || /top \d|prize|winner|champion/i.test(a.title))
+    .map((a) => a.title);
+  const current = (experiences ?? []).filter((e) => /present/i.test(e.period));
+
+  return {
     "@context": "https://schema.org",
     "@type": "Person",
+    "@id": PERSON_ID,
     name: profile?.name,
+    alternateName: ["Lê Trần Minh Đạt", "Le Tran Minh Dat", "Dat Le"].filter(
+      (n) => n !== profile?.name,
+    ),
     jobTitle: profile?.classRole,
     description: profile?.bio,
     email: profile?.email ? `mailto:${profile.email}` : undefined,
     url: SITE_URL,
-    image: ogImage(seo),
-    knowsAbout: skills.slice(0, 25),
+    image: profile?.avatarUrl ? absoluteUrl(profile.avatarUrl) : ogImage(seo),
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "Ho Chi Minh City",
+      addressCountry: "VN",
+    },
+    knowsAbout: skills.slice(0, 30),
+    knowsLanguage: languages.length ? languages : undefined,
+    alumniOf: education.map((m) => ({
+      "@type": "CollegeOrUniversity",
+      name: m[2],
+    })),
+    hasCredential: education.map((m) => ({
+      "@type": "EducationalOccupationalCredential",
+      credentialCategory: "degree",
+      name: m[1],
+      recognizedBy: { "@type": "CollegeOrUniversity", name: m[2] },
+    })),
+    award: awards.length ? awards : undefined,
+    hasOccupation: current.map((e) => ({
+      "@type": "Occupation",
+      name: e.title,
+      description: e.description.split("\n")[0],
+    })),
+    subjectOf: {
+      "@type": "DigitalDocument",
+      name: `${profile?.name ?? "Résumé"} — Résumé`,
+      encodingFormat: "application/pdf",
+      url: absoluteUrl(CV_PDF_PATH),
+    },
     sameAs,
   };
+}
+
+export function homeJsonLd(portfolio: Portfolio): object[] {
+  const seo = seoOf(portfolio);
 
   const website = {
     "@context": "https://schema.org",
     "@type": "WebSite",
+    "@id": WEBSITE_ID,
     name: seo.siteName,
     url: SITE_URL,
     description: seo.defaultDescription,
     inLanguage: "en",
-    author: { "@type": "Person", name: profile?.name },
+    author: { "@id": PERSON_ID },
+    publisher: { "@id": PERSON_ID },
   };
 
   const profilePage = {
     "@context": "https://schema.org",
     "@type": "ProfilePage",
+    url: SITE_URL,
+    isPartOf: { "@id": WEBSITE_ID },
     dateModified: new Date().toISOString().slice(0, 10),
-    mainEntity: { "@type": "Person", name: profile?.name },
+    mainEntity: { "@id": PERSON_ID },
   };
 
-  return [person, website, profilePage];
+  return [personJsonLd(portfolio), website, profilePage];
+}
+
+export function cvJsonLd(portfolio: Portfolio): object[] {
+  return [
+    personJsonLd(portfolio),
+    {
+      "@context": "https://schema.org",
+      "@type": "ProfilePage",
+      name: `${portfolio.profile?.name ?? ""} — Résumé`.trim(),
+      url: `${SITE_URL}/cv`,
+      isPartOf: { "@id": WEBSITE_ID },
+      mainEntity: { "@id": PERSON_ID },
+    },
+    breadcrumbJsonLd([
+      { name: "Home", path: "/" },
+      { name: "Résumé", path: "/cv" },
+    ]),
+  ];
 }
 
 export function articleJsonLd(post: BlogPost, authorName?: string): object {
@@ -69,7 +148,7 @@ export function articleJsonLd(post: BlogPost, authorName?: string): object {
     keywords: post.tags?.join(", "),
     image: post.coverImage ?? `${SITE_URL}/opengraph-image`,
     url: `${SITE_URL}/blog/${post.slug}`,
-    author: { "@type": "Person", name: authorName ?? "Author" },
+    author: { "@type": "Person", "@id": PERSON_ID, name: authorName ?? "Author" },
     mainEntityOfPage: `${SITE_URL}/blog/${post.slug}`,
   };
 }

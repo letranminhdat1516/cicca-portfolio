@@ -12,6 +12,10 @@ import { Resources } from "@/components/Resources";
 import { Contact } from "@/components/Contact";
 import { Footer } from "@/components/Footer";
 
+// Rendered per request (content fetches are cached 60s) so the image build
+// never needs a live API.
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata(): Promise<Metadata> {
   const data = await getPortfolio();
   return buildHomeMetadata(data);

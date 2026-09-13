@@ -3,12 +3,14 @@ import Link from "next/link";
 import { getPosts } from "@/lib/blog";
 import { SectionHeader } from "@/components/SectionHeader";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Blog",
-  description: "Dev logs, mission write-ups, and notes from the field.",
+  description: "Engineering notes by Le Tran Minh Dat on LLM gateways, RAG agents and full-stack delivery.",
   alternates: { canonical: "/blog" },
   openGraph: {
-    title: "Blog — PLAYER_01.sys",
+    title: "Blog — Le Tran Minh Dat",
     description: "Dev logs, mission write-ups, and notes from the field.",
     type: "website",
     url: "/blog",

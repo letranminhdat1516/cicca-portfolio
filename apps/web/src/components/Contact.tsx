@@ -32,6 +32,19 @@ export function Contact({ profile, socials }: { profile: Profile; socials: Socia
         >
           {profile.email} ▸
         </a>
+        <a
+          href="/cv/letranminhdat-cv.pdf"
+          target="_blank"
+          rel="noopener"
+          className="px-7 py-3 text-[12px] font-bold tracking-widest no-underline"
+          style={{
+            fontFamily: "var(--font-mono), monospace",
+            color: "#ffd23f",
+            border: "1px solid rgba(255,210,63,0.4)",
+          }}
+        >
+          DOWNLOAD CV (PDF)
+        </a>
         <div className="flex gap-2">
           {socials.map((s) => (
             <a

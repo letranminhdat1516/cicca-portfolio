@@ -77,6 +77,16 @@ export function HudNav() {
               <span className="absolute -bottom-1 left-0 h-px w-0 bg-[#22d3ee] transition-all group-hover:w-full" />
             </a>
           </li>
+          <li>
+            <a
+              href="/cv"
+              className="group relative text-[12px] tracking-widest text-[#ffd23f] no-underline transition-colors hover:text-[#22d3ee]"
+              style={{ fontFamily: "var(--font-mono), monospace" }}
+            >
+              CV
+              <span className="absolute -bottom-1 left-0 h-px w-0 bg-[#22d3ee] transition-all group-hover:w-full" />
+            </a>
+          </li>
         </ul>
       </nav>
     </header>

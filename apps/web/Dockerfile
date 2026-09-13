@@ -13,10 +13,15 @@ RUN pnpm install --frozen-lockfile
 # Sources
 COPY packages packages
 COPY apps/web apps/web
-# Public API URL is baked into the client bundle at build time. Rebuild this
-# image whenever the public domain changes.
+# Baked at build time — rebuild the image whenever the domain or API host changes:
+#  - NEXT_PUBLIC_* are inlined into the browser bundle (tracker, admin, SEO URLs)
+#  - API_INTERNAL_URL is the /api/* rewrite target (Next evaluates rewrites at build)
 ARG NEXT_PUBLIC_API_URL=""
+ARG NEXT_PUBLIC_SITE_URL=""
+ARG API_INTERNAL_URL="http://portfolio-api:3001"
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
+ENV API_INTERNAL_URL=$API_INTERNAL_URL
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN pnpm --filter @portfolio/web build
 
