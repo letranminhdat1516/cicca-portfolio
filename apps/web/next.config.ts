@@ -5,6 +5,14 @@ import type { NextConfig } from "next";
 // are baked at build time, so the container build must pass the in-cluster URL.
 const API_INTERNAL = process.env.API_INTERNAL_URL ?? "http://localhost:3101";
 
+// Non-canonical hostnames that serve the same app get a 301 to the canonical
+// site so search engines consolidate on one domain.
+const SITE = new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000");
+const ALIAS_HOSTS = [
+  `www.${SITE.hostname}`,
+  ...(process.env.ALIAS_HOSTS ?? "").split(",").map((h) => h.trim()),
+].filter(Boolean);
+
 const nextConfig: NextConfig = {
   // Self-contained server for the container image (apps/web/Dockerfile).
   output: "standalone",
@@ -15,6 +23,15 @@ const nextConfig: NextConfig = {
   // e.g. /api/content -> http://localhost:3101/content
   async rewrites() {
     return [{ source: "/api/:path*", destination: `${API_INTERNAL}/:path*` }];
+  },
+  async redirects() {
+    if (SITE.hostname === "localhost") return [];
+    return ALIAS_HOSTS.map((host) => ({
+      source: "/:path*",
+      has: [{ type: "host" as const, value: host }],
+      destination: `${SITE.origin}/:path*`,
+      permanent: true,
+    }));
   },
   async headers() {
     return [
