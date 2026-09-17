@@ -8,7 +8,7 @@ export function Resources({ resources = [] }: { resources?: Resource[] }) {
   if (resources.length === 0) return null;
   return (
     <section id="resources" className="mx-auto max-w-[1180px] px-6 py-20">
-      <SectionHeader index="07" label="SUPPLY DROP" title="SHARED LOOT" />
+      <SectionHeader index="07" label="SUPPLY DROP" title="SHARED LOOT" plain="Résumé and resources" />
       <div className="grid grid-cols-1 gap-5 [@media(min-width:700px)]:grid-cols-2 [@media(min-width:1000px)]:grid-cols-3">
         {resources.map((r) => (
           <div

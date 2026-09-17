@@ -1,27 +1,41 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getPosts } from "@/lib/blog";
+import { getPortfolio } from "@/lib/portfolio";
+import { pageMetadata, seoOf } from "@/lib/seo";
+import { JsonLd, blogJsonLd } from "@/components/seo/JsonLd";
 import { SectionHeader } from "@/components/SectionHeader";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Blog",
-  description: "Engineering notes by Le Tran Minh Dat on LLM gateways, RAG agents and full-stack delivery.",
-  alternates: { canonical: "/blog" },
-  openGraph: {
-    title: "Blog — Le Tran Minh Dat",
-    description: "Dev logs, mission write-ups, and notes from the field.",
-    type: "website",
-    url: "/blog",
-  },
-};
+const DESCRIPTION =
+  "Engineering notes by Le Tran Minh Dat on LLM gateways, RAG agents and full-stack delivery.";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const seo = seoOf(await getPortfolio().catch(() => null));
+  return pageMetadata({ seo, path: "/blog", title: "Blog", description: DESCRIPTION });
+}
 
 export default async function BlogIndex() {
-  const posts = await getPosts();
+  const [posts, authorName] = await Promise.all([
+    getPosts(),
+    getPortfolio()
+      .then((d) => d.profile?.name)
+      .catch(() => undefined),
+  ]);
   return (
     <main className="mx-auto max-w-[820px] px-6 pt-32 pb-20">
-      <SectionHeader index="LOG" label="DISPATCHES" title="BLOG" />
+      <JsonLd data={blogJsonLd(posts, authorName)} />
+      <SectionHeader index="LOG" label="DISPATCHES" />
+      <h1
+        className="mt-2 mb-3 font-bold"
+        style={{ fontFamily: "var(--font-title), sans-serif", fontSize: "clamp(26px,4vw,40px)", color: "#fff" }}
+      >
+        BLOG
+      </h1>
+      <p className="mb-8 text-[14px] leading-6" style={{ color: "#a8a8c2" }}>
+        {DESCRIPTION}
+      </p>
       <div className="flex flex-col gap-5">
         {posts.length === 0 && (
           <p style={{ color: "#9a9ab8" }}>No dispatches yet. Check back soon.</p>

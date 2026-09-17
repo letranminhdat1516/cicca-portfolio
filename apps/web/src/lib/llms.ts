@@ -1,5 +1,6 @@
-import type { BlogPostSummary, Portfolio } from "@portfolio/types";
-import { CV_PDF_PATH, absoluteUrl, seoOf } from "./seo";
+import type { BlogPost, BlogPostSummary, Portfolio } from "@portfolio/types";
+import { CV_PDF_PATH, NATIVE_NAME, absoluteUrl, projectPath, seoOf } from "./seo";
+import { buildFaq, placeName } from "./faq";
 
 const oneLine = (s: string) => s.replace(/\s+/g, " ").trim();
 
@@ -33,7 +34,10 @@ export function buildLlmsTxt(
 
   out.push(`# ${p?.name ?? seo.siteName}`, "", `> ${oneLine(seo.defaultDescription)}`);
   if (p) {
-    out.push("", oneLine(`${p.name} — ${p.classRole}, based in ${titleCase(p.region)}. ${p.bio}`));
+    out.push(
+      "",
+      oneLine(`${p.name} (Vietnamese: ${NATIVE_NAME}) — ${p.classRole}, based in ${placeName(p.region)}. ${p.bio}`),
+    );
   }
 
   section("Key pages");
@@ -42,7 +46,15 @@ export function buildLlmsTxt(
     `- [Résumé](${absoluteUrl("/cv")}): full CV as a web page`,
     `- [Résumé PDF](${absoluteUrl(CV_PDF_PATH)}): one-page printable CV`,
     `- [Blog](${absoluteUrl("/blog")}): engineering notes`,
+    `- [Full text](${absoluteUrl("/llms-full.txt")}): this briefing plus every article in full`,
   );
+
+  const faqs = buildFaq(data);
+  if (faqs.length) {
+    section("FAQ");
+    for (const f of faqs) out.push(`**${f.q}**`, f.a, "");
+    out.pop();
+  }
 
   if (data.experiences?.length) {
     section("Experience");
@@ -59,7 +71,7 @@ export function buildLlmsTxt(
   if (data.missions?.length) {
     section("Projects");
     for (const m of data.missions) {
-      out.push(`- **${m.title}** (${m.status.toLowerCase()}): ${oneLine(m.objective)} Stack: ${m.loadout.join(", ")}.`);
+      out.push(`- ${m.content?.trim() ? `[${m.title}](${absoluteUrl(projectPath(m))})` : `**${m.title}**`} (${m.status.toLowerCase()}): ${oneLine(m.objective)} Stack: ${m.loadout.join(", ")}.`);
     }
   }
 
@@ -97,9 +109,24 @@ export function buildLlmsTxt(
   return out.join("\n") + "\n";
 }
 
-function titleCase(s: string): string {
-  return s
-    .toLowerCase()
-    .replace(/\b([a-z])/g, (c) => c.toUpperCase())
-    .replace(/\bVn\b/, "Vietnam");
+/** /llms-full.txt — the briefing plus the full markdown of every article. */
+export function buildLlmsFullTxt(
+  data: Portfolio,
+  posts: BlogPost[] = [],
+): string {
+  const out = [buildLlmsTxt(data, posts).trimEnd()];
+  for (const post of posts) {
+    out.push(
+      "",
+      "---",
+      "",
+      `# ${post.title}`,
+      "",
+      `Source: ${absoluteUrl(`/blog/${post.slug}`)}`,
+      ...(post.publishedAt ? [`Published: ${post.publishedAt.slice(0, 10)}`] : []),
+      "",
+      post.content.trim(),
+    );
+  }
+  return out.join("\n") + "\n";
 }

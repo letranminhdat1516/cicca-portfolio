@@ -1,6 +1,7 @@
 import { CinematicBg } from "@/components/CinematicBg";
 import { HudNav } from "@/components/HudNav";
 import { CursorFx } from "@/components/CursorFx";
+import { Footer } from "@/components/Footer";
 import { Tracker } from "@/components/analytics/Tracker";
 
 export default function SiteLayout({
@@ -12,7 +13,10 @@ export default function SiteLayout({
       <CinematicBg />
       <CursorFx />
       <HudNav />
-      <div className="relative z-10">{children}</div>
+      <div className="relative z-10">
+        {children}
+        <Footer />
+      </div>
     </>
   );
 }

@@ -4,7 +4,7 @@ import { SectionHeader } from "./SectionHeader";
 export function Inventory({ skillGroups }: { skillGroups: SkillGroup[] }) {
   return (
     <section id="inventory" className="mx-auto max-w-[1180px] px-6 py-20">
-      <SectionHeader index="03" label="SKILL INVENTORY" title="EQUIPPED LOADOUT" />
+      <SectionHeader index="03" label="SKILL INVENTORY" title="EQUIPPED LOADOUT" plain="Skills and tech stack" />
       <div className="flex flex-col gap-8">
         {skillGroups.map((group) => (
           <div key={group.name}>

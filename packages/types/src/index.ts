@@ -38,6 +38,8 @@ export interface Mission {
   status: "COMPLETE" | "ACTIVE";
   statusColor: string;
   loadout: string[];
+  /** Long-form markdown case study; the project gets its own page once set. */
+  content?: string | null;
 }
 
 export interface SkillItem {
@@ -71,6 +73,7 @@ export interface BlogPostSummary {
   tags: string[];
   coverImage: string | null;
   publishedAt: string | null;
+  updatedAt?: string;
 }
 
 export interface BlogPost extends BlogPostSummary {
@@ -105,6 +108,7 @@ export interface SeoSettings {
   twitterHandle: string | null;
   gscVerification: string | null;
   llmsTxt: string | null;
+  updatedAt?: string;
 }
 
 export interface Portfolio {

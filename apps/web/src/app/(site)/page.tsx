@@ -10,7 +10,8 @@ import { Trophies } from "@/components/Trophies";
 import { Experiences } from "@/components/Experiences";
 import { Resources } from "@/components/Resources";
 import { Contact } from "@/components/Contact";
-import { Footer } from "@/components/Footer";
+import { Faq } from "@/components/Faq";
+import { buildFaq } from "@/lib/faq";
 
 // Rendered per request (content fetches are cached 60s) so the image build
 // never needs a live API.
@@ -33,8 +34,8 @@ export default async function Home() {
       <Trophies achievements={data.achievements} />
       <Experiences experiences={data.experiences} />
       <Resources resources={data.resources} />
+      <Faq faqs={buildFaq(data)} />
       <Contact profile={data.profile} socials={data.socials} />
-      <Footer />
     </main>
   );
 }

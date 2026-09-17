@@ -42,6 +42,29 @@ const jsonLd = (html) =>
   check("JSON-LD WebSite + ProfilePage", ld.some((n) => n["@type"] === "WebSite") && ld.some((n) => n["@type"] === "ProfilePage"));
   check("CV content rendered", body.includes("LLM Gateway Engineer") && body.includes("FPT University"));
   check("no placeholder links", !/href="#"|example\.com/.test(body));
+  check("JSON-LD projects ItemList + FAQPage", ld.some((n) => n["@type"] === "ItemList") && ld.some((n) => n["@type"] === "FAQPage"));
+  check("FAQ rendered in HTML", body.includes("Who is ") && body.includes("<details"));
+  check("counters server-rendered (not 0)", !/>0<\/div><div[^>]*>PRODUCTION SYSTEMS/.test(body));
+  check("native-script name visible", body.replace(/<script.*?<\/script>/gs, "").includes("Lê Trần Minh Đạt"));
+  check("RSS + llms.txt alternates", body.includes('type="application/rss+xml"') && body.includes('href="' + SITE + '/llms.txt"'));
+  check("manifest + theme-color", body.includes('rel="manifest"') && body.includes('name="theme-color"'));
+  check("no x-powered-by", !res.headers.get("x-powered-by"));
+}
+
+// Blog
+{
+  const { res, body } = await get("/blog");
+  check("/blog 200 with og:image", res.status === 200 && new RegExp(`<meta property="og:image" content="${SITE}/`).test(body));
+  check("/blog single <h1> + Blog JSON-LD", (body.match(/<h1[\s>]/g) ?? []).length === 1 && jsonLd(body).some((n) => n["@type"] === "Blog"));
+  const slug = body.match(/href="\/blog\/([^"/]+)"/)?.[1];
+  if (slug) {
+    const post = await get(`/blog/${slug}`);
+    check("post og:image + twitter:image", /property="og:image"/.test(post.body) && /name="twitter:image"/.test(post.body));
+    const og = await get(`/blog/${slug}/og`, { method: "HEAD" });
+    check("post share card png", og.res.status === 200 && (og.res.headers.get("content-type") ?? "").startsWith("image/png"));
+  }
+  const missing = await get("/blog/this-post-does-not-exist");
+  check("unknown post → 404 noindex", missing.res.status === 404 && /name="robots" content="noindex/.test(missing.body));
 }
 
 // Résumé page
@@ -74,6 +97,17 @@ const jsonLd = (html) =>
   const llms = await get("/llms.txt");
   check("llms.txt 200 text/plain", llms.res.status === 200 && (llms.res.headers.get("content-type") ?? "").startsWith("text/plain"));
   check("llms.txt profile briefing", llms.body.startsWith("# ") && ["## Experience", "## Projects", "## Skills", "## Education & awards", "## Contact"].every((h) => llms.body.includes(h)));
+
+  const smLast = [...sm.body.matchAll(/<lastmod>(.*?)<\/lastmod>/g)].map((m) => Date.parse(m[1]));
+  check("sitemap lastmod is a real edit time, not now()", smLast.every((t) => Date.now() - t > 60_000));
+  check("llms.txt has FAQ", llms.body.includes("## FAQ"));
+
+  const full = await get("/llms-full.txt");
+  check("llms-full.txt 200 text/plain", full.res.status === 200 && (full.res.headers.get("content-type") ?? "").startsWith("text/plain"));
+  const feed = await get("/feed.xml");
+  check("RSS feed", feed.res.status === 200 && feed.body.includes("<rss") && (feed.res.headers.get("content-type") ?? "").includes("rss+xml"));
+  const mf = await get("/manifest.webmanifest");
+  check("web manifest", mf.res.status === 200 && JSON.parse(mf.body).icons?.length > 0);
 
   const og = await get("/opengraph-image", { method: "HEAD" });
   check("OG image png", og.res.status === 200 && (og.res.headers.get("content-type") ?? "").startsWith("image/png"));

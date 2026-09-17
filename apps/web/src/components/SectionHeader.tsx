@@ -2,18 +2,21 @@ export function SectionHeader({
   index,
   label,
   title,
+  plain,
   center,
 }: {
   index: string;
   label: string;
   title?: string;
+  /** Plain-language meaning of a themed title, for screen readers and crawlers. */
+  plain?: string;
   center?: boolean;
 }) {
   return (
     <div className={center ? "text-center" : ""}>
       <div
         className="text-[11px] tracking-[4px]"
-        style={{ fontFamily: "var(--font-mono), monospace", color: "#b026ff" }}
+        style={{ fontFamily: "var(--font-mono), monospace", color: "#bf4dff" }}
       >
         [{index}] {label}
       </div>
@@ -27,6 +30,7 @@ export function SectionHeader({
           }}
         >
           {title}
+          {plain && <span className="sr-only"> — {plain}</span>}
         </h2>
       )}
     </div>

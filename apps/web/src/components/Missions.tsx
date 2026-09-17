@@ -1,5 +1,6 @@
 "use client";
 import type { Mission } from "@portfolio/types";
+import Link from "next/link";
 import { useTilt } from "@/hooks/useTilt";
 import { SectionHeader } from "./SectionHeader";
 
@@ -11,7 +12,8 @@ function MissionCard({ m }: { m: Mission }) {
   return (
     <article
       ref={ref}
-      className="p-5"
+      id={m.slug}
+      className="scroll-mt-24 p-5"
       style={{
         background: "rgba(10,10,18,0.7)",
         border: "1px solid rgba(176,38,255,0.2)",
@@ -21,7 +23,7 @@ function MissionCard({ m }: { m: Mission }) {
       <div className="flex items-center justify-between">
         <span
           className="text-[11px] tracking-[2px]"
-          style={{ fontFamily: "var(--font-mono), monospace", color: "#b026ff" }}
+          style={{ fontFamily: "var(--font-mono), monospace", color: "#bf4dff" }}
         >
           {m.code}
         </span>
@@ -59,6 +61,15 @@ function MissionCard({ m }: { m: Mission }) {
           </span>
         ))}
       </div>
+      {m.content?.trim() && (
+        <Link
+          href={`/projects/${m.slug}`}
+          className="mt-4 inline-block text-[11px] tracking-widest no-underline"
+          style={{ fontFamily: "var(--font-mono), monospace", color: "#22d3ee" }}
+        >
+          ‹ READ THE CASE STUDY: {m.title} ›
+        </Link>
+      )}
     </article>
   );
 }
@@ -66,7 +77,7 @@ function MissionCard({ m }: { m: Mission }) {
 export function Missions({ missions }: { missions: Mission[] }) {
   return (
     <section id="missions" className="mx-auto max-w-[1180px] px-6 py-20">
-      <SectionHeader index="02" label="MISSION LOG" title="COMPLETED MISSIONS" />
+      <SectionHeader index="02" label="MISSION LOG" title="COMPLETED MISSIONS" plain="Projects" />
       <div className="grid grid-cols-1 gap-5 [@media(min-width:900px)]:grid-cols-2">
         {missions.map((m) => (
           <MissionCard key={m.code} m={m} />

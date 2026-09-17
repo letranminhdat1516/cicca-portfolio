@@ -14,6 +14,11 @@ export const AI_CRAWLERS = [
   "Perplexity-User",
   "Google-Extended",
   "Applebot-Extended",
+  "meta-externalagent",
+  "Amazonbot",
+  "DuckAssistBot",
+  "MistralAI-User",
+  "cohere-ai",
   "CCBot",
 ];
 

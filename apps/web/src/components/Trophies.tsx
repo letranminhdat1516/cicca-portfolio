@@ -6,7 +6,7 @@ export function Trophies({ achievements }: { achievements: Achievement[] }) {
   return (
     <section id="trophies" className="relative mx-auto max-w-[1180px] px-6 py-20">
       {achievements[0] && <AchievementToast title={achievements[0].title} />}
-      <SectionHeader index="04" label="ACHIEVEMENTS" title="TROPHIES UNLOCKED" />
+      <SectionHeader index="04" label="ACHIEVEMENTS" title="TROPHIES UNLOCKED" plain="Education and awards" />
       <div className="relative pl-8">
         <div
           className="absolute left-[6px] top-1 bottom-1 w-px"

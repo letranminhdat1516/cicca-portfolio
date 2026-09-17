@@ -51,7 +51,7 @@ export function HudNav() {
             style={{ fontFamily: "var(--font-mono), monospace" }}
             className="text-[13px] tracking-widest text-[#e8e8f0]"
           >
-            PLAYER_01<span style={{ color: "#b026ff" }}>.sys</span>
+            PLAYER_01<span style={{ color: "#bf4dff" }}>.sys</span>
           </span>
         </a>
         <ul className="hidden gap-6 md:flex">

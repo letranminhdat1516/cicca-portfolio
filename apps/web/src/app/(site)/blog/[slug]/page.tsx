@@ -3,8 +3,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { getPost } from "@/lib/blog";
+import { getPost, isThin } from "@/lib/blog";
 import { getPortfolio } from "@/lib/portfolio";
+import { SITE_URL, pageMetadata, seoOf } from "@/lib/seo";
 import {
   JsonLd,
   articleJsonLd,
@@ -21,29 +22,25 @@ export async function generateMetadata({
   const { slug } = await params;
   try {
     const post = await getPost(slug);
-    return {
+    const seo = seoOf(await getPortfolio().catch(() => null));
+    return pageMetadata({
+      seo,
+      path: `/blog/${slug}`,
       title: post.title,
       description: post.excerpt,
       keywords: post.tags,
-      alternates: { canonical: `/blog/${slug}` },
+      image: post.coverImage ?? `/blog/${slug}/og`,
+      noindex: isThin(post),
       openGraph: {
-        title: post.title,
-        description: post.excerpt,
         type: "article",
-        url: `/blog/${slug}`,
         publishedTime: post.publishedAt ?? undefined,
         modifiedTime: post.updatedAt ?? undefined,
+        authors: [SITE_URL],
         tags: post.tags,
-        images: post.coverImage ? [post.coverImage] : undefined,
       },
-      twitter: {
-        card: "summary_large_image",
-        title: post.title,
-        description: post.excerpt,
-      },
-    };
+    });
   } catch {
-    return { title: "Not found" };
+    return { title: "Not found", robots: { index: false, follow: false } };
   }
 }
 
@@ -96,7 +93,7 @@ export default async function BlogPostPage({
       </h1>
       {post.publishedAt && (
         <div className="mt-2 text-[12px] tracking-widest" style={{ fontFamily: "var(--font-mono), monospace", color: "#9a9ab8" }}>
-          {new Date(post.publishedAt).toISOString().slice(0, 10)} · {post.tags.map((t) => `#${t}`).join(" ")}
+          <time dateTime={post.publishedAt}>{new Date(post.publishedAt).toISOString().slice(0, 10)}</time> · {post.tags.map((t) => `#${t}`).join(" ")}
         </div>
       )}
       <article className="md mt-8">

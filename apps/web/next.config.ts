@@ -16,6 +16,7 @@ const ALIAS_HOSTS = [
 const nextConfig: NextConfig = {
   // Self-contained server for the container image (apps/web/Dockerfile).
   output: "standalone",
+  poweredByHeader: false,
   outputFileTracingRoot: path.join(__dirname, "../../"),
   transpilePackages: ["@portfolio/design-tokens", "@portfolio/types"],
   // Proxy same-origin /api/* to the internal NestJS API, so the browser only
@@ -35,6 +36,13 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [
+      {
+        source: "/:path*",
+        headers: [
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+        ],
+      },
       {
         // The PDF carries a third party's contact details (the reference), so
         // search engines index the HTML résumé at /cv instead of the file.

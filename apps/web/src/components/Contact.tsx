@@ -50,7 +50,8 @@ export function Contact({ profile, socials }: { profile: Profile; socials: Socia
             <a
               key={s.label}
               href={s.href}
-              aria-label={s.name}
+              // rel="me" ties these profiles to this site as the same identity.
+              rel={/^https?:/.test(s.href) ? "me noopener" : undefined}
               title={s.name}
               className="grid h-9 w-9 place-items-center text-[11px] font-bold no-underline transition-colors hover:text-[#22d3ee]"
               style={{
@@ -60,7 +61,8 @@ export function Contact({ profile, socials }: { profile: Profile; socials: Socia
                 clipPath: "polygon(0 0,100% 0,100% 70%,calc(100% - 8px) 100%,0 100%)",
               }}
             >
-              {s.label}
+              <span aria-hidden="true">{s.label}</span>
+              <span className="sr-only">{s.name}</span>
             </a>
           ))}
         </div>

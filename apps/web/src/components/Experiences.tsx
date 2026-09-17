@@ -9,7 +9,7 @@ export function Experiences({ experiences = [] }: { experiences?: Experience[] }
   if (experiences.length === 0) return null;
   return (
     <section id="experiences" className="mx-auto max-w-[1180px] px-6 py-20">
-      <SectionHeader index="06" label="CAMPAIGN HISTORY" title="EXPERIENCE" />
+      <SectionHeader index="06" label="CAMPAIGN HISTORY" title="EXPERIENCE" plain="Work experience" />
       <div className="flex flex-col gap-4">
         {experiences.map((e) => (
           <div

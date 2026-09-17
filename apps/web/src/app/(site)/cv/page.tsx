@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getPortfolio } from "@/lib/portfolio";
-import { CV_PDF_PATH, ogImage, seoOf } from "@/lib/seo";
+import { CV_PDF_PATH, pageMetadata, seoOf } from "@/lib/seo";
 import { splitDescription } from "@/lib/llms";
 import { JsonLd, cvJsonLd } from "@/components/seo/JsonLd";
 
@@ -15,19 +15,14 @@ export async function generateMetadata(): Promise<Metadata> {
   const name = data.profile?.name ?? seo.siteName;
   const title = `Résumé — ${name}, ${data.profile?.classRole ?? "Developer"}`;
   const description = `${name}'s CV: LLM gateway, RAG agents, VAS accounting ERP, computer vision and k3s platform work. Experience, skills, education and awards.`;
-  return {
-    title: { absolute: title },
+  return pageMetadata({
+    seo,
+    path: "/cv",
+    title,
+    absoluteTitle: true,
     description,
-    alternates: { canonical: "/cv" },
-    openGraph: {
-      type: "profile",
-      url: "/cv",
-      title,
-      description,
-      images: [{ url: ogImage(seo), width: 1200, height: 630, alt: name }],
-    },
-    twitter: { card: "summary_large_image", title, description },
-  };
+    openGraph: { type: "profile" },
+  });
 }
 
 const MONO = { fontFamily: "var(--font-mono), monospace" } as const;
@@ -53,7 +48,7 @@ export default async function CvPage() {
     <main className="mx-auto max-w-[880px] px-6 pt-32 pb-24">
       <JsonLd data={cvJsonLd(data)} />
 
-      <nav aria-label="Breadcrumb" className="text-[12px] tracking-widest" style={{ ...MONO, color: "#6b6b88" }}>
+      <nav aria-label="Breadcrumb" className="text-[12px] tracking-widest" style={{ ...MONO, color: "#8686a4" }}>
         <Link href="/" className="no-underline" style={{ color: "#22d3ee" }}>
           HOME
         </Link>{" "}
@@ -139,7 +134,7 @@ export default async function CvPage() {
                     {e.period}
                   </span>
                 </div>
-                <p className="mt-1 text-[12px] tracking-wide" style={{ ...MONO, color: "#b026ff" }}>
+                <p className="mt-1 text-[12px] tracking-wide" style={{ ...MONO, color: "#bf4dff" }}>
                   {e.org}
                 </p>
                 {lead && (
@@ -178,7 +173,7 @@ export default async function CvPage() {
               <p className="mt-1 text-[13.5px] leading-6" style={{ color: "#a8a8c2" }}>
                 {m.objective}
               </p>
-              <p className="mt-1 text-[12px]" style={{ ...MONO, color: "#6b6b88" }}>
+              <p className="mt-1 text-[12px]" style={{ ...MONO, color: "#8686a4" }}>
                 {m.loadout.join(" · ")}
               </p>
             </li>

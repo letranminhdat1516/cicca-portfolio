@@ -25,6 +25,7 @@ describe("seo helpers", () => {
     const m = buildHomeMetadata(portfolio);
     expect(m.title).toEqual({ absolute: portfolio.seo!.defaultTitle });
     expect(m.alternates?.canonical).toBe("/");
+    expect(m.alternates?.types).toHaveProperty("application/rss+xml");
     expect(m.openGraph).toMatchObject({ url: SITE_URL, siteName: "Le Tran Minh Dat" });
     expect(m.twitter).toMatchObject({ card: "summary_large_image" });
     expect(m.verification).toEqual({ google: "gsc-token" });

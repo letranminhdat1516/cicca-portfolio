@@ -4,7 +4,9 @@ import { useReducedMotion } from "./useReducedMotion";
 
 export function useCountUp<T extends HTMLElement>(target: number, durationMs = 1500) {
   const ref = useRef<T>(null);
-  const [value, setValue] = useState(0);
+  // Start at the real value so the server-rendered HTML (what crawlers and LLMs
+  // read) carries the number; the count-up only replays it once in view.
+  const [value, setValue] = useState(target);
   const reduced = useReducedMotion();
 
   useEffect(() => {

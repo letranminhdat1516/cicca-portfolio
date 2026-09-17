@@ -34,6 +34,7 @@ export function Hero({ profile, socials }: { profile: Profile; socials: Social[]
           }}
         >
           {profile.name}
+          <span className="sr-only"> — {profile.classRole}</span>
         </h1>
 
         <div
@@ -94,7 +95,8 @@ export function Hero({ profile, socials }: { profile: Profile; socials: Social[]
               <a
                 key={s.label}
                 href={s.href}
-                aria-label={s.name}
+                // rel="me" ties these profiles to this site as the same identity.
+                rel={/^https?:/.test(s.href) ? "me noopener" : undefined}
                 title={s.name}
                 className="grid h-9 w-9 place-items-center text-[11px] font-bold no-underline transition-colors hover:text-[#22d3ee]"
                 style={{
@@ -104,7 +106,8 @@ export function Hero({ profile, socials }: { profile: Profile; socials: Social[]
                   clipPath: "polygon(0 0,100% 0,100% 70%,calc(100% - 8px) 100%,0 100%)",
                 }}
               >
-                {s.label}
+                <span aria-hidden="true">{s.label}</span>
+                <span className="sr-only">{s.name}</span>
               </a>
             ))}
           </div>
@@ -128,7 +131,11 @@ export function Hero({ profile, socials }: { profile: Profile; socials: Social[]
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={profile.avatarUrl}
-              alt={profile.name}
+              alt={`${profile.name} — logo`}
+              width={900}
+              height={636}
+              fetchPriority="high"
+              decoding="async"
               className="h-full w-full object-contain p-2"
               // Logo art is dark (black text + crimson dragon). invert() flips the black
               // text to white so it reads on the dark hexagon; hue-rotate(180deg) swings
@@ -143,7 +150,7 @@ export function Hero({ profile, socials }: { profile: Profile; socials: Social[]
         <div className="text-center">
           <div
             className="text-[11px] tracking-[2px]"
-            style={{ fontFamily: "var(--font-mono), monospace", color: "#6b6b88" }}
+            style={{ fontFamily: "var(--font-mono), monospace", color: "#8686a4" }}
           >
             [REGION: {profile.region}]
           </div>

@@ -16,6 +16,7 @@ export class BlogService {
         tags: true,
         coverImage: true,
         publishedAt: true,
+        updatedAt: true,
       },
     });
   }

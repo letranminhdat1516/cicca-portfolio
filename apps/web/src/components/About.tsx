@@ -14,7 +14,7 @@ export function About({
 }) {
   return (
     <section id="about" className="mx-auto max-w-[1180px] px-6 py-20">
-      <SectionHeader index="01" label="PROFILE" title="CHARACTER DOSSIER" />
+      <SectionHeader index="01" label="PROFILE" title="CHARACTER DOSSIER" plain="About" />
       <div
         className="p-5"
         style={{
@@ -28,7 +28,7 @@ export function About({
           <span className="h-2.5 w-2.5 rounded-full" style={{ background: "#ff2d9b" }} />
           <span className="h-2.5 w-2.5 rounded-full" style={{ background: "#ffd23f" }} />
           <span className="h-2.5 w-2.5 rounded-full" style={{ background: "#4ade80" }} />
-          <span className="ml-2 text-[11px]" style={{ color: "#6b6b88" }}>
+          <span className="ml-2 text-[11px]" style={{ color: "#8686a4" }}>
             ~/profile/bio.log
           </span>
         </div>

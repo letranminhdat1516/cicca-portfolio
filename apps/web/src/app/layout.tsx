@@ -1,7 +1,7 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Orbitron, Space_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import { SITE_URL } from "@/lib/seo";
+import { SITE_URL, alternatesFor } from "@/lib/seo";
 
 const orbitron = Orbitron({
   variable: "--font-title",
@@ -48,10 +48,10 @@ export const metadata: Metadata = {
     follow: true,
     googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
   },
-  alternates: {
-    types: { "text/plain": [{ url: "/llms.txt", title: "LLM-readable profile" }] },
-  },
+  alternates: { types: alternatesFor("/").types },
 };
+
+export const viewport: Viewport = { themeColor: "#08070f", colorScheme: "dark" };
 
 export default function RootLayout({
   children,

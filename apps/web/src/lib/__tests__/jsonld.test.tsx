@@ -33,7 +33,7 @@ describe("JSON-LD", () => {
 
   it("links home and CV pages to the person entity", () => {
     const home = homeJsonLd(portfolio) as Obj[];
-    expect(home.map((n) => n["@type"])).toEqual(["Person", "WebSite", "ProfilePage"]);
+    expect(home.map((n) => n["@type"]).slice(0, 3)).toEqual(["Person", "WebSite", "ProfilePage"]);
     expect(home[2].mainEntity).toEqual({ "@id": PERSON_ID });
 
     const cv = cvJsonLd(portfolio) as Obj[];
