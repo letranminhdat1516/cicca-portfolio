@@ -180,7 +180,7 @@ export default async function ProjectPage({ params }: Params) {
       <section style={{ background: "rgba(10,16,52,0.7)", borderTop: "1px solid rgba(111,168,255,0.25)", borderBottom: "1px solid rgba(111,168,255,0.25)" }}>
         <div style={{ maxWidth: 1240, margin: "0 auto", padding: "88px 24px", display: "flex", flexWrap: "wrap", gap: "48px 72px" }}>
           <article style={{ flex: "999 1 620px", minWidth: 0, display: "flex", flexDirection: "column", gap: 12 }}>
-            <span style={{ ...KICKER, color: "#6FA8FF" }}>THE CASE STUDY</span>
+            <h2 style={{ ...KICKER, margin: 0, fontWeight: 400, color: "#6FA8FF" }}>THE CASE STUDY</h2>
             {m.content?.trim() ? (
               <div className="md" style={{ fontSize: 18 }}>
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.content}</ReactMarkdown>
@@ -194,7 +194,7 @@ export default async function ProjectPage({ params }: Params) {
           </article>
           <aside style={{ flex: "1 1 300px", minWidth: 0, display: "flex", flexDirection: "column", gap: 20 }}>
             <div style={{ ...ASIDE_CARD, gap: 10 }}>
-              <span style={{ ...KICKER, color: "#8C97B8" }}>LINKS</span>
+              <h2 style={{ ...KICKER, margin: 0, fontWeight: 400, color: "#8C97B8" }}>LINKS</h2>
               <Link href="/blog" style={{ ...LINK_ROW, background: ACCENT, color: "#FFFFFF" }}>
                 Read the write-ups <span aria-hidden="true">→</span>
               </Link>
@@ -203,7 +203,7 @@ export default async function ProjectPage({ params }: Params) {
               </Link>
             </div>
             <div style={{ ...ASIDE_CARD, gap: 14 }}>
-              <span style={{ ...KICKER, color: "#8C97B8" }}>STACK</span>
+              <h2 style={{ ...KICKER, margin: 0, fontWeight: 400, color: "#8C97B8" }}>STACK</h2>
               <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexWrap: "wrap", gap: 8 }}>
                 {m.loadout.map((t) => (
                   <li key={t}>

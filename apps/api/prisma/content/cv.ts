@@ -80,11 +80,11 @@ export const projects = [
     slug: 'bank-llm-gateway',
     title: 'AI Gateway for an Enterprise Bank',
     objective:
-      "LiteLLM extensions for an AI gateway shared by many teams at an enterprise banking client. Spend is reconciled from three sources (gateway ledger, Bedrock logs in CloudWatch, the AWS bill through Athena) with a per-service tax split, which caught a double-counting bug that reported nearly four times the real spend. Runs across four AWS accounts, with SES/SNS alerts, bulk team onboarding, an OAuth bridge and X-Ray trace IDs on every spend record. I lead delivery and planning since Aug 2026; the lead engineer audits and sets direction.",
+      "The bank runs open-source LiteLLM as one AI gateway for its internal teams. I extended it with a separate package and admin pages, without changing the LiteLLM core, so upstream releases still merge: a tamper-evident audit log, Vietnamese PII guardrails, SSO and an auditor role, budget-aware routing, alerts and bulk onboarding. I also built Bedrock cost reconciliation against invocation logs and the AWS bill (Athena) by team, user and model, with Bedrock tax shown separately; checking it against the real invoice exposed and fixed a 4x over-count. I own delivery and planning since Aug 2026; the lead engineer reviews and merges.",
     difficulty: '★★★★★',
     impact: 'SPEND MATCHED TO THE REAL AWS BILL',
     status: MissionStatus.ACTIVE,
-    loadout: ['LiteLLM', 'AWS Bedrock', 'Athena', 'CloudWatch', 'SES / SNS', 'X-Ray'],
+    loadout: ['LiteLLM', 'Python', 'AWS Bedrock', 'Athena', 'Terraform', 'Presidio'],
   },
   {
     slug: 'voice-ordering-agent',
@@ -215,10 +215,10 @@ export const experiences = [
     org: 'Enterprise banking client · Outsourced contract',
     period: 'Aug 2026 – Present',
     description: [
-      '2-engineer team: I lead delivery and planning; the lead engineer audits and sets direction.',
-      "- Build LiteLLM extensions for an AI gateway shared by many teams. Spend is reconciled from three sources (the gateway ledger, Bedrock call logs in CloudWatch, and the AWS bill through Athena) with a per-service tax split Cost Explorer can't give; it caught a double-counting bug that reported nearly four times the real spend.",
-      '- Run it across four AWS accounts with two identities: an assumed IAM role to read other accounts and a service identity to write results, with a one-click connection test in the UI.',
-      '- Alerts over SES, or SNS where there is no mail server, with templates editable without a redeploy; bulk import creates teams from a file and issues one key per person; an OAuth bridge serves providers that only accept localhost redirects, and every spend record carries an AWS X-Ray trace ID.',
+      '2-engineer team: I built the extension layer and own delivery and planning; the lead engineer reviews and merges.',
+      "- Extended the bank's open-source LiteLLM gateway with a separate package and admin pages, so upstream releases still merge: a tamper-evident audit log (append-only, hash-chained), Vietnamese PII guardrails with a false-positive review flow, SSO and an auditor role.",
+      '- Built Bedrock cost reconciliation that checks gateway spend against invocation logs and the AWS bill (Athena) every day, by account, team, user and model, with Bedrock tax shown separately; checking it against the real invoice exposed and fixed a 4x over-count.',
+      '- Added cross-account access through assumed roles, budget-aware model downgrade, alerts by email, SES and SNS, bulk onboarding from a spreadsheet, X-Ray-linked traces and Terraform for the AWS stack; wrote the architecture docs and runbooks for the handover.',
     ].join('\n'),
   },
   {

@@ -14,7 +14,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const seo = seoOf(data);
   const name = data.profile?.name ?? seo.siteName;
   const title = `Résumé — ${name}, ${data.profile?.classRole ?? "Developer"}`;
-  const description = `${name}'s CV: LLM gateway, RAG agents, VAS accounting ERP, computer vision and k3s platform work. Experience, skills, education and awards.`;
+  const description = `${name}'s CV: AI-native software engineer building AI agents, MCP servers, LLM gateways and RAG systems. Experience, skills, education and awards.`;
   return pageMetadata({
     seo,
     path: "/cv",
