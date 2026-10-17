@@ -276,7 +276,7 @@ export default async function ProjectPage({ params }: Params) {
 
       {/* NEXT */}
       {nextItem && (
-        <section style={{ maxWidth: 1240, margin: "0 auto", padding: "0 24px 96px" }}>
+        <section style={{ width: "100%", boxSizing: "border-box", maxWidth: 1240, margin: "0 auto", padding: "72px 24px 96px" }}>
           <Link
             href={`/projects/${nextItem.mission.slug}`}
             className="card"
