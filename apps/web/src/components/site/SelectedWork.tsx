@@ -1,11 +1,17 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { Mission } from "@portfolio/types";
 import { WORK_COPY } from "@/data/home";
 import { selectWork, type WorkItem } from "@/data/projectVisuals";
 import { Eyebrow, H2, Highlight, MONO, PlayIcon, Tag } from "./ui";
 
-function Art({ w, large }: { w: WorkItem; large: boolean }) {
+// Large cards: 3-up in a 1200px container, 1-up on phones. Small cards: ~4-up, min 230px.
+const LARGE_SIZES = "(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 380px";
+const SMALL_SIZES = "(max-width: 700px) 80vw, 280px";
+
+function Art({ w, large, priority = false }: { w: WorkItem; large: boolean; priority?: boolean }) {
   const inset = large ? 16 : 12;
+  const cover = w.visual.images?.[0];
   return (
     <div
       style={{
@@ -18,21 +24,45 @@ function Art({ w, large }: { w: WorkItem; large: boolean }) {
         overflow: "hidden",
       }}
     >
-      <div className="grid-bg" aria-hidden="true" style={{ position: "absolute", inset: 0, opacity: 0.6 }} />
-      <span
-        aria-hidden="true"
-        style={{
-          ...MONO,
-          position: "relative",
-          fontWeight: 500,
-          fontSize: large ? "clamp(40px, 5vw, 64px)" : 40,
-          letterSpacing: large ? "-0.02em" : undefined,
-          color: "rgba(255,255,255,0.92)",
-          textShadow: `0 0 ${large ? 40 : 30}px rgba(255,255,255,0.35)`,
-        }}
-      >
-        {w.visual.glyph}
-      </span>
+      {cover ? (
+        <>
+          <Image
+            src={cover.src}
+            alt={cover.alt}
+            fill
+            sizes={large ? LARGE_SIZES : SMALL_SIZES}
+            priority={priority}
+            style={{ objectFit: "cover", objectPosition: "top" }}
+          />
+          {/* keeps the status chip legible on light screenshots */}
+          <div
+            aria-hidden="true"
+            style={{
+              position: "absolute",
+              inset: 0,
+              background: "linear-gradient(180deg, rgba(3,6,26,0.35) 0%, rgba(3,6,26,0) 30%, rgba(3,6,26,0) 60%, rgba(3,6,26,0.55) 100%)",
+            }}
+          />
+        </>
+      ) : (
+        <>
+          <div className="grid-bg" aria-hidden="true" style={{ position: "absolute", inset: 0, opacity: 0.6 }} />
+          <span
+            aria-hidden="true"
+            style={{
+              ...MONO,
+              position: "relative",
+              fontWeight: 500,
+              fontSize: large ? "clamp(40px, 5vw, 64px)" : 40,
+              letterSpacing: large ? "-0.02em" : undefined,
+              color: "rgba(255,255,255,0.92)",
+              textShadow: `0 0 ${large ? 40 : 30}px rgba(255,255,255,0.35)`,
+            }}
+          >
+            {w.visual.glyph}
+          </span>
+        </>
+      )}
       <span
         style={{
           ...MONO,
@@ -49,7 +79,7 @@ function Art({ w, large }: { w: WorkItem; large: boolean }) {
       >
         {w.status.label}
       </span>
-      {large && (
+      {large && !cover && (
         <span
           style={{
             ...MONO,
@@ -74,7 +104,7 @@ function Art({ w, large }: { w: WorkItem; large: boolean }) {
   );
 }
 
-function LargeCard({ w }: { w: WorkItem }) {
+function LargeCard({ w, priority }: { w: WorkItem; priority: boolean }) {
   return (
     <Link
       id={w.mission.slug}
@@ -92,7 +122,7 @@ function LargeCard({ w }: { w: WorkItem }) {
         flexDirection: "column",
       }}
     >
-      <Art w={w} large />
+      <Art w={w} large priority={priority} />
       <div style={{ padding: "20px 22px 22px", display: "flex", flexDirection: "column", gap: 8 }}>
         <span style={{ ...MONO, fontSize: 11, color: "#6FA8FF" }}>
           {w.visual.domain} · {w.visual.when}
@@ -164,8 +194,8 @@ export function SelectedWork({ missions }: { missions: Mission[] }) {
       </div>
       {/* image-first cards: the picture does the talking, the story lives on the project page */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(300px, 100%), 1fr))", gap: 20 }}>
-        {large.map((w) => (
-          <LargeCard key={w.mission.slug} w={w} />
+        {large.map((w, i) => (
+          <LargeCard key={w.mission.slug} w={w} priority={i === 0} />
         ))}
       </div>
       {rest.length > 0 && (

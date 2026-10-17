@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { CSSProperties } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import ReactMarkdown from "react-markdown";
@@ -8,7 +9,7 @@ import { getPortfolio } from "@/lib/portfolio";
 import { SITE_URL, pageMetadata, seoOf } from "@/lib/seo";
 import { JsonLd, PERSON_ID, breadcrumbJsonLd } from "@/components/seo/JsonLd";
 import { ACCENT } from "@/data/home";
-import { PROJECT_VISUALS, orderedWork } from "@/data/projectVisuals";
+import { PROJECT_VISUALS, orderedWork, type ProjectImage } from "@/data/projectVisuals";
 import { MONO, Highlight, Tag } from "@/components/site/ui";
 import { MediaViewer, type MediaItem } from "@/components/project/MediaViewer";
 
@@ -64,7 +65,11 @@ const LINK_ROW: CSSProperties = {
   fontWeight: 500,
 };
 
-function mediaFor(short: string): MediaItem[] {
+/** Real screenshots when the project has them; otherwise the "coming soon" placeholders. */
+function mediaFor(short: string, images?: ProjectImage[]): MediaItem[] {
+  if (images?.length) {
+    return images.map((img) => ({ kind: "IMAGE", label: img.caption, short: img.caption, src: img.src, alt: img.alt }));
+  }
   return [
     { kind: "VIDEO", label: `Demo — ${short} (coming soon)`, short: "Demo video" },
     { kind: "IMAGE", label: "Architecture overview", short: "Architecture" },
@@ -86,6 +91,8 @@ export default async function ProjectPage({ params }: Params) {
   const url = `${SITE_URL}/projects/${slug}`;
 
   const visual = PROJECT_VISUALS[slug];
+  const images = visual?.images ?? [];
+  const gallery = images.slice(1);
   const work = orderedWork(data.missions);
   const pos = work.findIndex((w) => w.mission.slug === slug);
   const next = work.length ? work[(pos + 1) % work.length] : undefined;
@@ -167,7 +174,7 @@ export default async function ProjectPage({ params }: Params) {
       </section>
 
       {/* MEDIA VIEWER */}
-      <MediaViewer items={mediaFor(visual?.short ?? m.title)} glyph={visual?.glyph ?? "◆"} />
+      <MediaViewer items={mediaFor(visual?.short ?? m.title, visual?.images)} glyph={visual?.glyph ?? "◆"} />
 
       {/* CASE STUDY */}
       <section style={{ background: "rgba(10,16,52,0.7)", borderTop: "1px solid rgba(111,168,255,0.25)", borderBottom: "1px solid rgba(111,168,255,0.25)" }}>
@@ -209,36 +216,63 @@ export default async function ProjectPage({ params }: Params) {
         </div>
       </section>
 
-      {/* GALLERY */}
-      <section aria-labelledby="bts" style={{ maxWidth: 1240, margin: "0 auto", padding: "88px 24px", display: "flex", flexDirection: "column", gap: 32 }}>
-        <h2 id="bts" style={{ margin: 0, fontWeight: 800, fontSize: "clamp(32px, 4vw, 48px)", lineHeight: 1.1, letterSpacing: "-0.03em" }}>
-          Behind the <Highlight>scenes</Highlight>
-        </h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(280px, 100%), 1fr))", gap: 20 }}>
-          {FIGURES.map((f) => (
-            <figure key={f.label} style={{ margin: 0, display: "flex", flexDirection: "column", gap: 10, gridColumn: f.full ? "1 / -1" : undefined }}>
-              <div
-                className="ph"
-                aria-hidden="true"
-                style={{
-                  ...MONO,
-                  aspectRatio: f.ratio,
-                  borderRadius: 22,
-                  border: "1px solid rgba(111,168,255,0.25)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: 13,
-                  color: "#8C97B8",
-                }}
-              >
-                {f.label}
-              </div>
-              <figcaption style={{ fontSize: 14, color: "#8C97B8" }}>{f.caption}</figcaption>
-            </figure>
-          ))}
-        </div>
-      </section>
+      {/* GALLERY — placeholders only for projects without screenshots; when there are screenshots
+          the media viewer above already shows every one, so a second gallery would repeat them */}
+      {images.length === 0 && (
+        <section aria-labelledby="bts" style={{ maxWidth: 1240, margin: "0 auto", padding: "88px 24px", display: "flex", flexDirection: "column", gap: 32 }}>
+          <h2 id="bts" style={{ margin: 0, fontWeight: 800, fontSize: "clamp(32px, 4vw, 48px)", lineHeight: 1.1, letterSpacing: "-0.03em" }}>
+            Behind the <Highlight>scenes</Highlight>
+          </h2>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(280px, 100%), 1fr))", gap: 20 }}>
+            {gallery.map((g, i) => (
+              <figure key={g.src} style={{ margin: 0, display: "flex", flexDirection: "column", gap: 10, gridColumn: i === 0 ? "1 / -1" : undefined }}>
+                <div
+                  style={{
+                    position: "relative",
+                    aspectRatio: "16 / 10",
+                    borderRadius: 22,
+                    overflow: "hidden",
+                    border: "1px solid rgba(111,168,255,0.25)",
+                    background: "#03061A",
+                  }}
+                >
+                  <Image
+                    src={g.src}
+                    alt={g.alt}
+                    fill
+                    sizes={i === 0 ? "(max-width: 1240px) 100vw, 1192px" : "(max-width: 640px) 100vw, (max-width: 1240px) 50vw, 600px"}
+                    style={{ objectFit: "cover", objectPosition: "top" }}
+                  />
+                </div>
+                <figcaption style={{ fontSize: 14, color: "#8C97B8" }}>{g.caption}</figcaption>
+              </figure>
+            ))}
+            {images.length === 0 &&
+              FIGURES.map((f) => (
+                <figure key={f.label} style={{ margin: 0, display: "flex", flexDirection: "column", gap: 10, gridColumn: f.full ? "1 / -1" : undefined }}>
+                  <div
+                    className="ph"
+                    aria-hidden="true"
+                    style={{
+                      ...MONO,
+                      aspectRatio: f.ratio,
+                      borderRadius: 22,
+                      border: "1px solid rgba(111,168,255,0.25)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: 13,
+                      color: "#8C97B8",
+                    }}
+                  >
+                    {f.label}
+                  </div>
+                  <figcaption style={{ fontSize: 14, color: "#8C97B8" }}>{f.caption}</figcaption>
+                </figure>
+              ))}
+          </div>
+        </section>
+      )}
 
       {/* NEXT */}
       {nextItem && (

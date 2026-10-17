@@ -29,7 +29,19 @@ export interface ProjectVisual {
   featured?: boolean;
   /** Overrides the status badge text derived from the CMS status. */
   statusLabel?: string;
+  /** Real screenshots (16:10, 1600px) under /public/projects/<slug>/; the first is the card art. */
+  images?: ProjectImage[];
 }
+
+export interface ProjectImage {
+  src: string;
+  alt: string;
+  caption: string;
+}
+
+/** Builds the screenshot list for a slug: files are /projects/<slug>/01.jpg, 02.jpg, … */
+const shots = (slug: string, list: [caption: string, alt: string][]): ProjectImage[] =>
+  list.map(([caption, alt], i) => ({ src: `/projects/${slug}/${String(i + 1).padStart(2, "0")}.jpg`, alt, caption }));
 
 export const PROJECT_VISUALS: Record<string, ProjectVisual> = {
   "siz-commerce-gateway": {
@@ -42,6 +54,13 @@ export const PROJECT_VISUALS: Record<string, ProjectVisual> = {
     domain: "AI commerce",
     role: "Backend & AI Engineer",
     featured: true,
+    images: shots("siz-commerce-gateway", [
+      ["Claude booking tickets through Siz", "Screenshot of a Claude chat where the assistant books tickets through the Siz MCP server"],
+      ["AI-Ready score report", "Screenshot of the AI-Ready score report rating how ready a merchant is for AI assistants"],
+      ["OAuth consent screen for the AI assistant", "Screenshot of the OAuth consent screen where a user grants the AI assistant access to their Siz account"],
+      ["Manage connections", "Screenshot of the page where a user reviews and revokes connected AI assistants"],
+      ["Merchant integration guide", "Screenshot of the merchant integration guide explaining how to connect a store to Siz"],
+    ]),
   },
   "bank-llm-gateway": {
     short: "Bank AI Gateway",
@@ -53,6 +72,13 @@ export const PROJECT_VISUALS: Record<string, ProjectVisual> = {
     domain: "Banking",
     role: "AI Gateway Platform Engineer",
     featured: true,
+    images: shots("bank-llm-gateway", [
+      ["Bedrock cost reconciliation", "Screenshot of the Bedrock cost reconciliation page comparing gateway spend with Bedrock invocations"],
+      ["Reconciliation variance detail", "Screenshot of the variance detail view drilling into differences between gateway and Bedrock costs"],
+      ["Vietnam PII policy template", "Screenshot of the Vietnam PII policy template that defines which personal data the gateway masks"],
+      ["Guardrails monitor", "Screenshot of the guardrails monitor showing blocked and flagged LLM requests"],
+      ["Tamper-evident audit log", "Screenshot of the tamper-evident audit log of every LLM request passing through the gateway"],
+    ]),
   },
   "voice-ordering-agent": {
     short: "Bảo Bối",
@@ -64,6 +90,13 @@ export const PROJECT_VISUALS: Record<string, ProjectVisual> = {
     domain: "F&B",
     role: "Backend & AI Engineer",
     featured: true,
+    images: shots("voice-ordering-agent", [
+      ["Chat recommendation", "Screenshot of the ordering assistant recommending drinks in a chat conversation"],
+      ["Mobile voice agent", "Screenshot of the cat mascot voice assistant taking an order on a tablet"],
+      ["Desktop experience", "Screenshot of the voice ordering assistant on desktop"],
+      ["Order dispatch", "Screenshot of the cart the assistant fills and sends to the café's ordering system"],
+      ["Admin system health", "Screenshot of the admin page checking every service the assistant depends on"],
+    ]),
   },
   "rag-enrollment-advisor": {
     short: "Admissions chatbot",
@@ -75,6 +108,13 @@ export const PROJECT_VISUALS: Record<string, ProjectVisual> = {
     domain: "Education",
     role: "AI Agent Consultant Engineer",
     statusLabel: "HANDED OVER",
+    images: shots("rag-enrollment-advisor", [
+      ["Advisor console", "Screenshot of the admissions advisor console answering a prospective student's question"],
+      ["LLM provider routing", "Screenshot of the settings page that routes requests between LLM providers"],
+      ["System overview", "Screenshot of the system overview dashboard for the admissions chatbot"],
+      ["Public API docs", "Screenshot of the public API documentation for the admissions chatbot"],
+      ["Architecture", "Architecture diagram of the retrieval-augmented admissions chatbot"],
+    ]),
   },
   "vas-accounting-erp": {
     short: "Accounting SaaS",
@@ -86,6 +126,13 @@ export const PROJECT_VISUALS: Record<string, ProjectVisual> = {
     domain: "Accounting",
     role: "Core Full-stack Developer",
     statusLabel: "HANDED OVER",
+    images: shots("vas-accounting-erp", [
+      ["Journal entries", "Screenshot of the journal entries list in the accounting app"],
+      ["Trial balance", "Screenshot of the trial balance report built to Vietnamese accounting standards"],
+      ["Financial reports", "Screenshot of the financial reports menu in the accounting app"],
+      ["Cash payments", "Screenshot of the cash payment voucher screen in the accounting app"],
+      ["Customers", "Screenshot of the customer list in the accounting app"],
+    ]),
   },
   "ipbms-patient-monitoring": {
     short: "IPBMS",
@@ -96,6 +143,13 @@ export const PROJECT_VISUALS: Record<string, ProjectVisual> = {
     when: "Jun 2025 – Jan 2026",
     domain: "Healthcare",
     role: "AI Team Lead, Computer Vision",
+    images: shots("ipbms-patient-monitoring", [
+      ["Real-time event dashboard", "Screenshot of the real-time dashboard listing fall and seizure events detected on camera streams"],
+      ["Live fall alert on mobile", "Screenshot of the mobile app showing a live fall alert for a monitored patient"],
+      ["Web admin portal", "Screenshot of the web admin portal for managing patients, cameras and caregivers"],
+      ["Mobile AI summary", "Screenshot of the mobile app's AI summary of a patient's recent events"],
+      ["Mobile subscription plans", "Screenshot of the subscription plans screen in the mobile app"],
+    ]),
   },
   "neuradao-ai-trading": {
     short: "NEURADAO",
@@ -106,6 +160,13 @@ export const PROJECT_VISUALS: Record<string, ProjectVisual> = {
     when: "Oct 2025",
     domain: "Fintech",
     role: "Team Lead, Software Engineer",
+    images: shots("neuradao-ai-trading", [
+      ["Landing hero", "Screenshot of the NEURADAO landing page hero section"],
+      ["AI trading agent", "Screenshot of the AI trading agent configuration and performance view"],
+      ["AI chat assistant", "Screenshot of the AI chat assistant answering a trading question"],
+      ["Earnings dashboard", "Screenshot of the earnings dashboard showing a user's trading returns"],
+      ["Chrome extension", "Screenshot of the NEURADAO Chrome extension"],
+    ]),
   },
 };
 

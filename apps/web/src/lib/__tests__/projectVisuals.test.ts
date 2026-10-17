@@ -1,3 +1,5 @@
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import type { Mission } from "@portfolio/types";
 import { PROJECT_VISUALS, orderedWork, selectWork, workStatus, type ProjectVisual } from "@/data/projectVisuals";
@@ -48,6 +50,29 @@ describe("project visuals map", () => {
       expect(v.short && v.tagline && v.glyph && v.art && v.when && v.domain).toBeTruthy();
       expect(v.tags.length).toBeGreaterThan(0);
     }
+  });
+});
+
+describe("project screenshots", () => {
+  it("every slug ships real screenshots under /projects/<slug>/ with alt text and a caption", () => {
+    for (const [slug, v] of Object.entries(PROJECT_VISUALS)) {
+      expect(v.images?.length, slug).toBeGreaterThan(0);
+      v.images!.forEach((img, i) => {
+        expect(img.src).toBe(`/projects/${slug}/${String(i + 1).padStart(2, "0")}.jpg`);
+        expect(img.alt.trim().length).toBeGreaterThan(10);
+        expect(img.caption.trim()).not.toBe("");
+      });
+    }
+  });
+
+  it("each screenshot file exists in public/", () => {
+    for (const v of Object.values(PROJECT_VISUALS)) {
+      for (const img of v.images ?? []) expect(existsSync(join(process.cwd(), "public", img.src)), img.src).toBe(true);
+    }
+  });
+
+  it("every project ships a full set of five screenshots", () => {
+    for (const v of Object.values(PROJECT_VISUALS)) expect(v.images ?? []).toHaveLength(5);
   });
 });
 
