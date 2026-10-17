@@ -25,14 +25,23 @@ describe('CV content', () => {
   it('lists every role from the CV', () => {
     const titles = experiences.map((e) => e.title);
     for (const t of [
-      'LLM Gateway Engineer',
+      'AI Gateway Platform Engineer',
+      'Backend & AI Engineer',
+      'Co-founder',
       'AI Agent Consultant Engineer',
-      'Accounting Application Developer',
+      'Core Full-stack Developer',
       'AI Team Lead, Computer Vision',
-      'AI Agent Engineer',
-      'Freelance Software Engineer, Team Lead',
+      'Team Lead, Software Engineer',
+      'IT Support Technician',
     ]) {
       expect(titles).toContain(t);
+    }
+  });
+
+  it('keeps retired or anonymised wording out of the content', () => {
+    const all = JSON.stringify({ projects, experiences, skillGroups, achievements, seo });
+    for (const banned of [/Ăng/i, /\.NET/, /C#/, /34 orders/, /202 leads/, /100,000/, /Polkadot/, /95-file/]) {
+      expect(all).not.toMatch(banned);
     }
   });
 

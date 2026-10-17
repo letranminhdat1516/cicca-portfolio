@@ -1,80 +1,94 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { getPosts } from "@/lib/blog";
+import { getFullPosts, getPosts, wordCount } from "@/lib/blog";
 import { getPortfolio } from "@/lib/portfolio";
 import { pageMetadata, seoOf } from "@/lib/seo";
+import { TOPICS, formatPostDate, readMinutes, topicOf } from "@/lib/blogTopics";
 import { JsonLd, blogJsonLd } from "@/components/seo/JsonLd";
-import { SectionHeader } from "@/components/SectionHeader";
+import { BlogIndex, type PostCard } from "@/components/blog/BlogIndex";
+import { ACCENT } from "@/data/home";
+import { Highlight, MONO } from "@/components/site/ui";
 
 export const dynamic = "force-dynamic";
 
 const DESCRIPTION =
   "Engineering notes by Le Tran Minh Dat on LLM gateways, RAG agents and full-stack delivery.";
+const INTRO = "Field notes on shipping LLM systems, running my own cluster, and what broke along the way.";
 
 export async function generateMetadata(): Promise<Metadata> {
   const seo = seoOf(await getPortfolio().catch(() => null));
   return pageMetadata({ seo, path: "/blog", title: "Blog", description: DESCRIPTION });
 }
 
-export default async function BlogIndex() {
-  const [posts, authorName] = await Promise.all([
+export default async function BlogPage() {
+  const [posts, full, authorName] = await Promise.all([
     getPosts(),
+    // Bodies only feed the reading time; a failure just hides it.
+    getFullPosts().catch(() => []),
     getPortfolio()
       .then((d) => d.profile?.name)
       .catch(() => undefined),
   ]);
+  const words = new Map(full.map((p) => [p.slug, wordCount(p.content)]));
+  const cards: PostCard[] = posts.map((p) => {
+    const w = words.get(p.slug);
+    return {
+      slug: p.slug,
+      title: p.title,
+      excerpt: p.excerpt,
+      tags: p.tags,
+      topic: topicOf(p.tags),
+      date: formatPostDate(p.publishedAt),
+      isoDate: p.publishedAt,
+      read: w ? `${readMinutes(w)} min` : null,
+      coverImage: p.coverImage,
+    };
+  });
+  const topics = TOPICS.filter((t) => cards.some((c) => c.topic === t));
+
   return (
-    <main className="mx-auto max-w-[820px] px-6 pt-32 pb-20">
+    <main>
       <JsonLd data={blogJsonLd(posts, authorName)} />
-      <SectionHeader index="LOG" label="DISPATCHES" />
-      <h1
-        className="mt-2 mb-3 font-bold"
-        style={{ fontFamily: "var(--font-title), sans-serif", fontSize: "clamp(26px,4vw,40px)", color: "#fff" }}
+      <section
+        style={{
+          maxWidth: 1240,
+          margin: "0 auto",
+          padding: "72px 24px 40px",
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "32px 64px",
+          alignItems: "flex-end",
+          justifyContent: "space-between",
+        }}
       >
-        BLOG
-      </h1>
-      <p className="mb-8 text-[14px] leading-6" style={{ color: "#a8a8c2" }}>
-        {DESCRIPTION}
-      </p>
-      <div className="flex flex-col gap-5">
-        {posts.length === 0 && (
-          <p style={{ color: "#9a9ab8" }}>No dispatches yet. Check back soon.</p>
-        )}
-        {posts.map((p) => (
-          <Link
-            key={p.slug}
-            href={`/blog/${p.slug}`}
-            className="block p-5 no-underline transition-transform hover:-translate-y-1"
-            style={{
-              background: "rgba(10,10,18,0.7)",
-              border: "1px solid rgba(176,38,255,0.2)",
-              clipPath:
-                "polygon(0 0,calc(100% - 18px) 0,100% 18px,100% 100%,18px 100%,0 calc(100% - 18px))",
-            }}
-          >
-            <div className="flex items-baseline justify-between gap-4">
-              <h2 className="text-[20px] font-bold" style={{ fontFamily: "var(--font-ui), sans-serif", color: "#fff" }}>
-                {p.title}
-              </h2>
-              {p.publishedAt && (
-                <span className="shrink-0 text-[11px] tracking-widest" style={{ fontFamily: "var(--font-mono), monospace", color: "#9a9ab8" }}>
-                  {new Date(p.publishedAt).toISOString().slice(0, 10)}
-                </span>
-              )}
-            </div>
-            <p className="mt-2 text-[14px] leading-6" style={{ color: "#a8a8c2" }}>
-              {p.excerpt}
-            </p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {p.tags.map((t) => (
-                <span key={t} className="px-2 py-1 text-[10px]" style={{ fontFamily: "var(--font-mono), monospace", color: "#22d3ee", border: "1px solid rgba(34,211,238,0.2)" }}>
-                  #{t}
-                </span>
-              ))}
-            </div>
-          </Link>
-        ))}
-      </div>
+        <div style={{ flex: "999 1 560px", minWidth: 0, display: "flex", flexDirection: "column", gap: 18 }}>
+          <span style={{ ...MONO, fontSize: 12, letterSpacing: "0.08em", color: "#6FA8FF" }}>BLOG</span>
+          <h1 style={{ margin: 0, fontWeight: 800, fontSize: "clamp(44px, 7vw, 96px)", lineHeight: 0.98, letterSpacing: "-0.04em" }}>
+            Notes from <Highlight big>the desk</Highlight>
+          </h1>
+          <p style={{ margin: 0, maxWidth: 600, fontSize: 19, color: "#C9D4F2" }}>{INTRO}</p>
+        </div>
+        <a
+          href="/feed.xml"
+          style={{
+            flex: "0 0 auto",
+            textDecoration: "none",
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            border: "1.5px solid #E8EEFF",
+            padding: "12px 20px",
+            borderRadius: 999,
+            fontWeight: 500,
+          }}
+        >
+          <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={ACCENT} strokeWidth="2.2" strokeLinecap="round">
+            <path d="M4 11a9 9 0 0 1 9 9M4 4a16 16 0 0 1 16 16" />
+            <circle cx="5" cy="19" r="1.2" fill={ACCENT} />
+          </svg>
+          Subscribe via RSS
+        </a>
+      </section>
+      <BlogIndex posts={cards} topics={topics} />
     </main>
   );
 }

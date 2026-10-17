@@ -25,17 +25,17 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 }
 
-const MONO = { fontFamily: "var(--font-mono), monospace" } as const;
-const UI = { fontFamily: "var(--font-ui), sans-serif" } as const;
+const MONO = { fontFamily: "var(--font-jetbrains), ui-monospace, monospace" } as const;
+const UI = { fontFamily: "var(--font-outfit), system-ui, sans-serif" } as const;
 
 function Heading({ children }: { children: React.ReactNode }) {
   return (
     <h2
       className="mt-12 mb-4 flex items-center gap-3 text-[13px] font-bold tracking-[3px]"
-      style={{ ...MONO, color: "#22d3ee" }}
+      style={{ ...MONO, color: "#6FA8FF" }}
     >
       {children}
-      <span className="h-px flex-1" style={{ background: "rgba(34,211,238,0.2)" }} />
+      <span className="h-px flex-1" style={{ background: "linear-gradient(90deg,rgba(111,168,255,0.6),transparent)" }} />
     </h2>
   );
 }
@@ -45,11 +45,11 @@ export default async function CvPage() {
   const { profile, experiences, missions, skillGroups, achievements, socials } = data;
 
   return (
-    <main className="mx-auto max-w-[880px] px-6 pt-32 pb-24">
+    <main className="mx-auto max-w-[880px] px-6 pt-14 pb-24">
       <JsonLd data={cvJsonLd(data)} />
 
-      <nav aria-label="Breadcrumb" className="text-[12px] tracking-widest" style={{ ...MONO, color: "#8686a4" }}>
-        <Link href="/" className="no-underline" style={{ color: "#22d3ee" }}>
+      <nav aria-label="Breadcrumb" className="text-[12px] tracking-widest" style={{ ...MONO, color: "#8C97B8" }}>
+        <Link href="/" className="no-underline" style={{ color: "#6FA8FF" }}>
           HOME
         </Link>{" "}
         / RÉSUMÉ
@@ -57,28 +57,28 @@ export default async function CvPage() {
 
       <header className="mt-6">
         <h1
-          className="m-0 font-black leading-tight"
+          className="m-0 font-extrabold leading-tight"
           style={{
-            fontFamily: "var(--font-title), sans-serif",
-            fontSize: "clamp(32px,6vw,54px)",
-            color: "#fff",
-            textShadow: "0 0 24px rgba(176,38,255,0.4)",
+            ...UI,
+            fontSize: "clamp(36px,6vw,60px)",
+            letterSpacing: "-0.035em",
+            color: "#F2F5FF",
           }}
         >
           {profile.name}
         </h1>
-        <p className="mt-2 text-[15px] font-bold tracking-[3px]" style={{ ...MONO, color: "#ffd23f" }}>
+        <p className="mt-2 text-[15px] font-bold tracking-[3px]" style={{ ...MONO, color: "#9CC2FF" }}>
           {profile.classRole.toUpperCase()}
         </p>
-        <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[13px]" style={{ color: "#9a9ab8" }}>
+        <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[13px]" style={{ color: "#8C97B8" }}>
           <span>Ho Chi Minh City, Vietnam</span>
-          <a href={`mailto:${profile.email}`} style={{ color: "#22d3ee" }}>
+          <a href={`mailto:${profile.email}`} style={{ color: "#6FA8FF" }}>
             {profile.email}
           </a>
           {socials
             .filter((s) => s.href.startsWith("http"))
             .map((s) => (
-              <a key={s.href} href={s.href} rel="me noopener" target="_blank" style={{ color: "#22d3ee" }}>
+              <a key={s.href} href={s.href} rel="me noopener" target="_blank" style={{ color: "#6FA8FF" }}>
                 {s.name}
               </a>
             ))}
@@ -88,22 +88,17 @@ export default async function CvPage() {
             href={CV_PDF_PATH}
             target="_blank"
             rel="noopener"
-            className="px-6 py-3 text-[12px] font-bold tracking-widest no-underline"
-            style={{
-              ...MONO,
-              color: "#08070f",
-              background: "linear-gradient(135deg,#22d3ee,#b026ff)",
-              clipPath: "polygon(0 0,100% 0,100% 70%,calc(100% - 12px) 100%,0 100%)",
-            }}
+            className="rounded-full px-6 py-3 text-[15px] font-medium no-underline"
+            style={{ color: "#FFFFFF", background: "#2F6BFF", boxShadow: "0 8px 24px -8px rgba(47,123,255,0.7)" }}
           >
-            DOWNLOAD PDF ▾
+            Download PDF
           </a>
           <a
             href={`mailto:${profile.email}`}
-            className="px-6 py-3 text-[12px] font-bold tracking-widest no-underline"
-            style={{ ...MONO, color: "#e8e8f0", border: "1px solid rgba(34,211,238,0.4)" }}
+            className="rounded-full px-6 py-3 text-[15px] font-medium no-underline"
+            style={{ color: "#E8EEFF", border: "1px solid rgba(111,168,255,0.45)", background: "rgba(10,16,52,0.5)" }}
           >
-            CONTACT ME
+            Contact me
           </a>
         </div>
       </header>
@@ -112,7 +107,7 @@ export default async function CvPage() {
         <Heading>
           <span id="summary">SUMMARY</span>
         </Heading>
-        <p className="text-[15px] leading-7" style={{ color: "#c4c4d8" }}>
+        <p className="text-[15px] leading-7" style={{ color: "#C9D4F2" }}>
           {profile.bio}
         </p>
       </section>
@@ -127,23 +122,23 @@ export default async function CvPage() {
             return (
               <article key={`${e.org}-${e.title}`}>
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
-                  <h3 className="m-0 text-[18px] font-bold" style={{ ...UI, color: "#fff" }}>
+                  <h3 className="m-0 text-[18px] font-bold" style={{ ...UI, color: "#F2F5FF" }}>
                     {e.title}
                   </h3>
-                  <span className="text-[12px] tracking-widest" style={{ ...MONO, color: "#9a9ab8" }}>
+                  <span className="text-[12px] tracking-widest" style={{ ...MONO, color: "#8C97B8" }}>
                     {e.period}
                   </span>
                 </div>
-                <p className="mt-1 text-[12px] tracking-wide" style={{ ...MONO, color: "#bf4dff" }}>
+                <p className="mt-1 text-[12px] tracking-wide" style={{ ...MONO, color: "#9CC2FF" }}>
                   {e.org}
                 </p>
                 {lead && (
-                  <p className="mt-2 text-[13.5px] leading-6" style={{ color: "#9a9ab8" }}>
+                  <p className="mt-2 text-[13.5px] leading-6" style={{ color: "#8C97B8" }}>
                     {lead}
                   </p>
                 )}
                 {bullets.length > 0 && (
-                  <ul className="mt-2 flex flex-col gap-1.5 pl-5" style={{ listStyle: "disc", color: "#c4c4d8" }}>
+                  <ul className="mt-2 flex flex-col gap-1.5 pl-5" style={{ listStyle: "disc", color: "#C9D4F2" }}>
                     {bullets.map((b) => (
                       <li key={b} className="text-[14px] leading-6">
                         {b}
@@ -164,16 +159,16 @@ export default async function CvPage() {
         <ul className="flex flex-col gap-4 p-0" style={{ listStyle: "none" }}>
           {missions.map((m) => (
             <li key={m.slug}>
-              <h3 className="m-0 text-[16px] font-bold" style={{ ...UI, color: "#fff" }}>
+              <h3 className="m-0 text-[16px] font-bold" style={{ ...UI, color: "#F2F5FF" }}>
                 {m.title}{" "}
-                <span className="text-[11px] tracking-widest" style={{ ...MONO, color: m.statusColor }}>
+                <span className="text-[11px] tracking-widest" style={{ ...MONO, color: "#6FA8FF" }}>
                   · {m.impact}
                 </span>
               </h3>
-              <p className="mt-1 text-[13.5px] leading-6" style={{ color: "#a8a8c2" }}>
+              <p className="mt-1 text-[13.5px] leading-6" style={{ color: "#A9B4D0" }}>
                 {m.objective}
               </p>
-              <p className="mt-1 text-[12px]" style={{ ...MONO, color: "#8686a4" }}>
+              <p className="mt-1 text-[12px]" style={{ ...MONO, color: "#8C97B8" }}>
                 {m.loadout.join(" · ")}
               </p>
             </li>
@@ -188,10 +183,10 @@ export default async function CvPage() {
         <dl className="grid grid-cols-1 gap-x-6 gap-y-3 [@media(min-width:700px)]:grid-cols-[200px_1fr]">
           {skillGroups.map((g) => (
             <div key={g.name} className="contents">
-              <dt className="text-[12px] font-bold tracking-widest" style={{ ...MONO, color: "#ffd23f" }}>
+              <dt className="text-[12px] font-bold tracking-widest" style={{ ...MONO, color: "#9CC2FF" }}>
                 {g.name.split("//")[0].trim()}
               </dt>
-              <dd className="m-0 text-[14px] leading-6" style={{ color: "#c4c4d8" }}>
+              <dd className="m-0 text-[14px] leading-6" style={{ color: "#C9D4F2" }}>
                 {g.items.map((i) => i.n).join(" · ")}
               </dd>
             </div>
@@ -206,13 +201,13 @@ export default async function CvPage() {
         <ul className="flex flex-col gap-3 p-0" style={{ listStyle: "none" }}>
           {achievements.map((a) => (
             <li key={a.title}>
-              <span className="text-[15px] font-bold" style={{ ...UI, color: "#fff" }}>
+              <span className="text-[15px] font-bold" style={{ ...UI, color: "#F2F5FF" }}>
                 {a.title}
               </span>{" "}
-              <span className="text-[11px] tracking-widest" style={{ ...MONO, color: a.color }}>
+              <span className="text-[11px] tracking-widest" style={{ ...MONO, color: "#9CC2FF" }}>
                 {a.year}
               </span>
-              <p className="mt-0.5 text-[13.5px] leading-6" style={{ color: "#a8a8c2" }}>
+              <p className="mt-0.5 text-[13.5px] leading-6" style={{ color: "#A9B4D0" }}>
                 {a.description}
               </p>
             </li>

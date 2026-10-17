@@ -3,7 +3,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { getPost, isThin } from "@/lib/blog";
+import { getPost, isThin, wordCount } from "@/lib/blog";
+import { formatPostDate, readMinutes } from "@/lib/blogTopics";
+import { MONO, Tag } from "@/components/site/ui";
 import { getPortfolio } from "@/lib/portfolio";
 import { SITE_URL, pageMetadata, seoOf } from "@/lib/seo";
 import {
@@ -61,8 +63,11 @@ export default async function BlogPostPage({
     .then((d) => d.profile?.name)
     .catch(() => undefined);
 
+  const date = formatPostDate(post.publishedAt);
+  const read = `${readMinutes(wordCount(post.content))} min`;
+
   return (
-    <main className="mx-auto max-w-[760px] px-6 pt-32 pb-24">
+    <main style={{ maxWidth: 820, margin: "0 auto", padding: "56px 24px 96px" }}>
       <JsonLd
         data={[
           articleJsonLd(post, authorName),
@@ -73,30 +78,33 @@ export default async function BlogPostPage({
           ]),
         ]}
       />
-      <Link
-        href="/blog"
-        className="text-[12px] tracking-widest no-underline"
-        style={{ fontFamily: "var(--font-mono), monospace", color: "#22d3ee" }}
-      >
-        ◂ ALL DISPATCHES
+      <Link href="/blog" style={{ ...MONO, textDecoration: "none", fontSize: 13, color: "#8C97B8", padding: "8px 0", display: "inline-block" }}>
+        ← All posts
       </Link>
       <h1
-        className="mt-4 font-bold"
         style={{
-          fontFamily: "var(--font-title), sans-serif",
-          fontSize: "clamp(28px,5vw,44px)",
-          color: "#fff",
-          textShadow: "0 0 20px rgba(176,38,255,0.35)",
+          margin: "20px 0 0",
+          fontWeight: 800,
+          fontSize: "clamp(36px, 5.5vw, 64px)",
+          lineHeight: 1.02,
+          letterSpacing: "-0.035em",
+          color: "#F2F5FF",
         }}
       >
         {post.title}
       </h1>
-      {post.publishedAt && (
-        <div className="mt-2 text-[12px] tracking-widest" style={{ fontFamily: "var(--font-mono), monospace", color: "#9a9ab8" }}>
-          <time dateTime={post.publishedAt}>{new Date(post.publishedAt).toISOString().slice(0, 10)}</time> · {post.tags.map((t) => `#${t}`).join(" ")}
-        </div>
-      )}
-      <article className="md mt-8">
+      <div style={{ ...MONO, marginTop: 18, display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", fontSize: 12, color: "#8C97B8" }}>
+        {date && post.publishedAt && <time dateTime={post.publishedAt}>{date}</time>}
+        {date && <span aria-hidden="true">·</span>}
+        <span>{read}</span>
+        {post.tags.map((t) => (
+          <Tag key={t} size={12}>
+            {t}
+          </Tag>
+        ))}
+      </div>
+      <div className="beam" aria-hidden="true" style={{ margin: "32px 0 8px" }} />
+      <article className="md">
         <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.content}</ReactMarkdown>
       </article>
     </main>

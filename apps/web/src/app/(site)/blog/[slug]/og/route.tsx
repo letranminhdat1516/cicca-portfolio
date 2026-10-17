@@ -17,12 +17,13 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
           flexDirection: "column",
           justifyContent: "center",
           padding: "80px",
-          background: "radial-gradient(circle at 20% 20%, #0a1530 0%, #05070f 55%, #04050b 100%)",
-          color: "#e8f0ff",
-          fontFamily: "monospace",
+          backgroundColor: "#03061A",
+          backgroundImage: "radial-gradient(circle at 85% 30%, rgba(47,123,255,0.45) 0%, rgba(91,75,230,0.18) 30%, rgba(3,6,26,0) 60%)",
+          color: "#E8EEFF",
+          fontFamily: "sans-serif",
         }}
       >
-        <div style={{ display: "flex", fontSize: 28, letterSpacing: 6, color: "#22d3ee" }}>
+        <div style={{ display: "flex", fontSize: 26, letterSpacing: 4, color: "#6FA8FF" }}>
           LE TRAN MINH DAT · BLOG
         </div>
         <div
@@ -31,13 +32,14 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
             fontSize: post.title.length > 50 ? 56 : 68,
             fontWeight: 800,
             marginTop: 20,
-            color: "#f0f6ff",
-            textShadow: "0 0 40px rgba(34,211,238,0.55)",
+            lineHeight: 1.05,
+            letterSpacing: -2,
+            color: "#F2F5FF",
           }}
         >
           {post.title}
         </div>
-        <div style={{ display: "flex", fontSize: 30, marginTop: 28, color: "#9fb3d1" }}>
+        <div style={{ display: "flex", fontSize: 30, marginTop: 28, color: "#9CC2FF" }}>
           {post.tags.map((t) => `#${t}`).join("  ")}
         </div>
         <div
@@ -46,7 +48,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
             marginTop: 48,
             height: 8,
             width: 320,
-            background: "linear-gradient(90deg,#22d3ee,#a855f7,#f43f5e)",
+            background: "linear-gradient(90deg,#1C3FD6,#2F6BFF 45%,#5B4BE6)",
             borderRadius: 8,
           }}
         />

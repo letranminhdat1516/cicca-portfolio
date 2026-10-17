@@ -1,37 +1,41 @@
 import type { Metadata, Viewport } from "next";
-import { Orbitron, Space_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
+import { Outfit, JetBrains_Mono, Orbitron, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { SITE_URL, alternatesFor } from "@/lib/seo";
 
+const outfit = Outfit({
+  variable: "--font-outfit",
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "500", "600", "700", "800"],
+});
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains",
+  subsets: ["latin", "latin-ext", "vietnamese"],
+  weight: ["400", "500", "600"],
+});
+// Legacy faces still used by the admin CMS only; preload off so the public
+// pages never download them.
 const orbitron = Orbitron({
   variable: "--font-title",
   subsets: ["latin"],
   weight: ["500", "700", "900"],
+  preload: false,
 });
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-ui",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
-});
-const inter = Inter({
-  variable: "--font-body",
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-});
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-mono",
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
+  preload: false,
 });
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Le Tran Minh Dat — AI-Native Full-Stack Developer",
+    default: "Le Tran Minh Dat — AI-Native Software Engineer",
     template: "%s — Le Tran Minh Dat",
   },
   description:
-    "AI-native full-stack developer in Ho Chi Minh City. Shipped 6 production systems: a bank LLM gateway, RAG agents, a VAS ERP and real-time computer vision.",
+    "AI-native software engineer in Ho Chi Minh City. I build AI agents and the backend they run on — LLM gateways, RAG, voice agents and k3s infrastructure.",
   applicationName: "Le Tran Minh Dat",
   authors: [{ name: "Le Tran Minh Dat", url: SITE_URL }],
   creator: "Le Tran Minh Dat",
@@ -51,7 +55,7 @@ export const metadata: Metadata = {
   alternates: { types: alternatesFor("/").types },
 };
 
-export const viewport: Viewport = { themeColor: "#08070f", colorScheme: "dark" };
+export const viewport: Viewport = { themeColor: "#03061A", colorScheme: "dark" };
 
 export default function RootLayout({
   children,
@@ -61,7 +65,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${orbitron.variable} ${spaceGrotesk.variable} ${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
+      className={`${outfit.variable} ${jetbrainsMono.variable} ${orbitron.variable} ${spaceGrotesk.variable} h-full antialiased`}
     >
       <body className="min-h-full">{children}</body>
     </html>
