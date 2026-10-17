@@ -40,7 +40,7 @@ const jsonLd = (html) =>
   check("JSON-LD Person", !!person?.name && !!person?.jobTitle, person?.name);
   check("JSON-LD Person alumniOf + sameAs", !!person?.alumniOf?.length && !!person?.sameAs?.length);
   check("JSON-LD WebSite + ProfilePage", ld.some((n) => n["@type"] === "WebSite") && ld.some((n) => n["@type"] === "ProfilePage"));
-  check("CV content rendered", body.includes("LLM Gateway Engineer") && body.includes("FPT University"));
+  check("CV content rendered", body.includes("AI Gateway Platform Engineer") && body.includes("FPT University"));
   check("no placeholder links", !/href="#"|example\.com/.test(body));
   check("JSON-LD projects ItemList + FAQPage", ld.some((n) => n["@type"] === "ItemList") && ld.some((n) => n["@type"] === "FAQPage"));
   check("FAQ rendered in HTML", body.includes("Who is ") && body.includes("<details"));
@@ -73,7 +73,7 @@ const jsonLd = (html) =>
   check("/cv 200", res.status === 200);
   check("/cv canonical", body.includes(`<link rel="canonical" href="${SITE}/cv"`));
   check("/cv BreadcrumbList", jsonLd(body).some((n) => n["@type"] === "BreadcrumbList"));
-  check("/cv lists all CV roles", ["LLM Gateway Engineer", "AI Agent Consultant Engineer", "Accounting Application Developer", "AI Team Lead, Computer Vision", "AI Agent Engineer", "Freelance Software Engineer, Team Lead"].every((t) => body.includes(t)));
+  check("/cv lists all CV roles", ["AI Gateway Platform Engineer", "Backend &amp; AI Engineer", "Co-founder", "AI Agent Consultant Engineer", "Core Full-stack Developer", "AI Team Lead, Computer Vision", "Team Lead, Software Engineer", "IT Support Technician"].every((t) => body.includes(t)));
 }
 
 // PDF
@@ -117,7 +117,7 @@ const jsonLd = (html) =>
 {
   const { res, body } = await get("/api/content");
   check("/api/content 200", res.status === 200);
-  check("API returns CV profile", JSON.parse(body).profile?.classRole === "AI-Native Full-Stack Developer");
+  check("API returns CV profile", JSON.parse(body).profile?.classRole === "AI-Native Software Engineer");
   const h = await get("/api/health");
   check("/api/health ok", h.res.status === 200 && JSON.parse(h.body).db === true);
 }
