@@ -2,7 +2,8 @@ import type { MetadataRoute } from "next";
 import type { BlogPostSummary } from "@portfolio/types";
 import { getFullPosts, isThin } from "@/lib/blog";
 import { getPortfolio } from "@/lib/portfolio";
-import { SITE_URL } from "@/lib/seo";
+import { SITE_URL, absoluteUrl } from "@/lib/seo";
+import { PROJECT_VISUALS } from "@/data/projectVisuals";
 
 export const dynamic = "force-dynamic";
 
@@ -26,7 +27,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const content = latest([contentUpdatedAt]);
 
   return [
-    { url: `${SITE_URL}/`, lastModified: content, changeFrequency: "weekly", priority: 1 },
+    {
+      url: `${SITE_URL}/`,
+      lastModified: content,
+      changeFrequency: "weekly",
+      priority: 1,
+      ...(data?.profile?.avatarUrl ? { images: [absoluteUrl(data.profile.avatarUrl)] } : {}),
+    },
     { url: `${SITE_URL}/cv`, lastModified: content, changeFrequency: "monthly", priority: 0.9 },
     {
       url: `${SITE_URL}/blog`,
@@ -39,6 +46,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: content,
       changeFrequency: "monthly" as const,
       priority: 0.8,
+      // <image:image> entries: the real screenshots shown on the case study.
+      images: (PROJECT_VISUALS[m.slug]?.images ?? []).map((i) => absoluteUrl(i.src)),
     })),
     ...posts.map((p) => ({
       url: `${SITE_URL}/blog/${p.slug}`,

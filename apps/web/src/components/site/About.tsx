@@ -1,5 +1,6 @@
 import type { Profile } from "@portfolio/types";
 import { ABOUT, FOCUS, NOW } from "@/data/home";
+import { IDENTITY } from "@/lib/identity";
 import { MONO } from "./ui";
 
 /** Bio paragraphs from the CMS; a short "Label:" lead-in is set in bold. */
@@ -42,6 +43,11 @@ export function About({ profile }: { profile: Profile }) {
             </p>
           ))}
           <div style={{ ...MONO, display: "flex", flexWrap: "wrap", gap: "8px 18px", fontSize: 13, color: "#A9B4D0" }}>
+            <span>
+              {`${profile.name || IDENTITY.name} · `}
+              <span lang="vi">{IDENTITY.nativeName}</span>
+              {` · ${IDENTITY.handle}`}
+            </span>
             <span>{ABOUT.meta}</span>
             <span>
               status: <span style={{ color: "#6FA8FF" }}>{ABOUT.status}</span> ▸

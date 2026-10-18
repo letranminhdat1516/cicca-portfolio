@@ -26,10 +26,32 @@ const post: BlogPost = {
 describe("FAQ", () => {
   const faqs = buildFaq(portfolio);
 
-  it("answers in the third person with the native-script name and place", () => {
+  it("answers in the third person with the native-script name, handle and place", () => {
     expect(faqs[0].q).toBe("Who is Le Tran Minh Dat?");
-    expect(faqs[0].a).toContain("Le Tran Minh Dat (Lê Trần Minh Đạt) is an AI-Native Full-Stack Developer based in Ho Chi Minh City, Vietnam.");
+    expect(faqs[0].a).toContain("Le Tran Minh Dat (Lê Trần Minh Đạt), known online as cicca, is an AI-Native Full-Stack Developer");
+    expect(faqs[0].a).toContain("based in Ho Chi Minh City, Vietnam.");
     expect(faqs.map((f) => f.a).join(" ")).not.toMatch(/\bI\b/);
+  });
+
+  it("covers the high-intent entity questions, one of them in Vietnamese", () => {
+    const qs = faqs.map((f) => f.q);
+    for (const q of [
+      "Lê Trần Minh Đạt là ai?",
+      "What does Le Tran Minh Dat work on?",
+      "Where is Le Tran Minh Dat based, and is he open to remote work?",
+      "What awards has Le Tran Minh Dat won?",
+      "What is Zillexa?",
+      'Is "cicca" the same person as Le Tran Minh Dat?',
+      "How do I contact Le Tran Minh Dat?",
+    ]) {
+      expect(qs).toContain(q);
+    }
+    const vi = faqs.find((f) => f.lang === "vi")!;
+    expect(vi.a).toContain("Đại học FPT");
+    expect(new Set(qs).size).toBe(qs.length);
+    const awards = faqs.find((f) => f.q.startsWith("What awards"))!.a;
+    expect(awards).toContain("Top 4 — Viettel AI Race");
+    expect(awards).not.toContain("FPT University");
   });
 
   it("only lists real external links as contact routes", () => {
@@ -57,8 +79,22 @@ describe("projects", () => {
   it("are listed as works authored by the person", () => {
     const list = projectsJsonLd(portfolio) as Obj;
     const first = (list.itemListElement as Obj[])[0].item as Obj;
-    expect(first).toMatchObject({ "@type": "CreativeWork", name: "Bank-wide LLM Gateway", url: `${SITE_URL}/#bank-llm-gateway` });
-    expect(homeJsonLd(portfolio).map((n) => (n as Obj)["@type"])).toEqual(["Person", "WebSite", "ProfilePage", "ItemList", "FAQPage"]);
+    expect(first).toMatchObject({
+      "@type": "CreativeWork",
+      name: "Bank-wide LLM Gateway",
+      url: `${SITE_URL}/#bank-llm-gateway`,
+      image: `${SITE_URL}/projects/bank-llm-gateway/01.jpg`,
+    });
+    expect(homeJsonLd(portfolio).map((n) => (n as Obj)["@type"])).toEqual([
+      "Person",
+      "WebSite",
+      "ProfilePage",
+      "ItemList",
+      "FAQPage",
+      "Organization",
+      "SoftwareSourceCode",
+      "SoftwareSourceCode",
+    ]);
   });
 });
 
@@ -71,7 +107,8 @@ describe("blog", () => {
   it("gives every page a share image even when openGraph is overridden", () => {
     const m = pageMetadata({ seo: seoOf(portfolio), path: "/blog", title: "Blog", description: "d" });
     expect((m.openGraph?.images as Obj[])[0].url).toBe(`${SITE_URL}/opengraph-image`);
-    expect(m.twitter?.images).toEqual([`${SITE_URL}/opengraph-image`]);
+    expect(m.twitter?.images).toEqual([{ url: `${SITE_URL}/opengraph-image`, alt: "Blog" }]);
+    expect(m.openGraph).toMatchObject({ locale: "en_US", alternateLocale: ["vi_VN"], siteName: "Le Tran Minh Dat" });
     expect(pageMetadata({ seo: seoOf(portfolio), path: "/x", title: "t", description: "d", noindex: true }).robots).toEqual({ index: false, follow: true });
   });
 
@@ -86,5 +123,14 @@ describe("blog", () => {
     const txt = buildLlmsFullTxt(portfolio, [post]);
     expect(txt).toContain(`Source: ${SITE_URL}/blog/hello`);
     expect(txt).toContain("One two three.");
+  });
+
+  it("llms-full.txt carries every written case study with its URL", () => {
+    const data = { ...portfolio, missions: [{ ...portfolio.missions[0], content: "## The problem\n\nBanks need audit." }] };
+    const txt = buildLlmsFullTxt(data);
+    expect(txt).toContain("# Project case studies");
+    expect(txt).toContain(`Source: ${SITE_URL}/projects/bank-llm-gateway`);
+    expect(txt).toContain("### The problem");
+    expect(txt).toContain("## FAQ");
   });
 });

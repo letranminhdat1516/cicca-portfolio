@@ -56,4 +56,19 @@ export const ERROR_TEXT: Record<ContactError, string> = {
   server: "Something went wrong on my side and the message wasn't sent. Please try again",
 };
 
-export const SENT_TEXT = "Thanks — your message is on its way. Check your inbox for a confirmation.";
+export const SENT_TITLE = "Message sent";
+export const SENT_TEXT = "Thanks — I'll get back to you soon. A confirmation is on its way to your inbox.";
+
+/** Form lifecycle; the view is a pure function of this so each state is testable. */
+export type ContactStatus = { kind: "idle" } | { kind: "sending" } | { kind: "sent" } | { kind: "error"; error: ContactError };
+
+export const isBusy = (s: ContactStatus) => s.kind === "sending";
+export const submitLabel = (s: ContactStatus) => (s.kind === "sending" ? "Sending…" : "Send message");
+export const errorMessage = (s: ContactStatus): string | null => (s.kind === "error" ? ERROR_TEXT[s.error] : null);
+
+/**
+ * Any link or button carrying this attribute opens the contact dialog instead of
+ * following its href (the href stays a real fallback: mailto: or /#contact).
+ */
+export const CONTACT_OPEN_ATTR = "data-contact-open";
+export const CONTACT_DIALOG_ID = "contact-dialog";

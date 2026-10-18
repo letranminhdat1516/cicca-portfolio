@@ -163,8 +163,9 @@ export class AnalyticsService {
     const checks = [
       {
         id: 'title',
-        label: 'Title length 30–60 chars',
-        pass: title.length >= 30 && title.length <= 60,
+        // 65, not 60: the title carries both spellings of the owner's name.
+        label: 'Title length 30–65 chars',
+        pass: title.length >= 30 && title.length <= 65,
         detail: `${title.length} chars`,
       },
       {

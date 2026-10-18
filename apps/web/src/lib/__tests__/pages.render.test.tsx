@@ -33,6 +33,9 @@ vi.mock("@/lib/blog", async (orig) => ({
 const { default: ProjectPage } = await import("@/app/(site)/projects/[slug]/page");
 const { default: BlogPostPage } = await import("@/app/(site)/blog/[slug]/page");
 const { default: BlogPage } = await import("@/app/(site)/blog/page");
+const { default: CvPage } = await import("@/app/(site)/cv/page");
+const { SiteFooter } = await import("@/components/site/SiteFooter");
+const { About } = await import("@/components/site/About");
 
 describe("project case-study page", () => {
   it("tells the story: counter, meta grid, numbered sections, screens", async () => {
@@ -79,5 +82,31 @@ describe("blog index page", () => {
     expect(html).toContain("1 min read");
     expect(html).toContain('href="/feed.xml"');
     expect(html).not.toContain('type="email"');
+  });
+});
+
+describe("visible entity text", () => {
+  it("shows the Vietnamese name and handle on the CV, in About and in the footer", async () => {
+    const cv = renderToStaticMarkup(await CvPage());
+    expect(cv).toContain('<span lang="vi">Lê Trần Minh Đạt</span>');
+    expect(cv).toContain("cicca");
+    expect(cv).toContain("Remote-ready (GMT+7, async-first)");
+
+    const about = renderToStaticMarkup(<About profile={portfolio.profile} />);
+    expect(about).toContain('<span lang="vi">Lê Trần Minh Đạt</span>');
+
+    const footer = renderToStaticMarkup(<SiteFooter />);
+    expect(footer).toMatch(/© 2026 Le Tran Minh Dat \(<span lang="vi">Lê Trần Minh Đạt<\/span>\) · cicca/);
+  });
+
+  it("makes a project with a case study indexable and gives it real screenshots in JSON-LD", async () => {
+    const { generateMetadata } = await import("@/app/(site)/projects/[slug]/page");
+    const indexable = await generateMetadata({ params: Promise.resolve({ slug: "bank-llm-gateway" }) });
+    expect(indexable.robots).toBeUndefined();
+    const draft = await generateMetadata({ params: Promise.resolve({ slug: "siz-commerce-gateway" }) });
+    expect(draft.robots).toEqual({ index: false, follow: true });
+    const html = renderToStaticMarkup(await ProjectPage({ params: Promise.resolve({ slug: "bank-llm-gateway" }) }));
+    expect(html).toContain("/projects/bank-llm-gateway/01.jpg");
+    expect(html).toContain('"@id":"http');
   });
 });

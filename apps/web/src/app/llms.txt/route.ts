@@ -4,6 +4,7 @@ import { buildLlmsTxt } from "@/lib/llms";
 
 // /llms.txt — the emerging convention that helps generative engines
 // (ChatGPT, Perplexity, Claude, Gemini) understand and cite this site (GEO).
+// Also served at /.well-known/llms.txt through a rewrite in next.config.ts.
 export const dynamic = "force-dynamic";
 
 export async function GET() {
@@ -18,7 +19,10 @@ export async function GET() {
     body = [
       "# Le Tran Minh Dat",
       "",
-      "> AI-native full-stack developer in Ho Chi Minh City — LLM gateways, RAG agents, ERP and computer vision.",
+      "> AI-Native Software Engineer in Ho Chi Minh City, Vietnam (Lê Trần Minh Đạt, also known as cicca) — AI agents, LLM gateways, RAG and voice agents.",
+      "",
+      "- [Portfolio](https://letranminhdat.com/): projects, experience and contact",
+      "- [CV](https://letranminhdat.com/cv): full CV as a web page",
       "",
     ].join("\n");
   }

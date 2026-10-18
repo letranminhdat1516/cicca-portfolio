@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Outfit, JetBrains_Mono, Orbitron, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { SITE_URL, alternatesFor } from "@/lib/seo";
+import { BOTH_NAMES, IDENTITY } from "@/lib/identity";
 
 const outfit = Outfit({
   variable: "--font-outfit",
@@ -31,20 +32,24 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Le Tran Minh Dat — AI-Native Software Engineer",
-    template: "%s — Le Tran Minh Dat",
+    // 65 chars with both name forms: the Vietnamese spelling is what local
+    // searchers type, the ASCII one what everyone else does.
+    default: `${BOTH_NAMES} — ${IDENTITY.jobTitle}`,
+    template: `%s — ${IDENTITY.name}`,
   },
-  description:
-    "AI-native software engineer in Ho Chi Minh City. I build AI agents and the backend they run on — LLM gateways, RAG, voice agents and k3s infrastructure.",
-  applicationName: "Le Tran Minh Dat",
-  authors: [{ name: "Le Tran Minh Dat", url: SITE_URL }],
-  creator: "Le Tran Minh Dat",
+  description: `${IDENTITY.jobTitle} in Ho Chi Minh City (${IDENTITY.nativeName}). I build AI agents and the backend they run on: LLM gateways, RAG, voice agents.`,
+  applicationName: IDENTITY.name,
+  // Renders <meta name="author"> on every page that does not override it.
+  authors: [{ name: IDENTITY.name, url: SITE_URL }],
+  creator: IDENTITY.name,
+  publisher: IDENTITY.name,
   category: "technology",
   openGraph: {
     type: "website",
-    siteName: "Le Tran Minh Dat",
+    siteName: IDENTITY.name,
     url: SITE_URL,
     locale: "en_US",
+    alternateLocale: ["vi_VN"],
   },
   twitter: { card: "summary_large_image" },
   robots: {

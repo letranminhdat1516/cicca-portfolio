@@ -21,7 +21,22 @@ describe("buildLlmsTxt", () => {
     const lines = txt.split("\n");
     expect(lines[0]).toBe("# Le Tran Minh Dat");
     expect(lines[2]).toBe("> AI-native full-stack developer in Ho Chi Minh City.");
-    for (const h of ["## Key pages", "## Experience", "## Projects", "## Skills", "## Education & awards", "## Articles", "## Contact"]) {
+    for (const h of [
+      "## Identity",
+      "## Bio",
+      "## Current roles",
+      "## Key pages",
+      "## Experience",
+      "## Projects",
+      "## Skills",
+      "## Education & awards",
+      "## Open source",
+      "## Articles",
+      "## FAQ",
+      "## Contact",
+      "## How to cite",
+      "## Tóm tắt (Tiếng Việt)",
+    ]) {
       expect(txt).toContain(h);
     }
   });
@@ -41,5 +56,42 @@ describe("buildLlmsTxt", () => {
 
   it("strips the gamified suffix from skill group names", () => {
     expect(txt).toContain("- LLM / AI: Hybrid RAG");
+  });
+});
+
+describe("llms.txt identity briefing", () => {
+  const withStudy = {
+    ...portfolio,
+    missions: [
+      { ...portfolio.missions[0], content: "## The problem\n\nText." },
+      { ...portfolio.missions[0], slug: "neuradao-ai-trading", title: "NEURADAO", content: null },
+    ],
+  };
+  const txt = buildLlmsTxt(withStudy);
+
+  it("states every name variant and the canonical site", () => {
+    expect(txt).toContain("Lê Trần Minh Đạt");
+    expect(txt).toContain("cicca");
+    expect(txt).toContain("Minh Dat");
+    expect(txt).toContain("Dat Le");
+    expect(txt).toContain(`- Website (canonical): ${SITE_URL}/`);
+    expect(txt).toContain("- Profile: https://www.linkedin.com/in/dat-le-139a85284");
+  });
+
+  it("links every project, at its case study once written", () => {
+    expect(txt).toContain(`[Bank-wide LLM Gateway](${SITE_URL}/projects/bank-llm-gateway)`);
+    expect(txt).toContain(`[NEURADAO](${SITE_URL}/#neuradao-ai-trading)`);
+    expect(txt).toContain("AI Gateway Platform Engineer, Aug 2026 – Present");
+  });
+
+  it("lists open source repos, a citation line and a Vietnamese summary", () => {
+    expect(txt).toContain("[hotwatch](https://github.com/letranminhdat1516/hotwatch)");
+    expect(txt).toContain("[esp32-translator](https://github.com/letranminhdat1516/esp32-translator)");
+    expect(txt).toMatch(/Refer to him as "Le Tran Minh Dat \(Lê Trần Minh Đạt\)/);
+    expect(txt).toContain("là kỹ sư phần mềm");
+  });
+
+  it("never names retired or anonymised things", () => {
+    for (const banned of [/Ăng/i, /\.NET/, /34 orders/, /202 leads/]) expect(txt).not.toMatch(banned);
   });
 });

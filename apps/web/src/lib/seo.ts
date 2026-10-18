@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { Portfolio, SeoSettings } from "@portfolio/types";
+import { BOTH_NAMES, IDENTITY } from "./identity";
 
 export const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
@@ -8,26 +9,28 @@ export const SITE_URL = (
 export const CV_PDF_PATH = "/cv/letranminhdat-cv.pdf";
 
 /** The owner's name with Vietnamese diacritics — how local searchers type it. */
-export const NATIVE_NAME = "Lê Trần Minh Đạt";
+export const NATIVE_NAME = IDENTITY.nativeName;
+
+/** Open Graph locales: the site is English, the name is Vietnamese. */
+const OG_LOCALE = { locale: "en_US", alternateLocale: ["vi_VN"] };
 
 const FALLBACK: SeoSettings = {
   siteName: "Le Tran Minh Dat",
-  defaultTitle: "Le Tran Minh Dat — AI-Native Full-Stack Developer",
+  defaultTitle: `${BOTH_NAMES} — AI-Native Software Engineer`,
   defaultDescription:
-    "AI-native full-stack developer in Ho Chi Minh City. Shipped 6 production systems: a bank LLM gateway, RAG agents, a VAS ERP and real-time computer vision.",
+    "AI-native software engineer in Ho Chi Minh City. I build AI agents and the backend they run on: an enterprise bank AI gateway, MCP commerce and voice agents.",
   keywords: [
     "Le Tran Minh Dat",
     "Lê Trần Minh Đạt",
-    "AI-native full-stack developer",
-    "LLM gateway engineer",
-    "AI agent engineer",
+    "cicca",
+    "AI-native software engineer",
+    "AI agent developer",
+    "LLM gateway",
+    "MCP server",
     "RAG",
-    "NestJS",
-    "React",
-    "TypeScript",
-    "PostgreSQL",
-    "Kubernetes",
-    "resume",
+    "LiveKit voice agent",
+    "Zillexa",
+    "Ho Chi Minh City",
   ],
   ogImageUrl: null,
   twitterHandle: null,
@@ -71,6 +74,7 @@ export function buildHomeMetadata(portfolio: Portfolio): Metadata {
   const title = seo.defaultTitle;
   const description = seo.defaultDescription;
   const image = ogImage(seo);
+  const imageAlt = `${BOTH_NAMES} — ${profile?.classRole || IDENTITY.jobTitle}`;
 
   return {
     // `absolute` so the root title template ("%s — <brand>") isn't appended —
@@ -78,8 +82,8 @@ export function buildHomeMetadata(portfolio: Portfolio): Metadata {
     title: { absolute: title },
     description,
     keywords: seo.keywords,
-    authors: profile?.name ? [{ name: profile.name, url: SITE_URL }] : undefined,
-    creator: profile?.name,
+    authors: [{ name: profile?.name || IDENTITY.name, url: SITE_URL }],
+    creator: profile?.name || IDENTITY.name,
     alternates: alternatesFor("/"),
     openGraph: {
       type: "profile",
@@ -87,14 +91,18 @@ export function buildHomeMetadata(portfolio: Portfolio): Metadata {
       siteName: seo.siteName,
       title,
       description,
-      locale: "en_US",
-      images: [{ url: image, width: 1200, height: 630, alt: seo.siteName }],
+      ...OG_LOCALE,
+      // og:profile tags name the person behind the page for link previews.
+      firstName: IDENTITY.givenName,
+      lastName: IDENTITY.familyName,
+      username: IDENTITY.handle,
+      images: [{ url: image, width: 1200, height: 630, alt: imageAlt }],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: [image],
+      images: [{ url: image, alt: imageAlt }],
       creator: seo.twitterHandle ?? undefined,
     },
     verification: seo.gscVerification
@@ -133,16 +141,17 @@ export function pageMetadata(opts: {
       ...opts.openGraph,
       url: path,
       siteName: seo.siteName,
-      locale: "en_US",
+      ...OG_LOCALE,
       title,
       description,
-      images: [{ url: image, width: 1200, height: 630, alt: title }],
+      // Dimensions are only known for the generated 1200×630 card.
+      images: [{ url: image, ...(opts.image ? {} : { width: 1200, height: 630 }), alt: title }],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: [image],
+      images: [{ url: image, alt: title }],
       creator: seo.twitterHandle ?? undefined,
     },
   };

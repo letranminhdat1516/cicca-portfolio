@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { FOOTER_LINE } from "@/data/home";
+import { IDENTITY } from "@/lib/identity";
 import { MONO } from "./ui";
 
 // Crawlable internal links (feeds, llms.txt) live here on every page.
@@ -36,6 +37,13 @@ export function SiteFooter() {
             </Link>
           ))}
         </nav>
+        {/* Both spellings of the name plus the handle, in visible text on every page. */}
+        <p style={{ margin: 0, letterSpacing: "0.04em", color: "#A9B4D0" }}>
+          {/* single text nodes so streamed HTML has no <!-- --> between the words */}
+          {`© 2026 ${IDENTITY.name} (`}
+          <span lang="vi">{IDENTITY.nativeName}</span>
+          {`) · ${IDENTITY.handle}`}
+        </p>
         <div>{FOOTER_LINE}</div>
       </div>
     </footer>

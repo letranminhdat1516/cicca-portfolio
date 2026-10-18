@@ -6,15 +6,19 @@ import { usePathname } from "next/navigation";
 import { ACCENT, BRAND } from "@/data/home";
 import { MONO } from "./ui";
 import { MENU_ID, MobileMenu } from "./MobileMenu";
+import { CONTACT_OPEN_ATTR } from "./contact";
 
-const LINKS: { href: string; label: string; match?: string }[] = [
+type NavLink = { href: string; label: string; match?: string; contact?: boolean };
+
+const LINKS: NavLink[] = [
   { href: "/#work", label: "Work", match: "/projects" },
   { href: "/#desk", label: "Desk" },
   { href: "/#experience", label: "Experience" },
   { href: "/#gallery", label: "Gallery" },
   { href: "/blog", label: "Blog", match: "/blog" },
 ];
-const CONTACT: { href: string; label: string; match?: string } = { href: "/#contact", label: "Contact" };
+/** Opens the contact dialog (see ContactDialog); the href is the no-JS fallback. */
+const CONTACT: NavLink = { href: "/#contact", label: "Contact", contact: true };
 
 /** Sticky glass nav shared by every public page; ≤760px the links move into a full-screen menu. */
 export function SiteNav() {
@@ -78,6 +82,8 @@ export function SiteNav() {
             })}
             <Link
               href={CONTACT.href}
+              aria-haspopup="dialog"
+              {...{ [CONTACT_OPEN_ATTR]: "" }}
               style={{
                 textDecoration: "none",
                 padding: "10px 20px",
@@ -109,7 +115,7 @@ export function SiteNav() {
       <MobileMenu
         open={open}
         onClose={close}
-        links={[...LINKS, CONTACT].map((l) => ({ href: l.href, label: l.label, current: isCurrent(l.match) }))}
+        links={[...LINKS, CONTACT].map((l) => ({ href: l.href, label: l.label, current: isCurrent(l.match), contact: l.contact }))}
       />
     </>
   );

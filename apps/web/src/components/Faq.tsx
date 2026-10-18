@@ -22,6 +22,7 @@ export function Faq({ faqs }: { faqs: FaqItem[] }) {
         {faqs.map((f, i) => (
           <details
             key={f.q}
+            lang={f.lang}
             open={i === 0}
             style={{
               borderRadius: 18,

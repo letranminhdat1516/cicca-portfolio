@@ -1,4 +1,5 @@
 import { MissionStatus, Prisma, PrismaClient, Rarity } from '@prisma/client';
+import { caseStudies } from './case-studies';
 
 // Single source of truth for the public portfolio content, transcribed from the
 // résumé (CV/letranminhdat_CV_2026-10.html → apps/web/public/cv/letranminhdat-cv.pdf)
@@ -13,11 +14,13 @@ export const SITE_DESCRIPTION =
 
 export const seo = {
   siteName: 'Le Tran Minh Dat',
-  defaultTitle: 'Le Tran Minh Dat — AI-Native Software Engineer',
+  // 65 chars: both spellings of the name, then the role.
+  defaultTitle: 'Le Tran Minh Dat (Lê Trần Minh Đạt) — AI-Native Software Engineer',
   defaultDescription: SITE_DESCRIPTION,
   keywords: [
     'Le Tran Minh Dat',
     'Lê Trần Minh Đạt',
+    'cicca',
     'AI-native software engineer',
     'AI agent developer',
     'AI gateway',
@@ -147,6 +150,16 @@ export const projects = [
     loadout: ['k3s', 'ArgoCD', 'Tailscale', 'Grafana LGTM'],
   },
 ];
+
+/**
+ * Project markdown to store: admin-written content wins when it is non-empty;
+ * otherwise the seeded case study fills the gap (an empty value keeps the
+ * project page noindex, so it must not block the seed).
+ */
+export function mergeContent(existing: string | null | undefined, seeded: string | null | undefined): string | null {
+  if (existing?.trim()) return existing;
+  return seeded?.trim() ? seeded : null;
+}
 
 type SkillSeed = { name: string; level: number; tip: string; basis: string };
 
@@ -306,7 +319,8 @@ function rarityOf(level: number): Rarity {
 /**
  * Replace all public portfolio content with the CV content above. Leaves users,
  * blog posts, analytics, stats and GSC/GitHub settings untouched, and keeps any
- * admin-written project `content` for slugs that still exist.
+ * admin-written project `content` for slugs that still exist; projects with no
+ * content yet get the seeded case study from ./case-studies.
  */
 export async function applyCvContent(prisma: PrismaClient) {
   const skillRows: Prisma.SkillCreateManyInput[] = skillGroups.flatMap((g) =>
@@ -321,8 +335,8 @@ export async function applyCvContent(prisma: PrismaClient) {
     })),
   );
 
-  // Project markdown `content` is written in the admin CMS (it gates indexing of
-  // /projects/<slug>); carry it over by slug so a re-sync does not wipe it.
+  // Project markdown `content` gates indexing of /projects/<slug>. Admin edits
+  // are carried over by slug so a re-sync does not wipe them.
   const existingContent = new Map(
     (await prisma.project.findMany({ select: { slug: true, content: true } })).map((p) => [
       p.slug,
@@ -347,7 +361,7 @@ export async function applyCvContent(prisma: PrismaClient) {
     prisma.project.createMany({
       data: projects.map((p, order) => ({
         ...p,
-        content: existingContent.get(p.slug) ?? null,
+        content: mergeContent(existingContent.get(p.slug), caseStudies[p.slug]),
         code: `MSN_${String(order + 1).padStart(2, '0')}`,
         statusColor: p.status === MissionStatus.ACTIVE ? ACTIVE : COMPLETE,
         order,

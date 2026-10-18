@@ -11,9 +11,9 @@ describe("seo helpers", () => {
 
   it("falls back to branded defaults when the CMS has no SEO row", () => {
     const seo = seoOf(null);
-    expect(seo.defaultTitle).toContain("Le Tran Minh Dat");
+    expect(seo.defaultTitle).toBe("Le Tran Minh Dat (Lê Trần Minh Đạt) — AI-Native Software Engineer");
     expect(seo.defaultDescription.length).toBeLessThanOrEqual(160);
-    expect(seo.defaultTitle.length).toBeLessThanOrEqual(60);
+    expect(seo.defaultTitle.length).toBeLessThanOrEqual(65);
   });
 
   it("uses the dynamic OG image unless a custom one is set", () => {
@@ -26,7 +26,18 @@ describe("seo helpers", () => {
     expect(m.title).toEqual({ absolute: portfolio.seo!.defaultTitle });
     expect(m.alternates?.canonical).toBe("/");
     expect(m.alternates?.types).toHaveProperty("application/rss+xml");
-    expect(m.openGraph).toMatchObject({ url: SITE_URL, siteName: "Le Tran Minh Dat" });
+    expect(m.openGraph).toMatchObject({
+      url: SITE_URL,
+      siteName: "Le Tran Minh Dat",
+      locale: "en_US",
+      alternateLocale: ["vi_VN"],
+      firstName: "Dat",
+      lastName: "Le",
+      username: "cicca",
+    });
+    const [img] = m.openGraph!.images as { alt: string }[];
+    expect(img.alt).toContain("Lê Trần Minh Đạt");
+    expect(m.authors).toEqual([{ name: "Le Tran Minh Dat", url: SITE_URL }]);
     expect(m.twitter).toMatchObject({ card: "summary_large_image" });
     expect(m.verification).toEqual({ google: "gsc-token" });
   });

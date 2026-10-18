@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getPortfolio } from "@/lib/portfolio";
 import { CV_PDF_PATH, pageMetadata, seoOf } from "@/lib/seo";
+import { BOTH_NAMES, IDENTITY } from "@/lib/identity";
 import { splitDescription } from "@/lib/llms";
 import { JsonLd, cvJsonLd } from "@/components/seo/JsonLd";
 
@@ -14,14 +15,14 @@ export async function generateMetadata(): Promise<Metadata> {
   const seo = seoOf(data);
   const name = data.profile?.name ?? seo.siteName;
   const title = `CV — ${name}, ${data.profile?.classRole ?? "Developer"}`;
-  const description = `${name}'s CV: AI-native software engineer building AI agents, MCP servers, LLM gateways and RAG systems. Experience, skills, education and awards.`;
+  const description = `CV of ${BOTH_NAMES}: AI-native software engineer building AI agents, MCP servers, LLM gateways and RAG. Experience, skills, awards.`;
   return pageMetadata({
     seo,
     path: "/cv",
     title,
     absoluteTitle: true,
     description,
-    openGraph: { type: "profile" },
+    openGraph: { type: "profile", firstName: IDENTITY.givenName, lastName: IDENTITY.familyName, username: IDENTITY.handle },
   });
 }
 
@@ -67,11 +68,15 @@ export default async function CvPage() {
         >
           {profile.name}
         </h1>
+        <p className="mt-2 text-[17px]" style={{ ...UI, color: "#C9D4F2" }}>
+          <span lang="vi">{IDENTITY.nativeName}</span>
+          <span style={{ color: "#8C97B8" }}>{` · ${IDENTITY.handle}`}</span>
+        </p>
         <p className="mt-2 text-[15px] font-bold tracking-[3px]" style={{ ...MONO, color: "#9CC2FF" }}>
           {profile.classRole.toUpperCase()}
         </p>
         <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[13px]" style={{ color: "#8C97B8" }}>
-          <span>Ho Chi Minh City, Vietnam</span>
+          <span>Ho Chi Minh City, Vietnam · Remote-ready ({IDENTITY.timezone}, async-first)</span>
           <a href={`mailto:${profile.email}`} style={{ color: "#6FA8FF" }}>
             {profile.email}
           </a>

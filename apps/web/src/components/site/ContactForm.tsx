@@ -2,21 +2,42 @@
 
 import { useId, useState, type FormEvent } from "react";
 import styles from "./ContactForm.module.css";
-import { ERROR_TEXT, LIMITS, SENT_TEXT, TOPICS, sendContact, type ContactError, type ContactInput } from "./contact";
-
-type Status = { kind: "idle" } | { kind: "sending" } | { kind: "sent" } | { kind: "error"; error: ContactError };
+import {
+  LIMITS,
+  SENT_TEXT,
+  SENT_TITLE,
+  TOPICS,
+  errorMessage,
+  isBusy,
+  sendContact,
+  submitLabel,
+  type ContactInput,
+  type ContactStatus,
+} from "./contact";
 
 const EMPTY: ContactInput = { name: "", email: "", topic: "", message: "", website: "" };
 
 /**
- * Contact card on the blue CTA band: labelled fields, an optional topic radio
- * group styled as pills, and a mailto fallback. Posts to the API's public /contact.
+ * The form inside the contact dialog: Name + Email, optional topic chips (a radio
+ * group), message, honeypot, inline errors and a success panel. Posts to the
+ * API's public /contact. `initialStatus` exists so each state can be rendered in tests.
  */
-export function ContactForm({ email }: { email?: string }) {
+export function ContactForm({
+  email,
+  onClose,
+  onSent,
+  initialStatus = { kind: "idle" },
+}: {
+  email?: string;
+  onClose?: () => void;
+  onSent?: () => void;
+  initialStatus?: ContactStatus;
+}) {
   const id = useId();
   const [fields, setFields] = useState<ContactInput>(EMPTY);
-  const [status, setStatus] = useState<Status>({ kind: "idle" });
-  const sending = status.kind === "sending";
+  const [status, setStatus] = useState<ContactStatus>(initialStatus);
+  const sending = isBusy(status);
+  const error = errorMessage(status);
   const set = (k: Exclude<keyof ContactInput, "topic">) => (e: { target: { value: string } }) =>
     setFields((f) => ({ ...f, [k]: e.target.value }));
 
@@ -28,36 +49,33 @@ export function ContactForm({ email }: { email?: string }) {
     if (out.ok) {
       setFields(EMPTY);
       setStatus({ kind: "sent" });
+      onSent?.();
     } else {
       setStatus({ kind: "error", error: out.error });
     }
   }
 
-  const mailto = email ? <a href={`mailto:${email}`}>or email me directly</a> : null;
-
   if (status.kind === "sent") {
     return (
-      <div className={styles.card}>
-        <h3 className={styles.title}>Message sent</h3>
-        <p className={styles.sent} role="status">
-          {SENT_TEXT}
-        </p>
-        <button type="button" className={styles.again} onClick={() => setStatus({ kind: "idle" })}>
-          Send another message
-        </button>
+      <div className={styles.sent} role="status">
+        <span className={styles.check} aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M5 12.5l4.5 4.5L19 7.5" />
+          </svg>
+        </span>
+        <h3 className={styles.sentTitle}>{SENT_TITLE}</h3>
+        <p className={styles.sentText}>{SENT_TEXT}</p>
+        {onClose && (
+          <button type="button" className={styles.send} onClick={onClose}>
+            Close
+          </button>
+        )}
       </div>
     );
   }
 
   return (
-    <form className={styles.card} onSubmit={onSubmit} aria-labelledby={`${id}-title`} aria-describedby={`${id}-sub`}>
-      <h3 className={styles.title} id={`${id}-title`}>
-        Send a message
-      </h3>
-      <p className={styles.sub} id={`${id}-sub`}>
-        I usually reply within 1–2 days (GMT+7).
-      </p>
-
+    <form className={styles.form} onSubmit={onSubmit} aria-busy={sending}>
       <div className={styles.row}>
         <div className={styles.field}>
           <label htmlFor={`${id}-name`} className={styles.label}>
@@ -99,11 +117,11 @@ export function ContactForm({ email }: { email?: string }) {
 
       <fieldset className={styles.topics} disabled={sending}>
         <legend className={styles.label}>
-          What&apos;s it about? <span className={styles.optional}>(optional)</span>
+          Topic <span className={styles.optional}>(optional)</span>
         </legend>
-        <div className={styles.pills}>
+        <div className={styles.chips}>
           {TOPICS.map((t) => (
-            <label key={t.value} className={styles.pill}>
+            <label key={t.value} className={styles.chip}>
               <input
                 type="radio"
                 name="topic"
@@ -112,7 +130,7 @@ export function ContactForm({ email }: { email?: string }) {
                 checked={fields.topic === t.value}
                 onChange={() => setFields((f) => ({ ...f, topic: t.value }))}
               />
-              <span className={styles.pillText}>{t.label}</span>
+              <span className={styles.chipText}>{t.label}</span>
             </label>
           ))}
         </div>
@@ -154,19 +172,21 @@ export function ContactForm({ email }: { email?: string }) {
         />
       </div>
 
-      {status.kind === "error" && (
+      {error && (
         <p className={styles.error} role="alert">
-          {ERROR_TEXT[status.error]}
-          {mailto ? <> — {mailto}.</> : "."}
+          {error}.
         </p>
       )}
 
-      <div className={styles.foot}>
-        <button type="submit" className={styles.send} disabled={sending} aria-busy={sending}>
-          {sending ? "Sending…" : "Send message"}
-        </button>
-        {mailto && <span className={styles.alt}>{mailto}</span>}
-      </div>
+      <button type="submit" className={styles.send} disabled={sending}>
+        {sending && <span className={styles.spinner} aria-hidden="true" />}
+        {submitLabel(status)}
+      </button>
+      {email && (
+        <p className={styles.alt}>
+          or email me at <a href={`mailto:${email}`}>{email}</a>
+        </p>
+      )}
     </form>
   );
 }

@@ -92,20 +92,54 @@ describe('contact', () => {
 
     expect(reply.from).toBe(DEFAULT_FROM);
     expect(reply.to).toEqual(['ada@example.com']);
-    expect(reply.subject).toBe('Thanks for your message');
+    expect(reply.subject).toBe('Thanks for getting in touch');
+    expect(reply.reply_to).toBe('datltmse@gmail.com');
     // nothing the visitor typed is echoed into a mail sent to a visitor-typed address
     for (const part of [reply.subject, reply.text, reply.html])
       expect(part).not.toContain('Ada');
     for (const part of [reply.text, reply.html]) {
-      expect(part).toContain(
-        'https://letranminhdat.com/cv/letranminhdat-cv.pdf',
-      );
-      expect(part).toContain('https://letranminhdat.com/#work');
-      expect(part).toContain('Dat (cicca)');
-      expect(part).toContain('1–2 days');
+      expect(part).toContain('Hi there,');
+      expect(part).toContain('within 1–2 business days');
+      expect(part).toContain('just reply to this email');
+      expect(part).toContain('Best regards,');
+      expect(part).toContain('Le Tran Minh Dat');
+      expect(part).toContain('This is an automatic confirmation.');
       // Never echo the visitor's free text back to a visitor-supplied address.
       expect(part).not.toContain('analytical engine');
+      // none of the old link list / signature
+      for (const gone of [
+        'CV',
+        'Selected work',
+        'letranminhdat.com',
+        'cicca',
+        'http',
+      ])
+        expect(part).not.toContain(gone);
     }
+    // no links at all in the auto-reply
+    expect(reply.html).not.toMatch(/<a[\s>]/i);
+    expect(reply.html).not.toContain('href');
+    expect(reply.html).toContain('#0B1440');
+    expect(reply.html).toContain('AI-Native Software Engineer');
+  });
+
+  it('notification: header with received time, details table, message box', async () => {
+    await post(
+      { ...valid, message: 'Line one\nLine two' },
+      { referer: 'https://letranminhdat.com/blog' },
+    ).expect(200);
+    const [note] = sentBodies(fetchMock);
+    expect(note.html).toContain('New message');
+    expect(note.html).toMatch(/Received [^<]*\(GMT\+7\)/);
+    for (const k of ['Name', 'Email', 'Page'])
+      expect(note.html).toContain(`>${k}</td>`);
+    expect(note.html).toContain('href="mailto:ada@example.com"');
+    expect(note.html).toContain('https://letranminhdat.com/blog');
+    expect(note.html).toContain('white-space:pre-wrap');
+    expect(note.html).toContain('Line one\nLine two');
+    expect(note.html).toContain('Reply to this email to answer them directly.');
+    expect(note.text).toContain('Page:    https://letranminhdat.com/blog');
+    expect(note.text).toContain('Reply to this email to answer them directly.');
   });
 
   it.each([
@@ -139,8 +173,7 @@ describe('contact', () => {
       ])
         expect(part).not.toContain(visitorText);
     }
-    expect(reply.html).toContain('>CV</a>');
-    expect(reply.text).toContain('- CV: https://letranminhdat.com/cv/');
+    expect(reply.html).not.toContain('<a ');
   });
 
   it('honours CONTACT_FROM / CONTACT_TO', async () => {
@@ -179,6 +212,7 @@ describe('contact', () => {
     );
     expect(note.html).toContain('&lt;b&gt;Eve&lt;/b&gt; &quot;x&quot;');
     expect(reply.html).not.toContain('Eve');
+    expect(reply.html).not.toContain('script');
     expect(escapeHtml(`&<>"'`)).toBe('&amp;&lt;&gt;&quot;&#39;');
   });
 

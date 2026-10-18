@@ -27,7 +27,8 @@ const jsonLd = (html) =>
   const { res, body } = await get("/");
   check("home 200", res.status === 200, String(res.status));
   const title = meta(body, /<title>(.*?)<\/title>/s);
-  check("home <title> ≤ 60 chars", !!title && title.length <= 60, title);
+  // 65: the title carries both spellings of the name.
+  check("home <title> ≤ 65 chars, both name forms", !!title && title.length <= 65 && title.includes("Lê Trần Minh Đạt"), title);
   const desc = meta(body, /<meta name="description" content="(.*?)"/);
   check("meta description 70–160 chars", !!desc && desc.length >= 70 && desc.length <= 160, `${desc?.length}`);
   check("canonical → site root", body.includes(`<link rel="canonical" href="${SITE}"`) || body.includes(`<link rel="canonical" href="${SITE}/"`));
@@ -39,6 +40,11 @@ const jsonLd = (html) =>
   const person = ld.find((n) => n["@type"] === "Person");
   check("JSON-LD Person", !!person?.name && !!person?.jobTitle, person?.name);
   check("JSON-LD Person alumniOf + sameAs", !!person?.alumniOf?.length && !!person?.sameAs?.length);
+  check("JSON-LD Person @id", person?.["@id"] === `${SITE}/#person`, person?.["@id"]);
+  check("JSON-LD Person alternateName has Lê Trần Minh Đạt + cicca", ["Lê Trần Minh Đạt", "cicca"].every((n) => person?.alternateName?.includes(n)));
+  check("JSON-LD sameAs GitHub + LinkedIn", ["github.com/letranminhdat1516", "linkedin.com/in/dat-le-139a85284"].every((h) => person?.sameAs?.some((u) => u.includes(h))));
+  check("og:locale:alternate vi_VN", body.includes('property="og:locale:alternate" content="vi_VN"'));
+  check("footer shows both names + handle", /© 2026 Le Tran Minh Dat \(<span lang="vi">Lê Trần Minh Đạt<\/span>\) · cicca/.test(body));
   check("JSON-LD WebSite + ProfilePage", ld.some((n) => n["@type"] === "WebSite") && ld.some((n) => n["@type"] === "ProfilePage"));
   check("CV content rendered", body.includes("AI Gateway Platform Engineer") && body.includes("FPT University"));
   check("no placeholder links", !/href="#"|example\.com/.test(body));
@@ -73,7 +79,20 @@ const jsonLd = (html) =>
   check("/cv 200", res.status === 200);
   check("/cv canonical", body.includes(`<link rel="canonical" href="${SITE}/cv"`));
   check("/cv BreadcrumbList", jsonLd(body).some((n) => n["@type"] === "BreadcrumbList"));
+  check("/cv shows the Vietnamese name", body.includes('<span lang="vi">Lê Trần Minh Đạt</span>'));
   check("/cv lists all CV roles", ["AI Gateway Platform Engineer", "Backend &amp; AI Engineer", "Co-founder", "AI Agent Consultant Engineer", "Core Full-stack Developer", "AI Team Lead, Computer Vision", "Team Lead, Software Engineer", "IT Support Technician"].every((t) => body.includes(t)));
+}
+
+// Project case study
+{
+  const missions = await get("/api/content").then(({ body }) => JSON.parse(body).missions ?? []).catch(() => []);
+  const m = missions.find((x) => x.content?.trim());
+  if (m) {
+    const { res, body } = await get(`/projects/${m.slug}`);
+    check(`/projects/${m.slug} 200 + indexable`, res.status === 200 && !/<meta name="robots" content="noindex/.test(body));
+    const article = jsonLd(body).find((n) => n["@type"] === "Article");
+    check("project Article authored by #person with screenshots", article?.author?.["@id"] === `${SITE}/#person` && [article?.image].flat().some((u) => String(u).includes(`/projects/${m.slug}/`)));
+  } else check("at least one project case study published", false);
 }
 
 // PDF
@@ -93,6 +112,9 @@ const jsonLd = (html) =>
 
   const sm = await get("/sitemap.xml");
   check("sitemap has / and /cv", sm.res.status === 200 && sm.body.includes(`<loc>${SITE}/cv</loc>`) && sm.body.includes(`<loc>${SITE}/</loc>`));
+  const smProjects = [...sm.body.matchAll(/<loc>([^<]*\/projects\/[^<]+)<\/loc>/g)].map((m) => m[1]);
+  check("sitemap has /projects/ case studies", smProjects.length > 0, `${smProjects.length} project URLs`);
+  check("sitemap has project screenshots (image:image)", sm.body.includes("<image:loc>") && sm.body.includes("/projects/"));
 
   const llms = await get("/llms.txt");
   check("llms.txt 200 text/plain", llms.res.status === 200 && (llms.res.headers.get("content-type") ?? "").startsWith("text/plain"));
@@ -101,9 +123,18 @@ const jsonLd = (html) =>
   const smLast = [...sm.body.matchAll(/<lastmod>(.*?)<\/lastmod>/g)].map((m) => Date.parse(m[1]));
   check("sitemap lastmod is a real edit time, not now()", smLast.every((t) => Date.now() - t > 60_000));
   check("llms.txt has FAQ", llms.body.includes("## FAQ"));
+  check("llms.txt has the Vietnamese name + handle", llms.body.includes("Lê Trần Minh Đạt") && llms.body.includes("cicca"));
+  const missions = await get("/api/content").then(({ body }) => JSON.parse(body).missions ?? []).catch(() => []);
+  const projectUrls = missions.map((m) => (m.content?.trim() ? `${SITE}/projects/${m.slug}` : `${SITE}/#${m.slug}`));
+  const missingProjects = projectUrls.filter((u) => !llms.body.includes(`(${u})`));
+  check("llms.txt links every project", missions.length > 0 && missingProjects.length === 0, missingProjects.join(", "));
+  check("llms.txt every project has a case study", missions.length > 0 && missions.every((m) => m.content?.trim()), missions.filter((m) => !m.content?.trim()).map((m) => m.slug).join(", "));
+  const wk = await get("/.well-known/llms.txt");
+  check("/.well-known/llms.txt 200", wk.res.status === 200 && wk.body.startsWith("# "));
 
   const full = await get("/llms-full.txt");
   check("llms-full.txt 200 text/plain", full.res.status === 200 && (full.res.headers.get("content-type") ?? "").startsWith("text/plain"));
+  check("llms-full.txt has project case studies", full.body.includes("# Project case studies"));
   const feed = await get("/feed.xml");
   check("RSS feed", feed.res.status === 200 && feed.body.includes("<rss") && (feed.res.headers.get("content-type") ?? "").includes("rss+xml"));
   const mf = await get("/manifest.webmanifest");

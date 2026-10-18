@@ -131,10 +131,10 @@ export const KEYCAP = {
 export const CTA = {
   title: "READY FOR THE NEXT QUEST",
   body: "Have a system that needs to reach production? Open to collaborations, freelance missions and full-time roles — send a signal.",
-  button: "Contact now",
+  button: "Contact me",
 };
 
-export const FOOTER_LINE = "SYSTEM LOADED · NO PIXELS HARMED · © 2026 LE TRAN MINH DAT · SERVED FROM A K3S HOMELAB";
+export const FOOTER_LINE = "SYSTEM LOADED · NO PIXELS HARMED · SERVED FROM A K3S HOMELAB";
 
 // ─── hero decoration (deterministic so server and client render the same) ───
 

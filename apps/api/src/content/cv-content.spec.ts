@@ -1,15 +1,18 @@
 import {
   achievements,
   experiences,
+  mergeContent,
   projects,
   seo,
   skillGroups,
   socials,
 } from '../../prisma/content/cv';
+import { caseStudies } from '../../prisma/content/case-studies';
 
 describe('CV content', () => {
   it('keeps SEO title and description within search snippet limits', () => {
-    expect(seo.defaultTitle.length).toBeLessThanOrEqual(60);
+    expect(seo.defaultTitle.length).toBeLessThanOrEqual(65);
+    expect(seo.defaultTitle).toContain('Lê Trần Minh Đạt');
     expect(seo.defaultDescription.length).toBeGreaterThanOrEqual(70);
     expect(seo.defaultDescription.length).toBeLessThanOrEqual(160);
   });
@@ -39,8 +42,8 @@ describe('CV content', () => {
   });
 
   it('keeps retired or anonymised wording out of the content', () => {
-    const all = JSON.stringify({ projects, experiences, skillGroups, achievements, seo });
-    for (const banned of [/Ăng/i, /\.NET/, /C#/, /34 orders/, /202 leads/, /100,000/, /Polkadot/, /95-file/]) {
+    const all = JSON.stringify({ projects, experiences, skillGroups, achievements, seo, caseStudies });
+    for (const banned of [/Ăng/i, /\.NET/, /C#/, /34 orders/, /202 leads/, /100,000/, /Polkadot/, /95-file/, /lines of code/i, /% of the code/i]) {
       expect(all).not.toMatch(banned);
     }
   });
@@ -57,5 +60,36 @@ describe('CV content', () => {
       expect(s.level).toBeGreaterThanOrEqual(0);
       expect(s.level).toBeLessThanOrEqual(100);
     }
+  });
+
+  it('has a factual case study for every project with the standard sections', () => {
+    for (const p of projects) {
+      const md = caseStudies[p.slug];
+      expect(md).toBeDefined();
+      for (const h of ['## The problem', '## What I built', '## How it works', '## Outcome', '## Stack']) {
+        expect(md).toContain(h);
+      }
+      const words = md.split(/\s+/).filter(Boolean).length;
+      expect(words).toBeGreaterThanOrEqual(250);
+      expect(words).toBeLessThanOrEqual(450);
+    }
+    expect(Object.keys(caseStudies).sort()).toEqual(projects.map((p) => p.slug).sort());
+  });
+});
+
+describe('mergeContent', () => {
+  it('keeps non-empty admin content', () => {
+    expect(mergeContent('## Mine', '## Seed')).toBe('## Mine');
+  });
+
+  it('fills empty or missing content with the seeded case study', () => {
+    expect(mergeContent(null, '## Seed')).toBe('## Seed');
+    expect(mergeContent(undefined, '## Seed')).toBe('## Seed');
+    expect(mergeContent('   \n', '## Seed')).toBe('## Seed');
+  });
+
+  it('stores null when neither has content', () => {
+    expect(mergeContent('', undefined)).toBeNull();
+    expect(mergeContent(null, '  ')).toBeNull();
   });
 });

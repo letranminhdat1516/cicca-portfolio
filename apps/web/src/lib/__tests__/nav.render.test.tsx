@@ -6,7 +6,7 @@ import { MENU_ID, MobileMenu } from "@/components/site/MobileMenu";
 const links = [
   { href: "/#work", label: "Work" },
   { href: "/blog", label: "Blog", current: true },
-  { href: "/#contact", label: "Contact" },
+  { href: "/#contact", label: "Contact", contact: true },
 ];
 
 describe("mobile nav", () => {
@@ -19,6 +19,19 @@ describe("mobile nav", () => {
     // desktop links are still rendered (CSS hides them on narrow screens)
     expect(html).toContain('class="nav-links"');
     for (const label of ["Work", "Desk", "Experience", "Gallery", "Blog", "Contact"]) expect(html).toContain(`>${label}<`);
+  });
+
+  it("Contact opens the dialog in both navs, keeping /#contact as the no-JS href", () => {
+    const html = renderToStaticMarkup(<SiteNav />);
+    // desktop pill + mobile-menu entry
+    const triggers = html.match(/<a [^>]*data-contact-open=""[^>]*>/g) ?? [];
+    expect(triggers).toHaveLength(2);
+    for (const t of triggers) {
+      expect(t).toContain('href="/#contact"');
+      expect(t).toContain('aria-haspopup="dialog"');
+    }
+    // the other links stay plain links
+    expect(html).not.toMatch(/href="\/#work"[^>]*data-contact-open/);
   });
 
   it("open: a numbered, labelled dialog with a close button", () => {

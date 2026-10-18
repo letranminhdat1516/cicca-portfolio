@@ -1,0 +1,156 @@
+/* Site-wide contact dialog: dark navy glass panel over a dimmed, blurred page. */
+.dialog {
+  box-sizing: border-box;
+  width: calc(100% - 32px);
+  max-width: 560px;
+  max-height: calc(100dvh - 32px);
+  margin: auto;
+  padding: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  color: #e8eeff;
+  background: rgba(10, 16, 52, 0.92);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(111, 168, 255, 0.35);
+  border-radius: 24px;
+  box-shadow: 0 30px 80px -24px rgba(3, 6, 26, 0.9), 0 0 48px -8px rgba(47, 107, 255, 0.45);
+}
+.dialog[open] {
+  animation: pop 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.dialog::backdrop {
+  background: rgba(3, 6, 26, 0.66);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+.dialog[open]::backdrop {
+  animation: fade 0.22s ease-out both;
+}
+
+.panel {
+  padding: 28px 28px 24px;
+}
+
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+.title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: #f2f5ff;
+}
+.sub {
+  margin: 6px 0 0;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: #a9b4d0;
+}
+
+.close {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin: -8px -10px 0 0;
+  padding: 0;
+  color: #c9d4f2;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.close:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+}
+.close:focus-visible {
+  outline: 2px solid #6fa8ff;
+  outline-offset: 2px;
+}
+
+/* White pill on the blue CTA band. `.site a` / `.site a:hover` set link colours; outrank them. */
+a.ctaButton[href],
+a.ctaButton[href]:hover {
+  color: #0a1034;
+}
+.ctaButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  margin-top: 8px;
+  padding: 0 30px;
+  font-size: 16px;
+  font-weight: 700;
+  text-decoration: none;
+  background: #ffffff;
+  border-radius: 999px;
+  box-shadow: 0 14px 34px -12px rgba(3, 6, 26, 0.75);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.ctaButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 18px 40px -12px rgba(3, 6, 26, 0.85);
+}
+.ctaButton:focus-visible {
+  outline: 3px solid #ffffff;
+  outline-offset: 4px;
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 560px) {
+  .dialog {
+    width: calc(100% - 20px);
+    max-height: calc(100dvh - 20px);
+    border-radius: 20px;
+  }
+  .panel {
+    padding: 22px 18px 20px;
+  }
+  .title {
+    font-size: 22px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dialog[open],
+  .dialog[open]::backdrop {
+    animation: none;
+  }
+  .close,
+  .ctaButton {
+    transition: none;
+  }
+  .ctaButton:hover {
+    transform: none;
+  }
+}

@@ -20,6 +20,7 @@ export const AI_CRAWLERS = [
   "MistralAI-User",
   "cohere-ai",
   "CCBot",
+  "Bingbot",
 ];
 
 const PRIVATE = ["/admin", "/api/"];

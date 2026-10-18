@@ -7,7 +7,8 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { getPortfolio } from "@/lib/portfolio";
 import { SITE_URL, pageMetadata, seoOf } from "@/lib/seo";
-import { JsonLd, PERSON_ID, breadcrumbJsonLd } from "@/components/seo/JsonLd";
+import { IDENTITY } from "@/lib/identity";
+import { JsonLd, projectPageJsonLd } from "@/components/seo/JsonLd";
 import { ACCENT } from "@/data/home";
 import { PROJECT_VISUALS, orderedWork, type ProjectImage } from "@/data/projectVisuals";
 import { MONO, Highlight, Tag } from "@/components/site/ui";
@@ -39,8 +40,10 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     path: `/projects/${slug}`,
     title: `${mission.title} — Case Study`,
     description: clip(oneLine(mission.objective), 158),
-    keywords: mission.loadout,
+    keywords: [...mission.loadout, IDENTITY.name],
     noindex: !mission.content?.trim(),
+    // The first real screenshot is a better share card than the generic one.
+    image: PROJECT_VISUALS[slug]?.images?.[0]?.src,
     openGraph: { type: "article", authors: [SITE_URL], tags: mission.loadout },
   });
 }
@@ -120,7 +123,6 @@ export default async function ProjectPage({ params }: Params) {
   const found = await load(slug);
   if (!found) notFound();
   const { data, mission: m } = found;
-  const url = `${SITE_URL}/projects/${slug}`;
 
   const visual = PROJECT_VISUALS[slug];
   const images = visual?.images ?? [];
@@ -154,30 +156,7 @@ export default async function ProjectPage({ params }: Params) {
 
   return (
     <main>
-      <JsonLd
-        data={[
-          {
-            "@context": "https://schema.org",
-            "@type": "Article",
-            "@id": `${url}#article`,
-            headline: m.title,
-            description: oneLine(m.objective),
-            keywords: m.loadout.join(", "),
-            inLanguage: "en",
-            url,
-            mainEntityOfPage: url,
-            image: `${SITE_URL}/opengraph-image`,
-            dateModified: seoOf(data).updatedAt,
-            author: { "@type": "Person", "@id": PERSON_ID, name: data.profile?.name, url: SITE_URL },
-            publisher: { "@id": PERSON_ID },
-          },
-          breadcrumbJsonLd([
-            { name: "Home", path: "/" },
-            { name: "Projects", path: "/#work" },
-            { name: m.title, path: `/projects/${slug}` },
-          ]),
-        ]}
-      />
+      <JsonLd data={projectPageJsonLd(data, m)} />
 
       <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 24px" }}>
         {/* CRUMB */}

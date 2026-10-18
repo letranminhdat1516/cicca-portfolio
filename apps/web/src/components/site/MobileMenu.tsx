@@ -2,6 +2,7 @@
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { MONO } from "./ui";
+import { CONTACT_OPEN_ATTR } from "./contact";
 
 export const MENU_ID = "site-menu";
 
@@ -9,6 +10,8 @@ export interface MenuLink {
   href: string;
   label: string;
   current?: boolean;
+  /** Opens the contact dialog instead of navigating (href stays the no-JS fallback). */
+  contact?: boolean;
 }
 
 const FOCUSABLE = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -78,7 +81,13 @@ export function MobileMenu({ open, onClose, links }: { open: boolean; onClose: (
         <ol className="mmenu-list">
           {links.map((l, i) => (
             <li key={l.href} style={{ ["--k" as string]: i }}>
-              <Link href={l.href} className="mmenu-link" aria-current={l.current ? "page" : undefined} onClick={onClose}>
+              <Link
+                href={l.href}
+                className="mmenu-link"
+                aria-current={l.current ? "page" : undefined}
+                {...(l.contact ? { [CONTACT_OPEN_ATTR]: "", "aria-haspopup": "dialog" as const } : null)}
+                onClick={onClose}
+              >
                 <span className="i" style={MONO}>
                   {String(i + 1).padStart(2, "0")}
                 </span>

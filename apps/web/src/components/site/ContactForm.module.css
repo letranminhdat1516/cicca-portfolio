@@ -1,38 +1,14 @@
-/* Contact card on the blue CTA band: white card, navy text, light fields. */
-.card {
-  position: relative;
-  width: 100%;
-  max-width: 720px;
-  margin: 8px auto 0;
-  padding: 32px 32px 28px;
+/* Contact form inside the dark navy dialog: dark fields, light text, blue focus. */
+.form {
+  display: flex;
+  flex-direction: column;
   text-align: left;
-  color: #03061a;
-  background: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  border-radius: 20px;
-  box-shadow: 0 24px 60px -20px rgba(3, 6, 26, 0.7);
-}
-
-.title {
-  margin: 0;
-  font-size: 22px;
-  font-weight: 800;
-  line-height: 1.25;
-  letter-spacing: -0.01em;
-  color: #03061a;
-}
-
-.sub {
-  margin: 6px 0 24px;
-  font-size: 15px;
-  line-height: 1.5;
-  color: #4a5578;
 }
 
 .row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  column-gap: 16px;
+  column-gap: 14px;
 }
 
 .field {
@@ -40,19 +16,19 @@
   flex-direction: column;
   gap: 6px;
   min-width: 0;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 
 .label {
   padding: 0;
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 600;
-  color: #0a1034;
+  color: #dce4ff;
 }
 
 .optional {
   font-weight: 400;
-  color: #5b6687;
+  color: #8c97b8;
 }
 
 .input {
@@ -62,56 +38,56 @@
   font: inherit;
   font-size: 16px; /* ≥16px stops iOS zooming on focus */
   line-height: 1.4;
-  color: #03061a;
-  background: #f4f6fb;
-  border: 1px solid #c9d3ee;
-  border-radius: 10px;
+  color: #e8eeff;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(140, 151, 184, 0.35);
+  border-radius: 12px;
   outline: none;
   transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
 }
 .input::placeholder {
-  color: #7a84a3;
+  color: #6f7a9c;
 }
 .input:hover:not(:disabled) {
-  border-color: #9fb0e0;
+  border-color: rgba(111, 168, 255, 0.55);
 }
 .input:focus,
 .input:focus-visible {
-  background: #ffffff;
-  border-color: #1c3fd6;
-  box-shadow: 0 0 0 3px rgba(47, 107, 255, 0.35);
+  background: rgba(255, 255, 255, 0.09);
+  border-color: #6fa8ff;
+  box-shadow: 0 0 0 3px rgba(47, 107, 255, 0.4);
 }
 .input:disabled {
-  opacity: 0.7;
+  opacity: 0.6;
 }
 
 .area {
-  min-height: 132px;
+  min-height: 120px;
   resize: vertical;
 }
 
 .hint {
   margin: 0;
-  font-size: 13px;
-  color: #5b6687;
+  font-size: 12.5px;
+  color: #8c97b8;
 }
 
-/* Topic radio group, radios styled as pills. */
+/* Topic radio group, radios styled as compact outline chips. */
 .topics {
   min-width: 0;
-  margin: 0 0 18px;
+  margin: 0 0 16px;
   padding: 0;
   border: 0;
 }
 .topics legend {
   margin-bottom: 8px;
 }
-.pills {
+.chips {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
-.pill {
+.chip {
   position: relative;
   display: inline-flex;
   cursor: pointer;
@@ -126,34 +102,35 @@
   opacity: 0;
   cursor: pointer;
 }
-.pillText {
+.chipText {
   display: inline-flex;
   align-items: center;
-  min-height: 44px;
-  padding: 0 18px;
-  font-size: 15px;
+  min-height: 34px;
+  padding: 0 14px;
+  font-size: 13.5px;
   font-weight: 500;
-  color: #0a1034;
-  background: #f4f6fb;
-  border: 1px solid #c9d3ee;
+  color: #c9d4f2;
+  background: transparent;
+  border: 1px solid rgba(140, 151, 184, 0.4);
   border-radius: 999px;
   transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
-.pill:hover .pillText {
-  border-color: #1c3fd6;
-}
-.radio:checked + .pillText {
+.chip:hover .chipText {
+  border-color: #6fa8ff;
   color: #ffffff;
-  background: #1c3fd6;
-  border-color: #1c3fd6;
 }
-.radio:focus-visible + .pillText {
-  box-shadow: 0 0 0 3px rgba(47, 107, 255, 0.45);
-  border-color: #1c3fd6;
+.radio:checked + .chipText {
+  color: #ffffff;
+  background: #2f6bff;
+  border-color: #2f6bff;
 }
-.topics:disabled .pill {
+.radio:focus-visible + .chipText {
+  box-shadow: 0 0 0 3px rgba(111, 168, 255, 0.5);
+  border-color: #6fa8ff;
+}
+.topics:disabled .chip {
   cursor: default;
-  opacity: 0.7;
+  opacity: 0.6;
 }
 
 /* Honeypot: off-screen (not display:none, which some bots skip). */
@@ -166,110 +143,126 @@
   overflow: hidden;
 }
 
-.foot {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px 20px;
-  margin-top: 4px;
-}
-
 .send {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 10px;
+  width: 100%;
   min-height: 48px;
+  margin-top: 4px;
   padding: 0 28px;
   font: inherit;
   font-size: 16px;
   font-weight: 700;
   color: #ffffff;
-  background: #1c3fd6;
+  background: #2f6bff;
   border: 0;
   border-radius: 999px;
+  box-shadow: 0 10px 28px -10px rgba(47, 107, 255, 0.85);
   cursor: pointer;
   transition: background 0.15s ease;
 }
 .send:hover:not(:disabled) {
-  background: #2f6bff;
+  background: #4a7fff;
 }
 .send:focus-visible {
   outline: 3px solid #6fa8ff;
   outline-offset: 3px;
 }
 .send:disabled {
-  opacity: 0.7;
+  opacity: 0.75;
   cursor: progress;
 }
 
-.alt {
-  font-size: 14px;
-  color: #4a5578;
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-.alt a,
-.error a {
-  display: inline-block;
-  padding: 10px 0;
-  color: #1c3fd6;
-  font-weight: 600;
+.form .alt {
+  margin: 12px 0 0;
+  font-size: 13.5px;
+  text-align: center;
+  color: #8c97b8;
 }
-.error a {
-  padding: 0;
+.form .alt a {
+  color: #9cc2ff;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.form .alt a:hover {
+  color: #ffffff;
 }
 
 .error {
-  margin: 0 0 16px;
+  margin: 0 0 14px;
   padding: 10px 14px;
   font-size: 14px;
   line-height: 1.5;
-  color: #7a1030;
-  background: #fff1f4;
-  border: 1px solid rgba(214, 40, 80, 0.35);
-  border-radius: 10px;
+  color: #ffd3dc;
+  background: rgba(214, 40, 80, 0.14);
+  border: 1px solid rgba(255, 107, 138, 0.45);
+  border-radius: 12px;
 }
 
+/* Success panel replaces the form body. */
 .sent {
-  margin: 10px 0 0;
-  font-size: 16px;
-  line-height: 1.6;
-  color: #0a1034;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 0 4px;
+  text-align: center;
 }
-.again {
-  min-height: 44px;
-  margin-top: 12px;
-  padding: 0;
-  font: inherit;
+.check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  color: #3ddc97;
+  background: rgba(61, 220, 151, 0.12);
+  border: 1px solid rgba(61, 220, 151, 0.45);
+  border-radius: 50%;
+}
+.sentTitle {
+  margin: 4px 0 0;
+  font-size: 20px;
+  font-weight: 800;
+  color: #f2f5ff;
+}
+.sentText {
+  margin: 0 0 12px;
+  max-width: 400px;
   font-size: 15px;
-  font-weight: 600;
-  color: #1c3fd6;
-  background: none;
-  border: 0;
-  text-decoration: underline;
-  cursor: pointer;
-}
-.again:focus-visible {
-  outline: 3px solid #6fa8ff;
-  outline-offset: 3px;
+  line-height: 1.6;
+  color: #a9b4d0;
 }
 
-@media (max-width: 640px) {
-  .card {
-    padding: 24px 18px 22px;
-    border-radius: 16px;
-  }
+@media (max-width: 560px) {
   .row {
     grid-template-columns: 1fr;
-  }
-  .send {
-    width: 100%;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .input,
-  .pillText,
+  .chipText,
   .send {
     transition: none;
+  }
+  .spinner {
+    animation-duration: 2.4s;
   }
 }

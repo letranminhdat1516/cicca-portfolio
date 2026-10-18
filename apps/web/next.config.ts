@@ -23,7 +23,12 @@ const nextConfig: NextConfig = {
   // ever talks to the web domain — one hostname, no CORS, no separate API host.
   // e.g. /api/content -> http://localhost:3101/content
   async rewrites() {
-    return [{ source: "/api/:path*", destination: `${API_INTERNAL}/:path*` }];
+    return [
+      { source: "/api/:path*", destination: `${API_INTERNAL}/:path*` },
+      // Some agents look for the llms.txt briefing under /.well-known/.
+      { source: "/.well-known/llms.txt", destination: "/llms.txt" },
+      { source: "/.well-known/llms-full.txt", destination: "/llms-full.txt" },
+    ];
   },
   async redirects() {
     if (SITE.hostname === "localhost") return [];

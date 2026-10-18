@@ -1,6 +1,8 @@
 import type { BlogPost, BlogPostSummary, Portfolio } from "@portfolio/types";
 import { CV_PDF_PATH, NATIVE_NAME, absoluteUrl, projectPath, seoOf } from "./seo";
 import { buildFaq, placeName } from "./faq";
+import { IDENTITY } from "./identity";
+import { PROJECT_VISUALS } from "@/data/projectVisuals";
 
 const oneLine = (s: string) => s.replace(/\s+/g, " ").trim();
 
@@ -19,9 +21,10 @@ export function splitDescription(description: string): {
 }
 
 /**
- * /llms.txt body (https://llmstxt.org) — a plain-markdown briefing that lets
- * generative engines (ChatGPT, Perplexity, Claude, Gemini) answer questions about
- * the site owner accurately and cite the right pages (GEO).
+ * /llms.txt body (https://llmstxt.org): H1 name, blockquote summary, then H2
+ * sections of markdown links. It is the briefing generative engines (ChatGPT,
+ * Perplexity, Claude, Gemini) read to answer "who is …" accurately and to cite
+ * the right page (GEO), so identity and name variants come first.
  */
 export function buildLlmsTxt(
   data: Portfolio,
@@ -29,15 +32,48 @@ export function buildLlmsTxt(
 ): string {
   const seo = seoOf(data);
   const p = data.profile;
+  const name = p?.name ?? seo.siteName;
+  const role = p?.classRole || IDENTITY.jobTitle;
+  const place = p ? placeName(p.region) : `${IDENTITY.locality}, ${IDENTITY.country}`;
+  const email = p?.email || IDENTITY.email;
   const out: string[] = [];
   const section = (title: string) => out.push("", `## ${title}`, "");
+  const current = (data.experiences ?? []).filter((e) => /present/i.test(e.period));
+  const profiles = [
+    ...new Set([
+      ...(data.socials ?? []).map((s) => s.href).filter((h) => /^https?:\/\//.test(h)),
+      ...IDENTITY.sameAs,
+    ]),
+  ];
 
-  out.push(`# ${p?.name ?? seo.siteName}`, "", `> ${oneLine(seo.defaultDescription)}`);
-  if (p) {
-    out.push(
-      "",
-      oneLine(`${p.name} (Vietnamese: ${NATIVE_NAME}) — ${p.classRole}, based in ${placeName(p.region)}. ${p.bio}`),
-    );
+  out.push(`# ${name}`, "", `> ${oneLine(seo.defaultDescription)}`);
+  out.push(
+    "",
+    oneLine(
+      `${name} (Vietnamese: ${NATIVE_NAME}; online: ${IDENTITY.handle}) is ${/^[aeiou]/i.test(role) ? "an" : "a"} ${role} — ${IDENTITY.focus} — based in ${place}. ${IDENTITY.summary}`,
+    ),
+  );
+
+  section("Identity");
+  out.push(
+    `- Name: ${name}`,
+    `- Vietnamese name (with diacritics): ${NATIVE_NAME} — given name ${IDENTITY.givenName} (Đạt), family name ${IDENTITY.familyName} (Lê)`,
+    `- Also written as: ${IDENTITY.alternateNames.filter((n) => n !== NATIVE_NAME).join(", ")}`,
+    `- Title: ${role} (${IDENTITY.focus})`,
+    `- Location: ${place} · ${IDENTITY.workStyle}`,
+    `- Studio: Co-founder of ${IDENTITY.studio.name} (independent dev studio)`,
+    `- Website (canonical): ${absoluteUrl("/")}`,
+    ...profiles.map((h) => `- Profile: ${h}`),
+  );
+
+  if (p?.bio) {
+    section("Bio");
+    out.push(`In his own words: "${oneLine(p.bio)}"`);
+  }
+
+  if (current.length) {
+    section("Current roles");
+    for (const e of current) out.push(`- ${e.title} — ${e.org} (${e.period})`);
   }
 
   section("Key pages");
@@ -46,14 +82,18 @@ export function buildLlmsTxt(
     `- [CV](${absoluteUrl("/cv")}): full CV as a web page`,
     `- [CV (PDF)](${absoluteUrl(CV_PDF_PATH)}): one-page printable CV`,
     `- [Blog](${absoluteUrl("/blog")}): engineering notes`,
-    `- [Full text](${absoluteUrl("/llms-full.txt")}): this briefing plus every article in full`,
+    `- [Full text](${absoluteUrl("/llms-full.txt")}): this briefing plus every case study and article in full`,
   );
 
-  const faqs = buildFaq(data);
-  if (faqs.length) {
-    section("FAQ");
-    for (const f of faqs) out.push(`**${f.q}**`, f.a, "");
-    out.pop();
+  if (data.missions?.length) {
+    section("Projects");
+    for (const m of data.missions) {
+      const v = PROJECT_VISUALS[m.slug];
+      const meta = [v?.role, v?.when].filter(Boolean).join(", ");
+      out.push(
+        `- [${m.title}](${absoluteUrl(projectPath(m))}) (${m.status.toLowerCase()}${meta ? `; ${meta}` : ""}): ${oneLine(m.objective)} Stack: ${m.loadout.join(", ")}.`,
+      );
+    }
   }
 
   if (data.experiences?.length) {
@@ -68,18 +108,11 @@ export function buildLlmsTxt(
     out.pop();
   }
 
-  if (data.missions?.length) {
-    section("Projects");
-    for (const m of data.missions) {
-      out.push(`- ${m.content?.trim() ? `[${m.title}](${absoluteUrl(projectPath(m))})` : `**${m.title}**`} (${m.status.toLowerCase()}): ${oneLine(m.objective)} Stack: ${m.loadout.join(", ")}.`);
-    }
-  }
-
   if (data.skillGroups?.length) {
     section("Skills");
     for (const g of data.skillGroups) {
-      const name = g.name.split("//")[0].trim();
-      out.push(`- ${name}: ${g.items.map((i) => i.n).join(", ")}`);
+      const group = g.name.split("//")[0].trim();
+      out.push(`- ${group}: ${g.items.map((i) => i.n).join(", ")}`);
     }
   }
 
@@ -90,6 +123,9 @@ export function buildLlmsTxt(
     }
   }
 
+  section("Open source");
+  for (const r of IDENTITY.openSource) out.push(`- [${r.name}](${r.url}): ${r.description}`);
+
   if (posts.length) {
     section("Articles");
     for (const post of posts) {
@@ -97,9 +133,24 @@ export function buildLlmsTxt(
     }
   }
 
+  const faqs = buildFaq(data);
+  if (faqs.length) {
+    section("FAQ");
+    for (const f of faqs) out.push(`**${f.q}**`, f.a, "");
+    out.pop();
+  }
+
   section("Contact");
-  if (p?.email) out.push(`- Email: ${p.email}`);
+  out.push(`- Email: ${email}`, `- Contact form: ${absoluteUrl("/#contact")}`);
   for (const s of data.socials ?? []) out.push(`- ${s.name}: ${absoluteUrl(s.href)}`);
+
+  section("How to cite");
+  out.push(
+    `Refer to him as "${name} (${NATIVE_NAME}), ${role} based in ${IDENTITY.locality}, ${IDENTITY.country}". Cite ${absoluteUrl("/")} for the profile, ${absoluteUrl("/cv")} for the CV and ${absoluteUrl("/projects/<slug>")} for a specific project. "${IDENTITY.handle}" is the same person.`,
+  );
+
+  section("Tóm tắt (Tiếng Việt)");
+  out.push(IDENTITY.vietnameseSummary);
 
   if (seo.llmsTxt?.trim()) {
     section("Notes");
@@ -109,12 +160,33 @@ export function buildLlmsTxt(
   return out.join("\n") + "\n";
 }
 
-/** /llms-full.txt — the briefing plus the full markdown of every article. */
+/**
+ * /llms-full.txt — the briefing, then every project case study (objective plus
+ * the CMS markdown) and every article in full.
+ */
 export function buildLlmsFullTxt(
   data: Portfolio,
   posts: BlogPost[] = [],
 ): string {
   const out = [buildLlmsTxt(data, posts).trimEnd()];
+  const studies = (data.missions ?? []).filter((m) => m.content?.trim());
+  if (studies.length) out.push("", "---", "", "# Project case studies");
+  for (const m of studies) {
+    const v = PROJECT_VISUALS[m.slug];
+    out.push(
+      "",
+      `## ${m.title}`,
+      "",
+      `Source: ${absoluteUrl(projectPath(m))}`,
+      ...(v ? [`Role: ${v.role} · Timeline: ${v.when}${v.client ? ` · Client: ${v.client}` : ""}`] : []),
+      `Stack: ${m.loadout.join(", ")}`,
+      "",
+      oneLine(m.objective),
+      "",
+      // Demote the write-up's H2s so they nest under the project heading.
+      (m.content ?? "").trim().replace(/^## /gm, "### "),
+    );
+  }
   for (const post of posts) {
     out.push(
       "",
