@@ -41,7 +41,7 @@ export const portfolio: Portfolio = {
   ],
   socials: [
     { label: "GH", name: "GitHub", href: "https://github.com/letranminhdat1516" },
-    { label: "CV", name: "Résumé", href: "/cv" },
+    { label: "CV", name: "CV", href: "/cv" },
     { label: "TW", name: "Twitter", href: "#" },
   ],
   experiences: [

@@ -7,7 +7,7 @@ export const RESEND_URL = 'https://api.resend.com/emails';
 export const DEFAULT_FROM = 'Le Tran Minh Dat <hello@letranminhdat.com>';
 export const DEFAULT_TO = 'datltmse@gmail.com';
 
-/** 3 letters per 10 minutes and 10 per day, per client IP. */
+/** 3 messages per 10 minutes and 10 per day, per client IP. */
 export const RATE_WINDOWS = [
   { ms: 10 * 60_000, max: 3 },
   { ms: 24 * 60 * 60_000, max: 10 },
@@ -68,18 +68,19 @@ export class ContactService {
       .split(',')
       .map((s) => s.trim())
       .filter(Boolean);
-    const letter = {
+    const msg = {
       name: input.name,
       email: input.email,
       message: input.message,
+      topic: input.topic,
     };
 
     try {
       await this.resend(key, {
         from,
         to,
-        reply_to: letter.email,
-        ...notificationMail(letter, {
+        reply_to: msg.email,
+        ...notificationMail(msg, {
           receivedAt: new Date(),
           origin: meta.origin,
         }),
@@ -93,7 +94,7 @@ export class ContactService {
     }
 
     const replyOk =
-      this.replyLimiter.take(letter.email.toLowerCase()).ok &&
+      this.replyLimiter.take(msg.email.toLowerCase()).ok &&
       this.replyGlobalLimiter.take('all').ok;
     if (!replyOk) {
       this.log.log('auto-reply skipped (cap reached)');
@@ -103,12 +104,12 @@ export class ContactService {
     try {
       await this.resend(key, {
         from,
-        to: [letter.email],
+        to: [msg.email],
         reply_to: to[0],
-        ...autoReplyMail(letter),
+        ...autoReplyMail(msg),
       });
     } catch (err) {
-      // The letter reached me; a missing courtesy reply is not the visitor's problem.
+      // The message reached me; a missing courtesy reply is not the visitor's problem.
       this.log.warn(`contact auto-reply failed: ${(err as Error).message}`);
     }
 

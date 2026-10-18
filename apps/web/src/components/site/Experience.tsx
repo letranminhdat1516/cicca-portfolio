@@ -24,7 +24,7 @@ export function Experience({ experiences }: { experiences: Exp[] }) {
         </h2>
         <p style={{ margin: 0, color: "#8C97B8" }}>{EXPERIENCE_COPY.lead}</p>
         <a href="/cv" style={{ ...PILL_OUTLINE, alignSelf: "flex-start", marginTop: 8 }}>
-          Full résumé
+          Full CV
         </a>
       </div>
       <ol style={{ flex: "999 1 600px", minWidth: 0, margin: 0, padding: 0, listStyle: "none" }}>

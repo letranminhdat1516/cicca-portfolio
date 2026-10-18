@@ -3,11 +3,11 @@ import Image from "next/image";
 import type { Profile, Social } from "@portfolio/types";
 import { BRAND, CTA } from "@/data/home";
 import { DocIcon, GithubIcon, LinkedinIcon, MailIcon } from "./ui";
-import { LetterForm } from "./LetterForm";
+import { ContactForm } from "./ContactForm";
 
 type CtaLink = { href: string; label: string; icon: ReactNode; rel?: string };
 
-/** Socials from the CMS → the CTA link row: GitHub / LinkedIn / Résumé / email. */
+/** Socials from the CMS → the CTA link row: GitHub / LinkedIn / CV / email. */
 export function ctaLinks(profile: Pick<Profile, "email">, socials: Social[]): CtaLink[] {
   const out: CtaLink[] = [];
   for (const s of socials) {
@@ -19,7 +19,7 @@ export function ctaLinks(profile: Pick<Profile, "email">, socials: Social[]): Ct
       out.push({ href: s.href, label: "LinkedIn", icon: <LinkedinIcon />, rel: "me noopener" });
     }
   }
-  out.push({ href: "/cv", label: "Résumé", icon: <DocIcon /> });
+  out.push({ href: "/cv", label: "CV", icon: <DocIcon /> });
   if (profile.email) out.push({ href: `mailto:${profile.email}`, label: profile.email, icon: <MailIcon /> });
   return out;
 }
@@ -59,7 +59,7 @@ export function ContactCta({ profile, socials }: { profile: Profile; socials: So
         </div>
         <h2 style={{ margin: 0, fontWeight: 800, fontSize: "clamp(28px, 4vw, 44px)", letterSpacing: "0.01em" }}>{CTA.title}</h2>
         <p style={{ margin: 0, maxWidth: 560, color: "#DCE4FF" }}>{CTA.body}</p>
-        <LetterForm email={profile.email || undefined} />
+        <ContactForm email={profile.email || undefined} />
         <div style={{ width: "100%", marginTop: 24, display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: 16, fontSize: 14 }}>
           {ctaLinks(profile, socials).map((l) => (
             <a

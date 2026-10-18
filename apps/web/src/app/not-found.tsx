@@ -8,7 +8,7 @@ export const metadata: Metadata = { title: "404 — Page not found", robots: { i
 const LINKS = [
   { href: "/", label: "Home", primary: true },
   { href: "/#work", label: "Selected work" },
-  { href: "/cv", label: "Résumé" },
+  { href: "/cv", label: "CV" },
   { href: "/blog", label: "Blog" },
 ];
 

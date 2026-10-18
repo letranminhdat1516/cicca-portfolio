@@ -73,7 +73,7 @@ export function buildFaq(data: Portfolio): Faq[] {
     .map((s) => `${s.name}: ${s.href}`);
   faqs.push({
     q: `How can I contact or hire ${p.name}?`,
-    a: [`Email ${p.email}.`, ...links.map((l) => `${l}.`), `Full résumé: ${absoluteUrl("/cv")}.`].join(" "),
+    a: [`Email ${p.email}.`, ...links.map((l) => `${l}.`), `Full CV: ${absoluteUrl("/cv")}.`].join(" "),
   });
 
   return faqs;

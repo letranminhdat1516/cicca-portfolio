@@ -43,8 +43,8 @@ export function buildLlmsTxt(
   section("Key pages");
   out.push(
     `- [Portfolio](${absoluteUrl("/")}): projects, skills, achievements and experience`,
-    `- [Résumé](${absoluteUrl("/cv")}): full CV as a web page`,
-    `- [Résumé PDF](${absoluteUrl(CV_PDF_PATH)}): one-page printable CV`,
+    `- [CV](${absoluteUrl("/cv")}): full CV as a web page`,
+    `- [CV (PDF)](${absoluteUrl(CV_PDF_PATH)}): one-page printable CV`,
     `- [Blog](${absoluteUrl("/blog")}): engineering notes`,
     `- [Full text](${absoluteUrl("/llms-full.txt")}): this briefing plus every article in full`,
   );

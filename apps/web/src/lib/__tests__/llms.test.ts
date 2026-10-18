@@ -26,10 +26,10 @@ describe("buildLlmsTxt", () => {
     }
   });
 
-  it("links the HTML and PDF résumé with absolute URLs", () => {
-    expect(txt).toContain(`[Résumé](${SITE_URL}/cv)`);
+  it("links the HTML and PDF CV with absolute URLs", () => {
+    expect(txt).toContain(`[CV](${SITE_URL}/cv)`);
     expect(txt).toContain(`${SITE_URL}/cv/letranminhdat-cv.pdf`);
-    expect(txt).toContain(`- Résumé: ${SITE_URL}/cv`);
+    expect(txt).toContain(`- CV: ${SITE_URL}/cv`);
   });
 
   it("renders experience bullets and collapses whitespace in projects", () => {

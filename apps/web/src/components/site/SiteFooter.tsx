@@ -5,7 +5,7 @@ import { MONO } from "./ui";
 // Crawlable internal links (feeds, llms.txt) live here on every page.
 const LINKS = [
   { href: "/", label: "HOME" },
-  { href: "/cv", label: "RÉSUMÉ" },
+  { href: "/cv", label: "CV" },
   { href: "/blog", label: "BLOG" },
   { href: "/feed.xml", label: "RSS" },
   { href: "/llms.txt", label: "LLMS.TXT" },

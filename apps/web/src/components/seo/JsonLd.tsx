@@ -87,7 +87,7 @@ export function personJsonLd(portfolio: Portfolio): object {
     })),
     subjectOf: {
       "@type": "DigitalDocument",
-      name: `${profile?.name ?? "Résumé"} — Résumé`,
+      name: `${profile?.name ?? "CV"} — CV`,
       encodingFormat: "application/pdf",
       url: absoluteUrl(CV_PDF_PATH),
     },
@@ -181,7 +181,7 @@ export function cvJsonLd(portfolio: Portfolio): object[] {
     {
       "@context": "https://schema.org",
       "@type": "ProfilePage",
-      name: `${portfolio.profile?.name ?? ""} — Résumé`.trim(),
+      name: `${portfolio.profile?.name ?? ""} — CV`.trim(),
       url: `${SITE_URL}/cv`,
       inLanguage: "en",
       dateModified: seoOf(portfolio).updatedAt?.slice(0, 10),
@@ -190,7 +190,7 @@ export function cvJsonLd(portfolio: Portfolio): object[] {
     },
     breadcrumbJsonLd([
       { name: "Home", path: "/" },
-      { name: "Résumé", path: "/cv" },
+      { name: "CV", path: "/cv" },
     ]),
   ];
 }

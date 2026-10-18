@@ -80,18 +80,19 @@ describe('contact', () => {
     expect(note.from).toBe(DEFAULT_FROM);
     expect(note.to).toEqual(['datltmse@gmail.com']);
     expect(note.reply_to).toBe('ada@example.com');
-    expect(note.subject).toBe('New letter from Ada Lovelace');
+    expect(note.subject).toBe('New message from Ada Lovelace');
     for (const part of [note.text, note.html]) {
       expect(part).toContain('Ada Lovelace');
       expect(part).toContain('ada@example.com');
       expect(part).toContain('analytical engine');
       expect(part).toContain('https://letranminhdat.com/');
       expect(part).toContain('GMT+7');
+      expect(part).not.toContain('Topic');
     }
 
     expect(reply.from).toBe(DEFAULT_FROM);
     expect(reply.to).toEqual(['ada@example.com']);
-    expect(reply.subject).toBe('Thanks for your letter');
+    expect(reply.subject).toBe('Thanks for your message');
     // nothing the visitor typed is echoed into a mail sent to a visitor-typed address
     for (const part of [reply.subject, reply.text, reply.html])
       expect(part).not.toContain('Ada');
@@ -105,6 +106,41 @@ describe('contact', () => {
       // Never echo the visitor's free text back to a visitor-supplied address.
       expect(part).not.toContain('analytical engine');
     }
+  });
+
+  it.each([
+    ['job', 'Job opportunity'],
+    ['freelance', 'Freelance project'],
+    ['collab', 'Collaboration'],
+    ['hello', 'Just saying hi'],
+  ])(
+    'topic %s → label in the notification subject and body',
+    async (topic, label) => {
+      await post({ ...valid, topic }).expect(200);
+      const [note] = sentBodies(fetchMock);
+      expect(note.subject).toBe(`New message from Ada Lovelace — ${label}`);
+      expect(note.text).toContain(`Topic:   ${label}`);
+      expect(note.html).toContain('>Topic</td>');
+      expect(note.html).toContain(label);
+    },
+  );
+
+  it('auto-reply carries no visitor-supplied text, topic included', async () => {
+    await post({ ...valid, topic: 'freelance' }).expect(200);
+    const [, reply] = sentBodies(fetchMock);
+    for (const part of [reply.subject, reply.text, reply.html]) {
+      for (const visitorText of [
+        'Ada',
+        'Lovelace',
+        'analytical engine',
+        'Freelance',
+        'freelance',
+        'Topic',
+      ])
+        expect(part).not.toContain(visitorText);
+    }
+    expect(reply.html).toContain('>CV</a>');
+    expect(reply.text).toContain('- CV: https://letranminhdat.com/cv/');
   });
 
   it('honours CONTACT_FROM / CONTACT_TO', async () => {
@@ -124,7 +160,7 @@ describe('contact', () => {
       email: ' ada@example.com ',
     }).expect(200);
     const [note] = sentBodies(fetchMock);
-    expect(note.subject).toBe('New letter from Ada');
+    expect(note.subject).toBe('New message from Ada');
     expect(note.reply_to).toBe('ada@example.com');
   });
 
@@ -164,6 +200,10 @@ describe('contact', () => {
     ['message too short', { ...valid, message: 'hi there' }],
     ['message too long', { ...valid, message: 'a'.repeat(3001) }],
     ['message padded short', { ...valid, message: '   short   ' }],
+    ['unknown topic', { ...valid, topic: 'spam' }],
+    ['topic as free text', { ...valid, topic: 'Job opportunity' }],
+    ['topic not a string', { ...valid, topic: 1 }],
+    ['topic prototype key', { ...valid, topic: 'constructor' }],
   ])('rejects %s with 400', async (_label, body) => {
     const res = await post(body);
     expect(res.status).toBe(400);

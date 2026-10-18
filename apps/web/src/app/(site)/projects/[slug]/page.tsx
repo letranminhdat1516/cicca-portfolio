@@ -301,7 +301,7 @@ export default async function ProjectPage({ params }: Params) {
                 Read the write-ups <span aria-hidden="true">→</span>
               </Link>
               <Link href="/cv" style={{ ...LINK_ROW, border: "1.5px dashed rgba(111,168,255,0.4)" }}>
-                Résumé <span aria-hidden="true">→</span>
+                CV <span aria-hidden="true">→</span>
               </Link>
             </div>
           </div>

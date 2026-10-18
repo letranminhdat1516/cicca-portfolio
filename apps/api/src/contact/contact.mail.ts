@@ -1,16 +1,19 @@
 /** Email bodies for the contact form. Every user-supplied value is escaped. */
 
+import { TOPICS, type Topic } from './contact.dto';
+
 const SITE = 'https://letranminhdat.com';
 export const CV_URL = `${SITE}/cv/letranminhdat-cv.pdf`;
 export const WORK_URL = `${SITE}/#work`;
 
-export interface Letter {
+export interface ContactMessage {
   name: string;
   email: string;
   message: string;
+  topic?: Topic;
 }
 
-export interface LetterMeta {
+export interface MessageMeta {
   receivedAt: Date;
   origin?: string;
 }
@@ -62,15 +65,26 @@ const wrap = (inner: string) =>
   `</div></body></html>`;
 
 /** Notification to me: who wrote, how to reach them, what they said. */
-export function notificationMail(l: Letter, meta: LetterMeta): MailBody {
+export function notificationMail(
+  l: ContactMessage,
+  meta: MessageMeta,
+): MailBody {
   const when = formatTime(meta.receivedAt);
   const origin = meta.origin || 'unknown';
-  const subject = `New letter from ${oneLine(l.name)}`;
+  // Only a whitelisted key maps to a label; anything else is dropped.
+  const topic =
+    l.topic && Object.prototype.hasOwnProperty.call(TOPICS, l.topic)
+      ? TOPICS[l.topic]
+      : undefined;
+  const subject = topic
+    ? `New message from ${oneLine(l.name)} — ${topic}`
+    : `New message from ${oneLine(l.name)}`;
   const text = [
-    `New letter from the portfolio contact form.`,
+    `New message from the portfolio contact form.`,
     ``,
     `Name:    ${l.name}`,
     `Email:   ${l.email}`,
+    ...(topic ? [`Topic:   ${topic}`] : []),
     `Sent:    ${when}`,
     `Origin:  ${origin}`,
     ``,
@@ -82,13 +96,14 @@ export function notificationMail(l: Letter, meta: LetterMeta): MailBody {
   const row = (k: string, v: string) =>
     `<tr><td style="padding:2px 16px 2px 0;color:#5b6687;white-space:nowrap">${k}</td><td style="padding:2px 0">${v}</td></tr>`;
   const html = wrap(
-    `<p style="margin:0 0 12px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#2f6bff">New letter</p>` +
+    `<p style="margin:0 0 12px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#2f6bff">New message</p>` +
       `<table style="border-collapse:collapse;font-size:14px;margin-bottom:16px">` +
       row('Name', escapeHtml(l.name)) +
       row(
         'Email',
         `<a href="mailto:${escapeHtml(l.email)}" style="color:#1c3fd6">${escapeHtml(l.email)}</a>`,
       ) +
+      (topic ? row('Topic', escapeHtml(topic)) : '') +
       row('Sent', escapeHtml(when)) +
       row('Origin', escapeHtml(origin)) +
       `</table>` +
@@ -104,17 +119,17 @@ export function notificationMail(l: Letter, meta: LetterMeta): MailBody {
  * turn the form into a relay for whatever someone types in.
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function autoReplyMail(_l: Letter): MailBody {
+export function autoReplyMail(_l: ContactMessage): MailBody {
   // No visitor-supplied text at all (not even the name): the recipient address is
   // typed by the visitor, so anything echoed back could be aimed at a third party.
-  const subject = 'Thanks for your letter';
+  const subject = 'Thanks for your message';
   const text = [
     `Hi there,`,
     ``,
-    `Thanks for your letter, it landed safely. I read every one myself and usually reply within 1–2 days (I'm on GMT+7).`,
+    `Thanks for your message, it landed safely. I read every one myself and usually reply within 1–2 days (I'm on GMT+7).`,
     ``,
     `While you wait:`,
-    `- My one-page CV: ${CV_URL}`,
+    `- CV: ${CV_URL}`,
     `- Selected work: ${WORK_URL}`,
     ``,
     `Talk soon,`,
@@ -125,10 +140,10 @@ export function autoReplyMail(_l: Letter): MailBody {
     `<a href="${href}" style="color:#1c3fd6">${label}</a>`;
   const html = wrap(
     `<p style="margin:0 0 14px">Hi there,</p>` +
-      `<p style="margin:0 0 14px">Thanks for your letter, it landed safely. I read every one myself and usually reply within 1–2 days (I'm on GMT+7).</p>` +
+      `<p style="margin:0 0 14px">Thanks for your message, it landed safely. I read every one myself and usually reply within 1–2 days (I'm on GMT+7).</p>` +
       `<p style="margin:0 0 6px">While you wait:</p>` +
       `<ul style="margin:0 0 14px;padding-left:20px">` +
-      `<li>${link(CV_URL, 'My one-page CV')}</li>` +
+      `<li>${link(CV_URL, 'CV')}</li>` +
       `<li>${link(WORK_URL, 'Selected work')}</li>` +
       `</ul>` +
       `<p style="margin:0">Talk soon,<br/><strong>Dat (cicca)</strong><br/>${link(SITE, 'letranminhdat.com')}</p>`,

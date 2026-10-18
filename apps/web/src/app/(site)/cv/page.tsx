@@ -5,7 +5,7 @@ import { CV_PDF_PATH, pageMetadata, seoOf } from "@/lib/seo";
 import { splitDescription } from "@/lib/llms";
 import { JsonLd, cvJsonLd } from "@/components/seo/JsonLd";
 
-// The résumé as semantic HTML: search engines and LLMs read this far more
+// The CV as semantic HTML: search engines and LLMs read this far more
 // reliably than the PDF, so it is the canonical, indexable copy of the CV.
 export const dynamic = "force-dynamic";
 
@@ -13,7 +13,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const data = await getPortfolio();
   const seo = seoOf(data);
   const name = data.profile?.name ?? seo.siteName;
-  const title = `Résumé — ${name}, ${data.profile?.classRole ?? "Developer"}`;
+  const title = `CV — ${name}, ${data.profile?.classRole ?? "Developer"}`;
   const description = `${name}'s CV: AI-native software engineer building AI agents, MCP servers, LLM gateways and RAG systems. Experience, skills, education and awards.`;
   return pageMetadata({
     seo,
@@ -52,7 +52,7 @@ export default async function CvPage() {
         <Link href="/" className="no-underline" style={{ color: "#6FA8FF" }}>
           HOME
         </Link>{" "}
-        / RÉSUMÉ
+        / CV
       </nav>
 
       <header className="mt-6">

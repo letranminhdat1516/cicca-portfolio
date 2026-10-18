@@ -67,7 +67,7 @@ const jsonLd = (html) =>
   check("unknown post → 404 noindex", missing.res.status === 404 && /name="robots" content="noindex/.test(missing.body));
 }
 
-// Résumé page
+// CV page
 {
   const { res, body } = await get("/cv");
   check("/cv 200", res.status === 200);

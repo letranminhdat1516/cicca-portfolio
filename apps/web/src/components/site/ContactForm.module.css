@@ -1,0 +1,275 @@
+/* Contact card on the blue CTA band: white card, navy text, light fields. */
+.card {
+  position: relative;
+  width: 100%;
+  max-width: 720px;
+  margin: 8px auto 0;
+  padding: 32px 32px 28px;
+  text-align: left;
+  color: #03061a;
+  background: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 20px;
+  box-shadow: 0 24px 60px -20px rgba(3, 6, 26, 0.7);
+}
+
+.title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: #03061a;
+}
+
+.sub {
+  margin: 6px 0 24px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #4a5578;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  margin-bottom: 18px;
+}
+
+.label {
+  padding: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #0a1034;
+}
+
+.optional {
+  font-weight: 400;
+  color: #5b6687;
+}
+
+.input {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 14px;
+  font: inherit;
+  font-size: 16px; /* ≥16px stops iOS zooming on focus */
+  line-height: 1.4;
+  color: #03061a;
+  background: #f4f6fb;
+  border: 1px solid #c9d3ee;
+  border-radius: 10px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+.input::placeholder {
+  color: #7a84a3;
+}
+.input:hover:not(:disabled) {
+  border-color: #9fb0e0;
+}
+.input:focus,
+.input:focus-visible {
+  background: #ffffff;
+  border-color: #1c3fd6;
+  box-shadow: 0 0 0 3px rgba(47, 107, 255, 0.35);
+}
+.input:disabled {
+  opacity: 0.7;
+}
+
+.area {
+  min-height: 132px;
+  resize: vertical;
+}
+
+.hint {
+  margin: 0;
+  font-size: 13px;
+  color: #5b6687;
+}
+
+/* Topic radio group, radios styled as pills. */
+.topics {
+  min-width: 0;
+  margin: 0 0 18px;
+  padding: 0;
+  border: 0;
+}
+.topics legend {
+  margin-bottom: 8px;
+}
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.pill {
+  position: relative;
+  display: inline-flex;
+  cursor: pointer;
+}
+/* Visually hidden but still focusable and operable with arrow keys. */
+.radio {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.pillText {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 18px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #0a1034;
+  background: #f4f6fb;
+  border: 1px solid #c9d3ee;
+  border-radius: 999px;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.pill:hover .pillText {
+  border-color: #1c3fd6;
+}
+.radio:checked + .pillText {
+  color: #ffffff;
+  background: #1c3fd6;
+  border-color: #1c3fd6;
+}
+.radio:focus-visible + .pillText {
+  box-shadow: 0 0 0 3px rgba(47, 107, 255, 0.45);
+  border-color: #1c3fd6;
+}
+.topics:disabled .pill {
+  cursor: default;
+  opacity: 0.7;
+}
+
+/* Honeypot: off-screen (not display:none, which some bots skip). */
+.trap {
+  position: absolute;
+  left: -10000px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+  margin-top: 4px;
+}
+
+.send {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 28px;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+  background: #1c3fd6;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.send:hover:not(:disabled) {
+  background: #2f6bff;
+}
+.send:focus-visible {
+  outline: 3px solid #6fa8ff;
+  outline-offset: 3px;
+}
+.send:disabled {
+  opacity: 0.7;
+  cursor: progress;
+}
+
+.alt {
+  font-size: 14px;
+  color: #4a5578;
+}
+
+.alt a,
+.error a {
+  display: inline-block;
+  padding: 10px 0;
+  color: #1c3fd6;
+  font-weight: 600;
+}
+.error a {
+  padding: 0;
+}
+
+.error {
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #7a1030;
+  background: #fff1f4;
+  border: 1px solid rgba(214, 40, 80, 0.35);
+  border-radius: 10px;
+}
+
+.sent {
+  margin: 10px 0 0;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #0a1034;
+}
+.again {
+  min-height: 44px;
+  margin-top: 12px;
+  padding: 0;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1c3fd6;
+  background: none;
+  border: 0;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.again:focus-visible {
+  outline: 3px solid #6fa8ff;
+  outline-offset: 3px;
+}
+
+@media (max-width: 640px) {
+  .card {
+    padding: 24px 18px 22px;
+    border-radius: 16px;
+  }
+  .row {
+    grid-template-columns: 1fr;
+  }
+  .send {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .input,
+  .pillText,
+  .send {
+    transition: none;
+  }
+}

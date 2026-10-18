@@ -204,7 +204,7 @@ export const achievements = [
 export const socials = [
   { label: 'GH', name: 'GitHub', href: 'https://github.com/letranminhdat1516' },
   { label: 'IN', name: 'LinkedIn', href: 'https://www.linkedin.com/in/dat-le-139a85284' },
-  { label: 'CV', name: 'Résumé', href: '/cv' },
+  { label: 'CV', name: 'CV', href: '/cv' },
 ];
 
 // Descriptions use a lead line (scope / ownership) first and "- " bullets after
@@ -291,8 +291,8 @@ export const experiences = [
 ];
 
 export const resources = [
-  { title: 'Résumé (PDF)', description: 'CV: experience, skills, open source, education and awards.', url: '/cv/letranminhdat-cv.pdf', repoUrl: null, tags: ['cv', 'pdf'] },
-  { title: 'Online résumé', description: 'The same CV as a crawlable web page.', url: '/cv', repoUrl: null, tags: ['cv', 'html'] },
+  { title: 'CV (PDF)', description: 'CV: experience, skills, open source, education and awards.', url: '/cv/letranminhdat-cv.pdf', repoUrl: null, tags: ['cv', 'pdf'] },
+  { title: 'CV (web page)', description: 'The same CV as a crawlable web page.', url: '/cv', repoUrl: null, tags: ['cv', 'html'] },
   { title: 'GitHub', description: 'Public repositories and contributions.', url: null, repoUrl: 'https://github.com/letranminhdat1516', tags: ['code'] },
 ];
 

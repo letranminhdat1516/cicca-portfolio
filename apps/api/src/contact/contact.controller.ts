@@ -25,7 +25,7 @@ function pageOrigin(req: Request): string | undefined {
 export class ContactController {
   constructor(private contact: ContactService) {}
 
-  /** Public, unauthenticated "write me a letter" endpoint. */
+  /** Public, unauthenticated contact form endpoint. */
   @Post()
   @HttpCode(200)
   async send(

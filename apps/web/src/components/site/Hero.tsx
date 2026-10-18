@@ -121,7 +121,7 @@ export function Hero({ profile }: { profile: Profile }) {
                 fontWeight: 500,
               }}
             >
-              Résumé
+              CV
             </a>
           </div>
           <div className="m-only" style={{ ...MONO, flexWrap: "wrap", gap: 8, fontSize: 12, color: "#DCE4FF" }}>
