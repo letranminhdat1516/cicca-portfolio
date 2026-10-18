@@ -5,15 +5,15 @@ import { ContactService, RateLimitedException } from './contact.service';
 
 /**
  * Client IP behind Cloudflare Tunnel → Next.js /api rewrite → API.
- * cf-connecting-ip is set (and overwritten) by Cloudflare, so it wins.
+ * Only cf-connecting-ip is used: Cloudflare overwrites it, and the origin port is
+ * bound to localhost so requests can't skip Cloudflare to forge it. The leftmost
+ * X-Forwarded-For entry is client-controlled, so it is never trusted. Abuse that
+ * still slips through is bounded by the global caps in ContactService.
  */
 export function clientIp(req: Request): string | undefined {
   const cf = (req.headers['cf-connecting-ip'] as string | undefined)?.trim();
   if (cf) return cf;
-  const fwd = (req.headers['x-forwarded-for'] as string | undefined)
-    ?.split(',')[0]
-    ?.trim();
-  return fwd || req.socket?.remoteAddress || undefined;
+  return req.socket?.remoteAddress || undefined;
 }
 
 function pageOrigin(req: Request): string | undefined {

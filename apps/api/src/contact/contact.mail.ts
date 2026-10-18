@@ -103,11 +103,13 @@ export function notificationMail(l: Letter, meta: LetterMeta): MailBody {
  * the recipient address is visitor-supplied, so quoting free text back would
  * turn the form into a relay for whatever someone types in.
  */
-export function autoReplyMail(l: Letter): MailBody {
-  const first = firstName(l.name);
-  const subject = `Thanks for your letter, ${first}`;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function autoReplyMail(_l: Letter): MailBody {
+  // No visitor-supplied text at all (not even the name): the recipient address is
+  // typed by the visitor, so anything echoed back could be aimed at a third party.
+  const subject = 'Thanks for your letter';
   const text = [
-    `Hi ${first},`,
+    `Hi there,`,
     ``,
     `Thanks for your letter, it landed safely. I read every one myself and usually reply within 1–2 days (I'm on GMT+7).`,
     ``,
@@ -122,7 +124,7 @@ export function autoReplyMail(l: Letter): MailBody {
   const link = (href: string, label: string) =>
     `<a href="${href}" style="color:#1c3fd6">${label}</a>`;
   const html = wrap(
-    `<p style="margin:0 0 14px">Hi ${escapeHtml(first)},</p>` +
+    `<p style="margin:0 0 14px">Hi there,</p>` +
       `<p style="margin:0 0 14px">Thanks for your letter, it landed safely. I read every one myself and usually reply within 1–2 days (I'm on GMT+7).</p>` +
       `<p style="margin:0 0 6px">While you wait:</p>` +
       `<ul style="margin:0 0 14px;padding-left:20px">` +

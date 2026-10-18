@@ -91,7 +91,10 @@ describe('contact', () => {
 
     expect(reply.from).toBe(DEFAULT_FROM);
     expect(reply.to).toEqual(['ada@example.com']);
-    expect(reply.subject).toBe('Thanks for your letter, Ada');
+    expect(reply.subject).toBe('Thanks for your letter');
+    // nothing the visitor typed is echoed into a mail sent to a visitor-typed address
+    for (const part of [reply.subject, reply.text, reply.html])
+      expect(part).not.toContain('Ada');
     for (const part of [reply.text, reply.html]) {
       expect(part).toContain(
         'https://letranminhdat.com/cv/letranminhdat-cv.pdf',
@@ -139,7 +142,7 @@ describe('contact', () => {
       '&lt;script&gt;alert(1)&lt;/script&gt; &amp; &lt;img',
     );
     expect(note.html).toContain('&lt;b&gt;Eve&lt;/b&gt; &quot;x&quot;');
-    expect(reply.html).toContain('Hi &lt;b&gt;Eve&lt;/b&gt;,');
+    expect(reply.html).not.toContain('Eve');
     expect(escapeHtml(`&<>"'`)).toBe('&amp;&lt;&gt;&quot;&#39;');
   });
 
@@ -185,16 +188,33 @@ describe('contact', () => {
     expect(Number(res.headers['retry-after'])).toBeGreaterThan(0);
     // another visitor is unaffected
     await post(valid, { 'cf-connecting-ip': '8.8.8.8' }).expect(200);
-    expect(fetchMock).toHaveBeenCalledTimes(8);
+    // 4 notifications + 1 auto-reply: the same address gets at most one auto-reply a day
+    expect(fetchMock).toHaveBeenCalledTimes(5);
   });
 
-  it('uses x-forwarded-for when cf-connecting-ip is absent', async () => {
+  it('ignores x-forwarded-for (client-controlled) and falls back to the socket address', async () => {
     for (let i = 0; i < 3; i++) {
       await post(valid, { 'x-forwarded-for': `7.7.7.7, 10.0.0.${i}` }).expect(
         200,
       );
     }
     await post(valid, { 'x-forwarded-for': '7.7.7.7' }).expect(429);
+  });
+
+  it('caps sends globally, whatever IP the requests claim', async () => {
+    for (let i = 0; i < 60; i++) {
+      await post(
+        { ...valid, email: `v${i}@example.com` },
+        { 'cf-connecting-ip': `10.1.${Math.floor(i / 3)}.${i % 3}` },
+      ).expect(200);
+    }
+    const res = await post(
+      { ...valid, email: 'late@example.com' },
+      { 'cf-connecting-ip': '10.9.9.9' },
+    );
+    expect(res.status).toBe(429);
+    // 60 notifications + 30 auto-replies (global auto-reply cap)
+    expect(fetchMock).toHaveBeenCalledTimes(90);
   });
 
   it('missing RESEND_API_KEY → 503 mail_not_configured', async () => {
@@ -250,7 +270,7 @@ describe('helpers', () => {
       ),
     ).toBe('1.1.1.1');
     expect(clientIp(req({ 'x-forwarded-for': '2.2.2.2, 3.3.3.3' }))).toBe(
-      '2.2.2.2',
+      '127.0.0.1',
     );
     expect(clientIp(req({}))).toBe('127.0.0.1');
   });

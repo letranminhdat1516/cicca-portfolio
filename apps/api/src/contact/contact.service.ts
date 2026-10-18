@@ -32,6 +32,11 @@ export class ContactService {
   private readonly log = new Logger(ContactService.name);
   private warnedNoKey = false;
   limiter = new RateLimiter(RATE_WINDOWS);
+  /** IP-independent caps, so spoofed or rotating IPs can't turn the form into a mailer. */
+  globalLimiter = new RateLimiter([{ ms: 24 * 60 * 60_000, max: 60 }]);
+  /** Auto-replies go to a visitor-typed address: one per address per day, 30 a day overall. */
+  replyLimiter = new RateLimiter([{ ms: 24 * 60 * 60_000, max: 1 }]);
+  replyGlobalLimiter = new RateLimiter([{ ms: 24 * 60 * 60_000, max: 30 }]);
 
   async send(input: ContactDto, meta: ContactMeta): Promise<{ ok: true }> {
     // Bots fill the hidden field; pretend it worked so they move on.
@@ -54,6 +59,9 @@ export class ContactService {
 
     const rate = this.limiter.take(meta.ip || 'unknown');
     if (rate.ok === false) throw new RateLimitedException(rate.retryAfterSec);
+    const global = this.globalLimiter.take('all');
+    if (global.ok === false)
+      throw new RateLimitedException(global.retryAfterSec);
 
     const from = process.env.CONTACT_FROM?.trim() || DEFAULT_FROM;
     const to = (process.env.CONTACT_TO?.trim() || DEFAULT_TO)
@@ -82,6 +90,14 @@ export class ContactService {
         { ok: false, error: 'send_failed' },
         HttpStatus.BAD_GATEWAY,
       );
+    }
+
+    const replyOk =
+      this.replyLimiter.take(letter.email.toLowerCase()).ok &&
+      this.replyGlobalLimiter.take('all').ok;
+    if (!replyOk) {
+      this.log.log('auto-reply skipped (cap reached)');
+      return { ok: true };
     }
 
     try {
