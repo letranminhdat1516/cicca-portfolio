@@ -11,7 +11,6 @@ import { JsonLd, PERSON_ID, breadcrumbJsonLd } from "@/components/seo/JsonLd";
 import { ACCENT } from "@/data/home";
 import { PROJECT_VISUALS, orderedWork, type ProjectImage } from "@/data/projectVisuals";
 import { MONO, Highlight, Tag } from "@/components/site/ui";
-import { MediaViewer, type MediaItem } from "@/components/project/MediaViewer";
 
 // One indexable page per project case study: a long-tail landing page for
 // search ("bank LLM gateway LiteLLM") and a precise URL for answer engines to
@@ -47,41 +46,74 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 }
 
 const KICKER: CSSProperties = { ...MONO, fontSize: 12, letterSpacing: "0.08em" };
-const ASIDE_CARD: CSSProperties = {
-  background: "#03061A",
-  border: "1px solid rgba(111,168,255,0.25)",
-  borderRadius: 24,
-  padding: 24,
-  display: "flex",
-  flexDirection: "column",
-};
 const LINK_ROW: CSSProperties = {
   textDecoration: "none",
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
-  padding: "12px 18px",
+  gap: 16,
+  minHeight: 44,
+  padding: "0 18px",
   borderRadius: 999,
   fontWeight: 500,
 };
+const FRAME: CSSProperties = {
+  position: "relative",
+  aspectRatio: "16 / 10",
+  borderRadius: 24,
+  overflow: "hidden",
+  border: "1px solid rgba(111,168,255,0.25)",
+  background: "#03061A",
+  boxShadow: "0 30px 60px -40px rgba(47,123,255,0.55)",
+};
 
-/** Real screenshots when the project has them; otherwise the "coming soon" placeholders. */
-function mediaFor(short: string, images?: ProjectImage[]): MediaItem[] {
-  if (images?.length) {
-    return images.map((img) => ({ kind: "IMAGE", label: img.caption, short: img.caption, src: img.src, alt: img.alt }));
-  }
-  return [
-    { kind: "VIDEO", label: `Demo — ${short} (coming soon)`, short: "Demo video" },
-    { kind: "IMAGE", label: "Architecture overview", short: "Architecture" },
-    { kind: "IMAGE", label: "Product screens", short: "Screens" },
-  ];
+/** "Bank LLM Gateway" → "Bank LLM" + highlighted "Gateway"; one-word titles stay plain. */
+function splitTitle(title: string): [string, string | null] {
+  const t = title.trim();
+  const i = t.lastIndexOf(" ");
+  return i > 0 ? [t.slice(0, i), t.slice(i + 1)] : [t, null];
 }
 
-const FIGURES = [
-  { label: "[Architecture diagram]", caption: "How the pieces fit together — diagram coming soon.", ratio: "16 / 9", full: true },
-  { label: "[Screenshot]", caption: "The product in use — screenshots coming soon.", ratio: "4 / 3", full: false },
-  { label: "[Dashboard]", caption: "Operations view — coming soon.", ratio: "4 / 3", full: false },
-];
+/** Screens after the cover as a vertical story: one large, then a pair, then one large, … */
+function storyRows(images: ProjectImage[]): ProjectImage[][] {
+  const rows: ProjectImage[][] = [];
+  for (let i = 0; i < images.length; ) {
+    const size = rows.length % 2 === 1 && i + 1 < images.length ? 2 : 1;
+    rows.push(images.slice(i, i + size));
+    i += size;
+  }
+  return rows;
+}
+
+function SectionHead({ n, id, title }: { n: string; id: string; title: string }) {
+  return (
+    <div className="blk-lbl">
+      <span aria-hidden="true" style={{ ...MONO, fontSize: 14, color: "#6FA8FF" }}>
+        {n}
+      </span>
+      <h2 id={id} style={{ margin: 0, fontWeight: 800, fontSize: "clamp(26px, 2.8vw, 34px)", lineHeight: 1.1, letterSpacing: "-0.02em" }}>
+        {title}
+      </h2>
+    </div>
+  );
+}
+
+function Shot({ img, no, sizes, preload, heading = true }: { img: ProjectImage; no: string; sizes: string; preload?: boolean; heading?: boolean }) {
+  const Caption = heading ? "h3" : "span";
+  return (
+    <figure style={{ margin: 0, display: "flex", flexDirection: "column", gap: 14, minWidth: 0 }}>
+      <div style={FRAME}>
+        <Image src={img.src} alt={img.alt} fill sizes={sizes} preload={preload} style={{ objectFit: "cover", objectPosition: "top" }} />
+      </div>
+      <figcaption style={{ display: "flex", gap: 12, alignItems: "baseline" }}>
+        <span aria-hidden="true" style={{ ...MONO, fontSize: 12, color: "#8C97B8" }}>
+          {no}
+        </span>
+        <Caption style={{ margin: 0, fontSize: 17, fontWeight: 600, color: "#E8EEFF" }}>{img.caption}</Caption>
+      </figcaption>
+    </figure>
+  );
+}
 
 export default async function ProjectPage({ params }: Params) {
   const { slug } = await params;
@@ -92,12 +124,12 @@ export default async function ProjectPage({ params }: Params) {
 
   const visual = PROJECT_VISUALS[slug];
   const images = visual?.images ?? [];
-  const gallery = images.slice(1);
+  const [cover, ...screens] = images;
   const work = orderedWork(data.missions);
   const pos = work.findIndex((w) => w.mission.slug === slug);
   const next = work.length ? work[(pos + 1) % work.length] : undefined;
   const nextItem = next && next.mission.slug !== slug ? next : undefined;
-  const no = pos >= 0 ? work[pos].no : null;
+  const counter = pos >= 0 ? `${work[pos].no} / ${String(work.length).padStart(2, "0")}` : null;
 
   const statusText = visual?.statusLabel
     ? titleCase(visual.statusLabel)
@@ -105,11 +137,20 @@ export default async function ProjectPage({ params }: Params) {
       ? "In production"
       : "Delivered";
   const facts = [
-    { k: "ROLE", v: visual?.role },
-    { k: "TIMELINE", v: visual?.when },
-    { k: "DOMAIN", v: visual?.domain },
-    { k: "IMPACT", v: m.impact ? titleCase(m.impact) : undefined },
+    { k: "Client", v: visual?.client },
+    { k: "Timeline", v: visual?.when },
+    { k: "Role", v: visual?.role },
+    { k: "Outcome", v: visual?.outcome ?? statusText },
   ].filter((f): f is { k: string; v: string } => Boolean(f.v));
+  const specs = [
+    { k: "Domain", v: visual?.domain },
+    { k: "Impact", v: m.impact ? titleCase(m.impact) : undefined },
+  ].filter((f): f is { k: string; v: string } => Boolean(f.v));
+
+  const [lead, mark] = splitTitle(m.title);
+  const sections = ["about", ...(screens.length ? ["screens"] : []), "stack"];
+  const num = (id: string) => String(sections.indexOf(id) + 1).padStart(2, "0");
+  const hasContent = Boolean(m.content?.trim());
 
   return (
     <main>
@@ -138,63 +179,124 @@ export default async function ProjectPage({ params }: Params) {
         ]}
       />
 
-      {/* TITLE */}
-      <section style={{ maxWidth: 1240, margin: "0 auto", padding: "56px 24px 40px", display: "flex", flexDirection: "column", gap: 24 }}>
-        <Link href="/#work" style={{ ...MONO, alignSelf: "flex-start", textDecoration: "none", fontSize: 13, color: "#8C97B8", padding: "8px 0" }}>
-          ← All work
-        </Link>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
-          <span style={{ ...MONO, background: ACCENT, color: "#FFFFFF", fontSize: 12, padding: "4px 12px", borderRadius: 999 }}>{statusText}</span>
-          {(no || visual?.domain) && (
-            <span style={{ ...MONO, fontSize: 13, color: "#8C97B8" }}>{[no, visual?.domain].filter(Boolean).join(" · ")}</span>
+      <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 24px" }}>
+        {/* CRUMB */}
+        <nav aria-label="Breadcrumb" style={{ ...MONO, paddingTop: 32, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, fontSize: 13 }}>
+          <Link href="/#work" style={{ textDecoration: "none", color: "#8C97B8", padding: "10px 0" }}>
+            ← All work
+          </Link>
+          {counter && (
+            <span style={{ color: "#8C97B8" }}>
+              <span className="sr-only">Project </span>
+              {counter}
+            </span>
           )}
-        </div>
-        <h1 style={{ margin: 0, fontWeight: 800, fontSize: "clamp(40px, 6vw, 80px)", lineHeight: 1, letterSpacing: "-0.04em", maxWidth: 1000 }}>
-          {m.title}
-        </h1>
-        <p style={{ margin: 0, maxWidth: 760, fontSize: 20, color: "#C9D4F2" }}>{m.objective}</p>
+        </nav>
+
+        {/* TITLE */}
+        <header className="p-hero">
+          <div style={{ display: "flex", flexDirection: "column", gap: 20, minWidth: 0 }}>
+            <span style={{ ...MONO, alignSelf: "flex-start", background: ACCENT, color: "#FFFFFF", fontSize: 12, padding: "4px 12px", borderRadius: 999 }}>
+              {statusText}
+            </span>
+            <h1 style={{ margin: 0, fontWeight: 800, fontSize: "clamp(44px, 7vw, 96px)", lineHeight: 1, letterSpacing: "-0.04em", textWrap: "balance" }}>
+              {mark ? (
+                <>
+                  {lead} <Highlight big>{mark}</Highlight>
+                </>
+              ) : (
+                lead
+              )}
+            </h1>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 20, minWidth: 0 }}>
+            {visual?.tagline && <p style={{ margin: 0, fontSize: "clamp(20px, 2vw, 24px)", lineHeight: 1.35, color: "#C9D4F2", textWrap: "pretty" }}>{visual.tagline}</p>}
+            {visual?.tags.length ? (
+              <ul aria-label="Tags" style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexWrap: "wrap", gap: 8 }}>
+                {visual.tags.map((t) => (
+                  <li key={t}>
+                    <Tag size={14}>{t}</Tag>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </div>
+        </header>
+
+        {/* COVER */}
+        {/* the cover sits above the first h2, so its caption is not a heading */}
+        {cover && <Shot img={cover} no="01" sizes="(max-width: 1240px) 100vw, 1192px" preload heading={false} />}
+
+        {/* META */}
         {facts.length > 0 && (
-          <dl
-            style={{
-              margin: "8px 0 0",
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(min(180px, 100%), 1fr))",
-              gap: "0 32px",
-              borderTop: "1px solid rgba(232,238,255,0.6)",
-            }}
-          >
+          <dl className="p-facts">
             {facts.map((f) => (
-              <div key={f.k} style={{ padding: "14px 0", display: "flex", flexDirection: "column", gap: 2 }}>
-                <dt style={{ ...MONO, fontSize: 12, color: "#8C97B8" }}>{f.k}</dt>
-                <dd style={{ margin: 0, fontWeight: 600 }}>{f.v}</dd>
+              <div key={f.k} style={{ display: "flex", flexDirection: "column", gap: 6, minWidth: 0 }}>
+                <dt style={{ ...MONO, fontSize: 12, letterSpacing: "0.06em", color: "#8C97B8", textTransform: "uppercase" }}>{f.k}</dt>
+                <dd style={{ margin: 0, fontSize: 19, fontWeight: 600, lineHeight: 1.3, color: "#F2F5FF" }}>{f.v}</dd>
               </div>
             ))}
           </dl>
         )}
-      </section>
 
-      {/* MEDIA VIEWER */}
-      <MediaViewer items={mediaFor(visual?.short ?? m.title, visual?.images)} glyph={visual?.glyph ?? "◆"} />
-
-      {/* CASE STUDY */}
-      <section style={{ background: "rgba(10,16,52,0.7)", borderTop: "1px solid rgba(111,168,255,0.25)", borderBottom: "1px solid rgba(111,168,255,0.25)" }}>
-        <div style={{ maxWidth: 1240, margin: "0 auto", padding: "88px 24px", display: "flex", flexWrap: "wrap", gap: "48px 72px" }}>
-          <article style={{ flex: "999 1 620px", minWidth: 0, display: "flex", flexDirection: "column", gap: 12 }}>
-            <h2 style={{ ...KICKER, margin: 0, fontWeight: 400, color: "#6FA8FF" }}>THE CASE STUDY</h2>
-            {m.content?.trim() ? (
-              <div className="md" style={{ fontSize: 18 }}>
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.content}</ReactMarkdown>
+        {/* 01 ABOUT */}
+        <section aria-labelledby="about" className="blk">
+          <SectionHead n={num("about")} id="about" title="About the project" />
+          <div style={{ minWidth: 0, display: "flex", flexDirection: "column", gap: 8 }}>
+            <p style={{ margin: 0, fontSize: "clamp(22px, 2.4vw, 30px)", lineHeight: 1.3, fontWeight: 500, color: "#F2F5FF", textWrap: "pretty" }}>{m.objective}</p>
+            {hasContent ? (
+              <div className="md md-article" style={{ fontSize: 18, marginTop: 16 }}>
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.content ?? ""}</ReactMarkdown>
               </div>
             ) : (
-              <>
-                {visual?.tagline && <p style={{ margin: 0, fontSize: 18, color: "#C9D4F2" }}>{visual.tagline}</p>}
-                <p style={{ margin: 0, fontSize: 16, color: "#8C97B8" }}>The full write-up is on the way.</p>
-              </>
+              <p style={{ margin: "16px 0 0", fontSize: 16, color: "#8C97B8" }}>The full write-up is on the way.</p>
             )}
-          </article>
-          <aside style={{ flex: "1 1 300px", minWidth: 0, display: "flex", flexDirection: "column", gap: 20 }}>
-            <div style={{ ...ASIDE_CARD, gap: 10 }}>
-              <h2 style={{ ...KICKER, margin: 0, fontWeight: 400, color: "#8C97B8" }}>LINKS</h2>
+          </div>
+        </section>
+
+        {/* 02 SCREENS */}
+        {screens.length > 0 && (
+          <section aria-labelledby="screens" className="blk blk-wide">
+            <SectionHead n={num("screens")} id="screens" title="Screens" />
+            <div style={{ display: "flex", flexDirection: "column", gap: "clamp(40px, 6vw, 72px)", minWidth: 0 }}>
+              {storyRows(screens).map((row) => (
+                <div key={row[0].src} className={row.length === 2 ? "shot-pair" : undefined}>
+                  {row.map((img) => (
+                    <Shot
+                      key={img.src}
+                      img={img}
+                      no={String(images.indexOf(img) + 1).padStart(2, "0")}
+                      sizes={row.length === 2 ? "(max-width: 900px) 100vw, 600px" : "(max-width: 1240px) 100vw, 1192px"}
+                    />
+                  ))}
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* 03 STACK */}
+        <section aria-labelledby="stack" className="blk">
+          <SectionHead n={num("stack")} id="stack" title="Stack & links" />
+          <div className="p-specs">
+            <div style={{ gridColumn: "1 / -1", display: "flex", flexDirection: "column", gap: 12 }}>
+              <h3 style={{ ...KICKER, margin: 0, fontWeight: 400, color: "#8C97B8" }}>STACK</h3>
+              <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexWrap: "wrap", gap: 8 }}>
+                {m.loadout.map((t) => (
+                  <li key={t}>
+                    <Tag size={15}>{t}</Tag>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            {specs.map((f) => (
+              <div key={f.k} style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                <h3 style={{ ...KICKER, margin: 0, fontWeight: 400, color: "#8C97B8" }}>{f.k.toUpperCase()}</h3>
+                <p style={{ margin: 0, fontWeight: 600 }}>{f.v}</p>
+              </div>
+            ))}
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <h3 style={{ ...KICKER, margin: 0, fontWeight: 400, color: "#8C97B8" }}>LINKS</h3>
               <Link href="/blog" style={{ ...LINK_ROW, background: ACCENT, color: "#FFFFFF" }}>
                 Read the write-ups <span aria-hidden="true">→</span>
               </Link>
@@ -202,77 +304,9 @@ export default async function ProjectPage({ params }: Params) {
                 Résumé <span aria-hidden="true">→</span>
               </Link>
             </div>
-            <div style={{ ...ASIDE_CARD, gap: 14 }}>
-              <h2 style={{ ...KICKER, margin: 0, fontWeight: 400, color: "#8C97B8" }}>STACK</h2>
-              <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexWrap: "wrap", gap: 8 }}>
-                {m.loadout.map((t) => (
-                  <li key={t}>
-                    <Tag size={14}>{t}</Tag>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </aside>
-        </div>
-      </section>
-
-      {/* GALLERY — placeholders only for projects without screenshots; when there are screenshots
-          the media viewer above already shows every one, so a second gallery would repeat them */}
-      {images.length === 0 && (
-        <section aria-labelledby="bts" style={{ maxWidth: 1240, margin: "0 auto", padding: "88px 24px", display: "flex", flexDirection: "column", gap: 32 }}>
-          <h2 id="bts" style={{ margin: 0, fontWeight: 800, fontSize: "clamp(32px, 4vw, 48px)", lineHeight: 1.1, letterSpacing: "-0.03em" }}>
-            Behind the <Highlight>scenes</Highlight>
-          </h2>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(280px, 100%), 1fr))", gap: 20 }}>
-            {gallery.map((g, i) => (
-              <figure key={g.src} style={{ margin: 0, display: "flex", flexDirection: "column", gap: 10, gridColumn: i === 0 ? "1 / -1" : undefined }}>
-                <div
-                  style={{
-                    position: "relative",
-                    aspectRatio: "16 / 10",
-                    borderRadius: 22,
-                    overflow: "hidden",
-                    border: "1px solid rgba(111,168,255,0.25)",
-                    background: "#03061A",
-                  }}
-                >
-                  <Image
-                    src={g.src}
-                    alt={g.alt}
-                    fill
-                    sizes={i === 0 ? "(max-width: 1240px) 100vw, 1192px" : "(max-width: 640px) 100vw, (max-width: 1240px) 50vw, 600px"}
-                    style={{ objectFit: "cover", objectPosition: "top" }}
-                  />
-                </div>
-                <figcaption style={{ fontSize: 14, color: "#8C97B8" }}>{g.caption}</figcaption>
-              </figure>
-            ))}
-            {images.length === 0 &&
-              FIGURES.map((f) => (
-                <figure key={f.label} style={{ margin: 0, display: "flex", flexDirection: "column", gap: 10, gridColumn: f.full ? "1 / -1" : undefined }}>
-                  <div
-                    className="ph"
-                    aria-hidden="true"
-                    style={{
-                      ...MONO,
-                      aspectRatio: f.ratio,
-                      borderRadius: 22,
-                      border: "1px solid rgba(111,168,255,0.25)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: 13,
-                      color: "#8C97B8",
-                    }}
-                  >
-                    {f.label}
-                  </div>
-                  <figcaption style={{ fontSize: 14, color: "#8C97B8" }}>{f.caption}</figcaption>
-                </figure>
-              ))}
           </div>
         </section>
-      )}
+      </div>
 
       {/* NEXT */}
       {nextItem && (

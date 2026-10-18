@@ -3,6 +3,7 @@ import Image from "next/image";
 import type { Profile, Social } from "@portfolio/types";
 import { BRAND, CTA } from "@/data/home";
 import { DocIcon, GithubIcon, LinkedinIcon, MailIcon } from "./ui";
+import { LetterForm } from "./LetterForm";
 
 type CtaLink = { href: string; label: string; icon: ReactNode; rel?: string };
 
@@ -58,14 +59,7 @@ export function ContactCta({ profile, socials }: { profile: Profile; socials: So
         </div>
         <h2 style={{ margin: 0, fontWeight: 800, fontSize: "clamp(28px, 4vw, 44px)", letterSpacing: "0.01em" }}>{CTA.title}</h2>
         <p style={{ margin: 0, maxWidth: 560, color: "#DCE4FF" }}>{CTA.body}</p>
-        {profile.email && (
-          <a
-            href={`mailto:${profile.email}`}
-            style={{ textDecoration: "none", background: "#FFFFFF", color: "#1C3FD6", padding: "12px 28px", borderRadius: 999, fontWeight: 600 }}
-          >
-            {CTA.button}
-          </a>
-        )}
+        <LetterForm email={profile.email || undefined} />
         <div style={{ width: "100%", marginTop: 24, display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: 16, fontSize: 14 }}>
           {ctaLinks(profile, socials).map((l) => (
             <a

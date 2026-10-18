@@ -115,3 +115,4 @@ pnpm dev                           # web :3000 + api :3001
 ## 4. Mẹo bảo mật khi deploy
 - Đổi `ADMIN_EMAIL` / `ADMIN_PASSWORD` và đặt `JWT_SECRET` mạnh (`openssl rand -hex 32`).
 - Đặt `CORS_ORIGINS` = domain thật của trang web.
+- Form liên hệ ("write me a letter") gửi mail qua Resend: đặt `RESEND_API_KEY` (thiếu thì form báo lỗi 503), tuỳ chọn `CONTACT_FROM` (domain phải được verify trong Resend) và `CONTACT_TO` (mặc định `datltmse@gmail.com`).

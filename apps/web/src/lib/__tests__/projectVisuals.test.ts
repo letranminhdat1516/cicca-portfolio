@@ -3,7 +3,8 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import type { Mission } from "@portfolio/types";
 import { PROJECT_VISUALS, orderedWork, selectWork, workStatus, type ProjectVisual } from "@/data/projectVisuals";
-import { formatPostDate, readMinutes, topicOf } from "@/lib/blogTopics";
+import { TOPICS, formatPostDate, readMinutes, topicOf } from "@/lib/blogTopics";
+import { topicCounts } from "@/components/blog/BlogIndex";
 import { bioParagraphs } from "@/components/site/About";
 import { experienceLine, isCurrent } from "@/components/site/Experience";
 
@@ -50,6 +51,27 @@ describe("project visuals map", () => {
       expect(v.short && v.tagline && v.glyph && v.art && v.when && v.domain).toBeTruthy();
       expect(v.tags.length).toBeGreaterThan(0);
     }
+  });
+});
+
+describe("case-study meta", () => {
+  it("every slug names its client and outcome", () => {
+    for (const [slug, v] of Object.entries(PROJECT_VISUALS)) {
+      expect(v.client?.trim(), slug).toBeTruthy();
+      expect(v.outcome?.trim(), slug).toBeTruthy();
+    }
+  });
+});
+
+describe("blog topic chips", () => {
+  it("counts real posts per topic, All first, empty topics dropped", () => {
+    const posts = [{ topic: "LLM" as const }, { topic: "LLM" as const }, { topic: "Infra" as const }];
+    expect(topicCounts(posts, TOPICS)).toEqual([
+      { topic: "All", count: 3 },
+      { topic: "LLM", count: 2 },
+      { topic: "Infra", count: 1 },
+    ]);
+    expect(topicCounts([], TOPICS)).toEqual([{ topic: "All", count: 0 }]);
   });
 });
 

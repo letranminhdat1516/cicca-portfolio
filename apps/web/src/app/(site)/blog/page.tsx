@@ -6,7 +6,7 @@ import { TOPICS, formatPostDate, readMinutes, topicOf } from "@/lib/blogTopics";
 import { JsonLd, blogJsonLd } from "@/components/seo/JsonLd";
 import { BlogIndex, type PostCard } from "@/components/blog/BlogIndex";
 import { ACCENT } from "@/data/home";
-import { Highlight, MONO } from "@/components/site/ui";
+import { Highlight, MONO, PANEL } from "@/components/site/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -39,23 +39,22 @@ export default async function BlogPage() {
       topic: topicOf(p.tags),
       date: formatPostDate(p.publishedAt),
       isoDate: p.publishedAt,
-      read: w ? `${readMinutes(w)} min` : null,
+      read: w ? `${readMinutes(w)} min read` : null,
       coverImage: p.coverImage,
     };
   });
-  const topics = TOPICS.filter((t) => cards.some((c) => c.topic === t));
 
   return (
     <main>
       <JsonLd data={blogJsonLd(posts, authorName)} />
-      <section
+      <header
         style={{
           maxWidth: 1240,
           margin: "0 auto",
           padding: "72px 24px 40px",
           display: "flex",
           flexWrap: "wrap",
-          gap: "32px 64px",
+          gap: "24px 64px",
           alignItems: "flex-end",
           justifyContent: "space-between",
         }}
@@ -65,30 +64,57 @@ export default async function BlogPage() {
           <h1 style={{ margin: 0, fontWeight: 800, fontSize: "clamp(44px, 7vw, 96px)", lineHeight: 0.98, letterSpacing: "-0.04em" }}>
             Notes from <Highlight big>the desk</Highlight>
           </h1>
-          <p style={{ margin: 0, maxWidth: 600, fontSize: 19, color: "#C9D4F2" }}>{INTRO}</p>
         </div>
-        <a
-          href="/feed.xml"
+        <p style={{ flex: "1 1 320px", margin: 0, maxWidth: 440, fontSize: 18, color: "#C9D4F2" }}>{INTRO}</p>
+      </header>
+      <BlogIndex posts={cards} topics={TOPICS} />
+
+      {/* FOLLOW ALONG — RSS only: there is no newsletter backend, so no email form */}
+      <section aria-labelledby="follow" style={{ maxWidth: 1240, margin: "0 auto", padding: "88px 24px 96px" }}>
+        <div
           style={{
-            flex: "0 0 auto",
-            textDecoration: "none",
+            ...PANEL,
+            borderRadius: 32,
+            padding: "clamp(28px, 5vw, 48px)",
             display: "flex",
+            flexWrap: "wrap",
+            gap: "24px 48px",
             alignItems: "center",
-            gap: 8,
-            border: "1.5px solid #E8EEFF",
-            padding: "12px 20px",
-            borderRadius: 999,
-            fontWeight: 500,
+            justifyContent: "space-between",
+            backgroundImage: "radial-gradient(60% 120% at 100% 0%, rgba(47,123,255,0.22), transparent 70%)",
           }}
         >
-          <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={ACCENT} strokeWidth="2.2" strokeLinecap="round">
-            <path d="M4 11a9 9 0 0 1 9 9M4 4a16 16 0 0 1 16 16" />
-            <circle cx="5" cy="19" r="1.2" fill={ACCENT} />
-          </svg>
-          Subscribe via RSS
-        </a>
+          <div style={{ flex: "1 1 420px", minWidth: 0, display: "flex", flexDirection: "column", gap: 10 }}>
+            <h2 id="follow" style={{ margin: 0, fontWeight: 800, fontSize: "clamp(30px, 3.6vw, 44px)", lineHeight: 1.05, letterSpacing: "-0.03em" }}>
+              Follow <Highlight>along</Highlight>
+            </h2>
+            <p style={{ margin: 0, fontSize: 17, color: "#C9D4F2" }}>New notes land in the RSS feed as soon as they are published. Point any feed reader at it.</p>
+          </div>
+          <a
+            href="/feed.xml"
+            style={{
+              flex: "0 0 auto",
+              textDecoration: "none",
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              minHeight: 48,
+              padding: "0 24px",
+              borderRadius: 999,
+              fontWeight: 600,
+              background: ACCENT,
+              color: "#FFFFFF",
+              boxShadow: "0 0 24px rgba(47,123,255,0.5)",
+            }}
+          >
+            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+              <path d="M4 11a9 9 0 0 1 9 9M4 4a16 16 0 0 1 16 16" />
+              <circle cx="5" cy="19" r="1.2" fill="currentColor" />
+            </svg>
+            Subscribe via RSS
+          </a>
+        </div>
       </section>
-      <BlogIndex posts={cards} topics={topics} />
     </main>
   );
 }

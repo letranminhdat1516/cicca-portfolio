@@ -69,6 +69,9 @@ pnpm --filter @portfolio/web build
 | `JWT_SECRET` | api | >=16 chars; generate with `openssl rand -hex 32` |
 | `CORS_ORIGINS` | api | comma-separated allowed origins (default `http://localhost:3000`) |
 | `ADMIN_EMAIL` / `ADMIN_PASSWORD` | api (seed) | the single admin account |
+| `RESEND_API_KEY` | api | Resend API key for the contact form; unset → `POST /contact` returns 503 `mail_not_configured` |
+| `CONTACT_FROM` | api | sender for both contact emails (default `Le Tran Minh Dat <hello@letranminhdat.com>`; domain must be verified in Resend) |
+| `CONTACT_TO` | api | where contact-form letters are delivered (default `datltmse@gmail.com`; comma-separated for several) |
 | `NEXT_PUBLIC_API_URL` | web | base URL of the API |
 | `NEXT_PUBLIC_SITE_URL` | web | public site URL (used in sitemap) |
 

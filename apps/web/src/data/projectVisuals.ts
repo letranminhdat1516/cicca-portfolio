@@ -25,6 +25,10 @@ export interface ProjectVisual {
   domain: string;
   /** Role on the project, shown on the case-study page. */
   role: string;
+  /** Who it was built for, as the case-study page names them (never the bank's or the café's brand). */
+  client?: string;
+  /** One-line result for the case-study meta grid ("Live MVP"). */
+  outcome?: string;
   /** Eligible for the three large cards on the home page. */
   featured?: boolean;
   /** Overrides the status badge text derived from the CMS status. */
@@ -53,6 +57,8 @@ export const PROJECT_VISUALS: Record<string, ProjectVisual> = {
     when: "Aug 2026 – Present",
     domain: "AI commerce",
     role: "Backend & AI Engineer",
+    client: "F&B and AI-commerce company",
+    outcome: "Live MVP",
     featured: true,
     images: shots("siz-commerce-gateway", [
       ["Claude booking tickets through Siz", "Screenshot of a Claude chat where the assistant books tickets through the Siz MCP server"],
@@ -71,6 +77,8 @@ export const PROJECT_VISUALS: Record<string, ProjectVisual> = {
     when: "Aug 2026 – Present",
     domain: "Banking",
     role: "AI Gateway Platform Engineer",
+    client: "Enterprise banking client",
+    outcome: "Spend matched to the real AWS bill",
     featured: true,
     images: shots("bank-llm-gateway", [
       ["Bedrock cost reconciliation", "Screenshot of the Bedrock cost reconciliation page comparing gateway spend with Bedrock invocations"],
@@ -89,6 +97,8 @@ export const PROJECT_VISUALS: Record<string, ProjectVisual> = {
     when: "May 2026 – Present",
     domain: "F&B",
     role: "Backend & AI Engineer",
+    client: "F&B and AI-commerce company",
+    outcome: "Ran in a real café",
     featured: true,
     images: shots("voice-ordering-agent", [
       ["Chat recommendation", "Screenshot of the ordering assistant recommending drinks in a chat conversation"],
@@ -107,6 +117,8 @@ export const PROJECT_VISUALS: Record<string, ProjectVisual> = {
     when: "Apr – Sep 2026",
     domain: "Education",
     role: "AI Agent Consultant Engineer",
+    client: "Hướng Nghiệp Á Âu",
+    outcome: "97% of AI drafts accepted",
     statusLabel: "HANDED OVER",
     images: shots("rag-enrollment-advisor", [
       ["Advisor console", "Screenshot of the admissions advisor console answering a prospective student's question"],
@@ -125,6 +137,8 @@ export const PROJECT_VISUALS: Record<string, ProjectVisual> = {
     when: "2025 – Sep 2026",
     domain: "Accounting",
     role: "Core Full-stack Developer",
+    client: "Enterprise accounting client",
+    outcome: "Used daily by 20 accountants",
     statusLabel: "HANDED OVER",
     images: shots("vas-accounting-erp", [
       ["Journal entries", "Screenshot of the journal entries list in the accounting app"],
@@ -143,6 +157,8 @@ export const PROJECT_VISUALS: Record<string, ProjectVisual> = {
     when: "Jun 2025 – Jan 2026",
     domain: "Healthcare",
     role: "AI Team Lead, Computer Vision",
+    client: "Whammy Tech",
+    outcome: "84% fewer false alarms",
     images: shots("ipbms-patient-monitoring", [
       ["Real-time event dashboard", "Screenshot of the real-time dashboard listing fall and seizure events detected on camera streams"],
       ["Live fall alert on mobile", "Screenshot of the mobile app showing a live fall alert for a monitored patient"],
@@ -160,6 +176,8 @@ export const PROJECT_VISUALS: Record<string, ProjectVisual> = {
     when: "Oct 2025",
     domain: "Fintech",
     role: "Team Lead, Software Engineer",
+    client: "NEURADAO",
+    outcome: "Live in 20 days",
     images: shots("neuradao-ai-trading", [
       ["Landing hero", "Screenshot of the NEURADAO landing page hero section"],
       ["AI trading agent", "Screenshot of the AI trading agent configuration and performance view"],

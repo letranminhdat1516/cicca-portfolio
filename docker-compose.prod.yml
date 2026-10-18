@@ -39,6 +39,9 @@ services:
       DATABASE_URL: postgresql://portfolio:${POSTGRES_PASSWORD}@postgres:5432/portfolio?schema=public
       JWT_SECRET: ${JWT_SECRET}
       CORS_ORIGINS: ${SITE_URL}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      CONTACT_FROM: ${CONTACT_FROM:-}
+      CONTACT_TO: ${CONTACT_TO:-}
       API_PORT: "3001"
     ports:
       - "127.0.0.1:3101:3001"
