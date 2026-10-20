@@ -3,8 +3,8 @@ import { useCallback, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ACCENT, BRAND } from "@/data/home";
-import { MONO } from "./ui";
+import { BRAND } from "@/data/home";
+import { BUTTON_GRADIENT, MONO } from "./ui";
 import { MENU_ID, MobileMenu } from "./MobileMenu";
 import { CONTACT_OPEN_ATTR } from "./contact";
 
@@ -88,9 +88,9 @@ export function SiteNav() {
                 textDecoration: "none",
                 padding: "10px 20px",
                 borderRadius: 999,
-                background: ACCENT,
+                background: BUTTON_GRADIENT,
                 color: "#FFFFFF",
-                boxShadow: "0 0 24px rgba(47,123,255,0.6)",
+                boxShadow: "0 0 24px rgba(91,75,230,0.55)",
               }}
             >
               {CONTACT.label}

@@ -1,8 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ACCENT, GALLERY, KEYCAP } from "@/data/home";
-import { Eyebrow, H2, PILL_OUTLINE, PlayIcon } from "./ui";
+import { Eyebrow, H2, MONO, PlayIcon } from "./ui";
 
+/**
+ * Behind-the-scenes photos as slim, slightly tilted gradient-edged frames around the keycap.
+ * Placement and tilt live in globals.css (.pol-*), so phones get a simple
+ * stacked column.
+ */
 export function Gallery() {
   return (
     <section id="gallery" style={{ position: "relative" }}>
@@ -15,73 +20,59 @@ export function Gallery() {
             <Eyebrow>05 · GALLERY</Eyebrow>
             <h2 style={H2}>Behind the scenes</h2>
           </div>
-          <Link href={`/projects/${GALLERY[0].slug}`} style={PILL_OUTLINE}>
-            View all media
-          </Link>
+          <p style={{ margin: 0, maxWidth: 380, fontSize: 15, lineHeight: 1.6, color: "#8C97B8" }}>
+            Hackathon stages, finals and the people I met along the way.
+          </p>
         </div>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 24, alignItems: "center" }}>
-          <div style={{ flex: "1 1 360px", minWidth: 0, maxWidth: 460, display: "flex", flexDirection: "column", gap: 20 }}>
-            {GALLERY.map((g) => (
-              <Link
-                key={g.title}
-                href={`/projects/${g.slug}`}
-                className="card"
-                style={{
-                  textDecoration: "none",
-                  color: "#E8EEFF",
-                  borderRadius: 20,
-                  border: "1px solid rgba(111,168,255,0.3)",
-                  background: "rgba(10,16,52,0.75)",
-                  padding: "12px 12px 18px",
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 10,
-                }}
-              >
-                <div className="ph" style={{ aspectRatio: "16 / 9", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  {g.video && (
-                    <span
-                      aria-hidden="true"
-                      style={{
-                        width: 54,
-                        height: 54,
-                        borderRadius: "50%",
-                        background: ACCENT,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        boxShadow: "0 0 24px rgba(47,123,255,0.7)",
-                      }}
-                    >
-                      <PlayIcon size={20} color="#FFFFFF" />
-                    </span>
-                  )}
-                </div>
-                <div style={{ padding: "0 6px", display: "flex", flexDirection: "column", gap: 2 }}>
-                  <h3 style={{ margin: 0, fontWeight: 700, fontSize: 17 }}>{g.title}</h3>
-                  <span style={{ fontSize: 12, color: "#8C97B8" }}>{g.meta}</span>
-                </div>
-              </Link>
-            ))}
+        <div className="pol-board">
+          <div className="pol-keycap" aria-hidden="true">
+            <div className="halo" style={{ position: "absolute", left: "20%", top: "20%", width: "60%", height: "60%", opacity: 0.6 }} />
+            <Image
+              src={KEYCAP.src}
+              alt=""
+              fill
+              sizes="(max-width: 900px) 0px, 520px"
+              style={{
+                objectFit: "cover",
+                objectPosition: "66% 55%",
+                transform: "scale(1.18)",
+                WebkitMaskImage: "radial-gradient(closest-side at 50% 50%, #000 62%, transparent 100%)",
+                maskImage: "radial-gradient(closest-side at 50% 50%, #000 62%, transparent 100%)",
+              }}
+            />
           </div>
-          <div style={{ flex: "1.5 1 480px", minWidth: 0, display: "flex", justifyContent: "center" }}>
-            <div style={{ position: "relative", width: "100%", maxWidth: 760, aspectRatio: "1 / 1" }}>
-              <div className="halo" aria-hidden="true" style={{ position: "absolute", left: "20%", top: "20%", width: "60%", height: "60%", opacity: 0.6 }} />
-              <Image
-                src={KEYCAP.src}
-                alt={KEYCAP.alt}
-                fill
-                sizes="(max-width: 900px) 100vw, 760px"
-                style={{
-                  objectFit: "cover",
-                  objectPosition: "66% 55%",
-                  transform: "scale(1.18)",
-                  WebkitMaskImage: "radial-gradient(closest-side at 50% 50%, #000 62%, transparent 100%)",
-                  maskImage: "radial-gradient(closest-side at 50% 50%, #000 62%, transparent 100%)",
-                }}
-              />
-            </div>
-          </div>
+          {GALLERY.map((g, i) => (
+            <Link key={g.title} href={`/projects/${g.slug}`} className={`pol pol-${i + 1}`}>
+              <span style={{ position: "relative", display: "block", aspectRatio: "4 / 3", overflow: "hidden", borderRadius: 12, background: "#0b1233" }}>
+                <Image src={g.image.src} alt={g.image.alt} fill sizes="(max-width: 900px) 100vw, 560px" quality={90} style={{ objectFit: "cover" }} />
+                {g.video && (
+                  <span
+                    aria-hidden="true"
+                    style={{
+                      position: "absolute",
+                      left: "50%",
+                      top: "50%",
+                      transform: "translate(-50%,-50%)",
+                      width: 54,
+                      height: 54,
+                      borderRadius: "50%",
+                      background: ACCENT,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      boxShadow: "0 0 24px rgba(47,123,255,0.7)",
+                    }}
+                  >
+                    <PlayIcon size={20} color="#FFFFFF" />
+                  </span>
+                )}
+              </span>
+              <span style={{ display: "flex", flexDirection: "column", gap: 4, padding: "12px 6px 0" }}>
+                <span style={{ fontWeight: 600, fontSize: 15, color: "#E8EEFF", lineHeight: 1.3 }}>{g.title}</span>
+                <span style={{ ...MONO, fontSize: 11, color: "#8C97B8" }}>{g.meta}</span>
+              </span>
+            </Link>
+          ))}
         </div>
       </div>
     </section>

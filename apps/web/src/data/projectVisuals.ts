@@ -35,6 +35,8 @@ export interface ProjectVisual {
   statusLabel?: string;
   /** Real screenshots (16:10, 1600px) under /public/projects/<slug>/; the first is the card art. */
   images?: ProjectImage[];
+  /** A competition entry: it keeps its case-study page (linked from the awards) but is not product work, so it stays out of "Selected work". */
+  competition?: boolean;
   /** Heading for the image section on the case-study page; defaults to "Screens". */
   mediaTitle?: string;
   /** Demo recording shown on the case-study page under the cover. */
@@ -208,6 +210,7 @@ export const PROJECT_VISUALS: Record<string, ProjectVisual> = {
     client: "TOKEN2049 Origins Hackathon 2026",
     outcome: "Runner-up, main track",
     statusLabel: "RUNNER-UP",
+    competition: true,
     mediaTitle: "Photos",
     images: shots("chord-agents", [
       ["Main-track finalists at the awards", "TOKEN2049 Origins Hackathon finalists on stage in front of the AWS prize board"],
@@ -228,6 +231,7 @@ export const PROJECT_VISUALS: Record<string, ProjectVisual> = {
     client: "Viettel Group",
     outcome: "Runner-up (top 4) of 1,628 teams",
     statusLabel: "RUNNER-UP",
+    competition: true,
     mediaTitle: "Photos",
     images: shots("viettel-ai-race-2026", [
       ["Team Zillexa at the final", "Three members of team Zillexa holding their award at the Viettel AI Race 2026 final"],
@@ -261,14 +265,14 @@ export function workStatus(mission: Pick<Mission, "status">, visual?: Pick<Proje
   };
 }
 
-/** Every mission that has visuals, in CMS order (mission.order, else API order). */
+/** Every product mission that has visuals (competitions left out), in CMS order (mission.order, else API order). */
 export function orderedWork(
   missions: Mission[],
   visuals: Record<string, ProjectVisual> = PROJECT_VISUALS,
 ): WorkItem[] {
   return missions
     .map((mission, index) => ({ mission, index, visual: visuals[mission.slug] }))
-    .filter((x): x is { mission: Mission; index: number; visual: ProjectVisual } => Boolean(x.visual))
+    .filter((x): x is { mission: Mission; index: number; visual: ProjectVisual } => Boolean(x.visual) && !x.visual?.competition)
     .sort((a, b) => orderOf(a.mission, a.index) - orderOf(b.mission, b.index) || a.index - b.index)
     .map(({ mission, visual }, i) => ({
       mission,

@@ -17,6 +17,10 @@ export const GRADIENT_TEXT: CSSProperties = {
   color: "transparent",
 };
 
+/** Fill for primary buttons: the hero's blue-to-violet, a touch deeper so white text stays readable. */
+export const BUTTON_GRADIENT = "linear-gradient(100deg,#2F7BFF,#3D5BFF 50%,#7B5CFF)";
+
+
 /** Small mono kicker above a section heading ("01 · SELECTED WORK"). */
 export function Eyebrow({ children, color = "#6FA8FF" }: { children: ReactNode; color?: string }) {
   return (

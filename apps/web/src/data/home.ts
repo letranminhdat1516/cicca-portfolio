@@ -128,9 +128,26 @@ export function awardHref(title: string): string | undefined {
   return AWARD_LINKS.find((l) => l.match.test(title))?.href;
 }
 
-export const GALLERY = [
-  { title: "Siz — booking a ticket through an AI assistant", meta: "Video · demo coming soon", video: true, slug: "siz-commerce-gateway" },
-  { title: "Bảo Bối — ordering a drink by voice", meta: "Video · demo coming soon", video: true, slug: "voice-ordering-agent" },
+/** Behind-the-scenes cards: event photos now; a card can carry `video: true` once a recording exists. */
+export const GALLERY: { title: string; meta: string; slug: string; image: { src: string; alt: string }; video?: boolean }[] = [
+  {
+    title: "TOKEN2049 Origins — on stage for the awards",
+    meta: "Photos · Singapore, Oct 2026",
+    slug: "chord-agents",
+    image: { src: "/gallery/token2049-awards.jpg", alt: "TOKEN2049 Origins Hackathon finalists on stage in front of the AWS prize board" },
+  },
+  {
+    title: "Viettel AI Race 2026 — the final",
+    meta: "Photos · Sep 2026",
+    slug: "viettel-ai-race-2026",
+    image: { src: "/gallery/viettel-final.jpg", alt: "Team Zillexa holding their award at the Viettel AI Race 2026 final" },
+  },
+  {
+    title: "Between sessions at TOKEN2049",
+    meta: "Photos · Singapore, Oct 2026",
+    slug: "chord-agents",
+    image: { src: "/gallery/token2049-floor.jpg", alt: "Le Tran Minh Dat chatting with other builders at the TOKEN2049 Origins Hackathon" },
+  },
 ];
 export const KEYCAP = {
   src: "/brand/keycap.png",
