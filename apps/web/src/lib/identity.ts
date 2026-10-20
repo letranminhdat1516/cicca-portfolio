@@ -82,7 +82,7 @@ export const IDENTITY = {
   ],
   /** Short Vietnamese briefing (FAQ answer, llms.txt). */
   vietnameseSummary:
-    "Lê Trần Minh Đạt (Le Tran Minh Dat, tên trên mạng là cicca) là kỹ sư phần mềm AI-native (AI-Native Software Engineer) tại Thành phố Hồ Chí Minh, Việt Nam. Đạt xây dựng AI agent và hệ thống backend phía sau chúng: lớp mở rộng cho AI gateway (LiteLLM) của một ngân hàng doanh nghiệp, máy chủ MCP cho thương mại AI (Siz), trợ lý gọi món bằng giọng nói (Bảo Bối) và chatbot tư vấn tuyển sinh dùng RAG. Đạt là đồng sáng lập Zillexa (studio phát triển độc lập), tốt nghiệp Kỹ sư Kỹ thuật phần mềm tại Đại học FPT TP. Hồ Chí Minh năm 2026 (GPA 3.47/4.0), lọt chung kết ETHGlobal Singapore 2026 (giải nhì, top 5 main track) và đạt Á quân (Top 4) Viettel AI Race 2026. Sẵn sàng làm việc từ xa (GMT+7). Liên hệ: datltmse@gmail.com.",
+    "Lê Trần Minh Đạt (Le Tran Minh Dat, tên trên mạng là cicca) là kỹ sư phần mềm AI-native (AI-Native Software Engineer) tại Thành phố Hồ Chí Minh, Việt Nam. Đạt xây dựng AI agent và hệ thống backend phía sau chúng: lớp mở rộng cho AI gateway (LiteLLM) của một ngân hàng doanh nghiệp, máy chủ MCP cho thương mại AI (Siz), trợ lý gọi món bằng giọng nói (Bảo Bối) và chatbot tư vấn tuyển sinh dùng RAG. Đạt là đồng sáng lập Zillexa (studio phát triển độc lập), tốt nghiệp Kỹ sư Kỹ thuật phần mềm tại Đại học FPT TP. Hồ Chí Minh năm 2026 (GPA 3.47/4.0), đạt Á quân (Runner-up) main track tại TOKEN2049 Origins Hackathon 2026 ở Singapore và đạt Á quân (Top 4) Viettel AI Race 2026. Sẵn sàng làm việc từ xa (GMT+7). Liên hệ: datltmse@gmail.com.",
 } as const;
 
 /** "Le Tran Minh Dat (Lê Trần Minh Đạt)" — the form used in titles and the footer. */

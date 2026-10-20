@@ -117,6 +117,17 @@ export const EXPERIENCE_COPY = {
 
 export const RECOGNITION_TILTS = ["-1deg", "0.8deg", "-0.5deg", "0.6deg"];
 
+/** Where an award card leads; matched on the CMS title, which has no link field. */
+const AWARD_LINKS: { match: RegExp; href: string }[] = [
+  { match: /chord/i, href: "/projects/chord-agents" },
+  { match: /viettel/i, href: "/projects/viettel-ai-race-2026" },
+  { match: /b\.?eng|university|degree/i, href: "/cv" },
+];
+
+export function awardHref(title: string): string | undefined {
+  return AWARD_LINKS.find((l) => l.match.test(title))?.href;
+}
+
 export const GALLERY = [
   { title: "Siz — booking a ticket through an AI assistant", meta: "Video · demo coming soon", video: true, slug: "siz-commerce-gateway" },
   { title: "Bảo Bối — ordering a drink by voice", meta: "Video · demo coming soon", video: true, slug: "voice-ordering-agent" },

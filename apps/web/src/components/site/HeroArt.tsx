@@ -6,24 +6,16 @@ import { MONO } from "./ui";
 const ROBOT = { src: "/brand/robot.png", width: 1171, height: 1035 };
 const ROBOT_SIZES = "(max-width: 640px) 100vw, (max-width: 1100px) 90vw, 660px";
 
-type Skin = "cyan" | "blue";
-const KEY_SKIN: Record<Skin, CSSProperties> = {
-  cyan: {
-    background: "linear-gradient(155deg,rgba(130,255,245,0.95),rgba(40,215,235,0.85) 45%,rgba(10,140,195,0.92))",
-    border: "1px solid rgba(215,255,255,0.9)",
-    boxShadow:
-      "inset 0 2px 1px rgba(255,255,255,0.85), inset 0 -7px 12px rgba(0,80,120,0.45), 0 5px 0 rgba(10,110,150,0.85), 0 14px 30px -6px rgba(40,220,255,0.75)",
-  },
-  blue: {
-    background: "linear-gradient(155deg,#6F8CFF,#2E4BFF 45%,#1A2AB8)",
-    border: "1px solid rgba(190,205,255,0.85)",
-    boxShadow:
-      "inset 0 2px 1px rgba(255,255,255,0.6), inset 0 -7px 12px rgba(10,20,90,0.55), 0 5px 0 #13208A, 0 14px 30px -6px rgba(60,100,255,0.75)",
-  },
+// Same deep blue as the Shift key the robot holds.
+const KEY_SKIN: CSSProperties = {
+  background: "radial-gradient(120% 90% at 60% 55%,#3B5BFF,#1F33E0 40%,#0E1890 75%,#070C55)",
+  border: "1px solid rgba(90,120,255,0.6)",
+  boxShadow:
+    "inset 0 1px 1px rgba(160,180,255,0.55), inset 0 -6px 10px rgba(5,8,60,0.7), 0 5px 0 #070C4A, 0 12px 28px -6px rgba(40,70,255,0.7)",
 };
 
-/** Floating keycap: one shared spec (52px, r14, 5px depth, 15px mono label); two skins. */
-function Keycap({ label, skin, tilt, className, pos }: { label: string; skin: Skin; tilt: string; className: string; pos: CSSProperties }) {
+/** Floating keycap: one shared spec (52px, r14, 5px depth, 15px mono label). */
+function Keycap({ label, tilt, className, pos }: { label: string; tilt: string; className: string; pos: CSSProperties }) {
   return (
     <span className={className} aria-hidden="true" style={{ position: "absolute", width: 52, height: 52, ...pos }}>
       <span
@@ -35,7 +27,7 @@ function Keycap({ label, skin, tilt, className, pos }: { label: string; skin: Sk
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          ...KEY_SKIN[skin],
+          ...KEY_SKIN,
         }}
       >
         <span
@@ -43,8 +35,8 @@ function Keycap({ label, skin, tilt, className, pos }: { label: string; skin: Sk
             position: "absolute",
             inset: "6px 6px 10px",
             borderRadius: 10,
-            background: "linear-gradient(180deg,rgba(255,255,255,0.34),rgba(255,255,255,0.04))",
-            border: "1px solid rgba(255,255,255,0.32)",
+            background: "linear-gradient(180deg,rgba(120,150,255,0.22),rgba(40,60,255,0.04))",
+            border: "1px solid rgba(130,160,255,0.25)",
           }}
         />
         <span
@@ -55,7 +47,7 @@ function Keycap({ label, skin, tilt, className, pos }: { label: string; skin: Sk
             fontSize: 15,
             fontWeight: 600,
             color: "#FFFFFF",
-            textShadow: "0 0 8px rgba(150,230,255,0.95)",
+            textShadow: "0 0 8px rgba(110,150,255,0.9)",
           }}
         >
           {label}
@@ -123,8 +115,8 @@ export function HeroArt() {
           borderRadius: "50%",
           overflow: "hidden",
           background: "radial-gradient(circle at 50% 40%,rgba(61,107,255,0.32),rgba(28,46,158,0.18) 60%,rgba(10,18,64,0.05))",
-          border: "2px solid rgba(170,205,255,0.9)",
-          boxShadow: "0 0 30px 4px rgba(47,123,255,0.75), 0 0 90px 18px rgba(91,75,230,0.3), inset 0 0 40px rgba(47,123,255,0.45)",
+          border: "1.5px solid rgba(140,175,240,0.5)",
+          boxShadow: "0 0 18px 2px rgba(47,123,255,0.35), 0 0 70px 12px rgba(91,75,230,0.15), inset 0 0 30px rgba(47,123,255,0.25)",
         }}
       >
         {/* the stage floor */}
@@ -248,10 +240,10 @@ export function HeroArt() {
           width: "88%",
           aspectRatio: "1 / 1",
           borderRadius: "50%",
-          background: "conic-gradient(from 0deg,transparent,#BFD8FF 18%,transparent 34%,transparent 50%,#A99BFF 68%,transparent 84%)",
+          background: "conic-gradient(from 0deg,transparent,rgba(150,180,240,0.55) 18%,transparent 34%,transparent 50%,rgba(140,125,230,0.55) 68%,transparent 84%)",
           WebkitMaskImage: "radial-gradient(closest-side,transparent 96%,#000 97%)",
           maskImage: "radial-gradient(closest-side,transparent 96%,#000 97%)",
-          filter: "drop-shadow(0 0 6px rgba(111,168,255,0.9))",
+          filter: "drop-shadow(0 0 4px rgba(111,168,255,0.4))",
         }}
       />
       <div
@@ -316,11 +308,11 @@ export function HeroArt() {
         }}
       />
       {/* AI: behind the hood, left of the head */}
-      <Keycap label="AI" skin="cyan" className="float2" tilt="rotateX(20deg) rotateY(-18deg) rotateZ(-12deg)" pos={{ zIndex: 1, left: "33%", top: "18%" }} />
+      <Keycap label="AI" className="float2" tilt="rotateX(20deg) rotateY(-18deg) rotateZ(-12deg)" pos={{ zIndex: 1, left: "33%", top: "18%" }} />
       {/* </>: in front, beside the orb hand */}
-      <Keycap label="</>" skin="blue" className="float3" tilt="rotateX(22deg) rotateY(16deg) rotateZ(-8deg)" pos={{ zIndex: 5, left: "14%", top: "59%" }} />
+      <Keycap label="</>" className="float3" tilt="rotateX(22deg) rotateY(16deg) rotateZ(-8deg)" pos={{ zIndex: 5, left: "14%", top: "59%" }} />
       {/* cmd: in front, above the Shift key */}
-      <Keycap label="⌘" skin="cyan" className="float1" tilt="rotateX(20deg) rotateY(20deg) rotateZ(14deg)" pos={{ zIndex: 5, right: "12%", top: "45%" }} />
+      <Keycap label="⌘" className="float1" tilt="rotateX(20deg) rotateY(20deg) rotateZ(14deg)" pos={{ zIndex: 5, right: "12%", top: "45%" }} />
       {/* mini terminal */}
       <div
         className="chip float1 term"

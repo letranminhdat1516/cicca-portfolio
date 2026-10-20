@@ -11,7 +11,7 @@ import { IDENTITY } from "@/lib/identity";
 import { JsonLd, projectPageJsonLd } from "@/components/seo/JsonLd";
 import { ACCENT } from "@/data/home";
 import { PROJECT_VISUALS, orderedWork, type ProjectImage } from "@/data/projectVisuals";
-import { MONO, Highlight, Tag } from "@/components/site/ui";
+import { GRADIENT_TEXT, MONO, Tag } from "@/components/site/ui";
 
 // One indexable page per project case study: a long-tail landing page for
 // search ("bank LLM gateway LiteLLM") and a precise URL for answer engines to
@@ -106,7 +106,7 @@ function Shot({ img, no, sizes, preload, heading = true }: { img: ProjectImage; 
   return (
     <figure style={{ margin: 0, display: "flex", flexDirection: "column", gap: 14, minWidth: 0 }}>
       <div style={FRAME}>
-        <Image src={img.src} alt={img.alt} fill sizes={sizes} preload={preload} style={{ objectFit: "cover", objectPosition: "top" }} />
+        <Image src={img.src} alt={img.alt} fill sizes={sizes} preload={preload} quality={90} style={{ objectFit: "cover", objectPosition: "top" }} />
       </div>
       <figcaption style={{ display: "flex", gap: 12, alignItems: "baseline" }}>
         <span aria-hidden="true" style={{ ...MONO, fontSize: 12, color: "#8C97B8" }}>
@@ -150,7 +150,8 @@ export default async function ProjectPage({ params }: Params) {
   ].filter((f): f is { k: string; v: string } => Boolean(f.v));
 
   const [lead, mark] = splitTitle(m.title);
-  const sections = ["about", ...(screens.length ? ["screens"] : []), "stack"];
+  const video = visual?.video;
+  const sections = ["about", ...(video ? ["demo"] : []), ...(screens.length ? ["screens"] : []), "stack"];
   const num = (id: string) => String(sections.indexOf(id) + 1).padStart(2, "0");
   const hasContent = Boolean(m.content?.trim());
 
@@ -181,7 +182,7 @@ export default async function ProjectPage({ params }: Params) {
             <h1 style={{ margin: 0, fontWeight: 800, fontSize: "clamp(44px, 7vw, 96px)", lineHeight: 1, letterSpacing: "-0.04em", textWrap: "balance" }}>
               {mark ? (
                 <>
-                  {lead} <Highlight big>{mark}</Highlight>
+                  {lead} <span style={GRADIENT_TEXT}>{mark}</span>
                 </>
               ) : (
                 lead
@@ -233,10 +234,30 @@ export default async function ProjectPage({ params }: Params) {
           </div>
         </section>
 
-        {/* 02 SCREENS */}
+        {/* DEMO */}
+        {video && (
+          <section aria-labelledby="demo" className="blk blk-wide">
+            <SectionHead n={num("demo")} id="demo" title="Demo" />
+            <figure style={{ margin: 0, display: "flex", flexDirection: "column", gap: 14, minWidth: 0 }}>
+              <div style={{ ...FRAME, aspectRatio: "16 / 9" }}>
+                <video
+                  src={video.src}
+                  poster={video.poster}
+                  controls
+                  playsInline
+                  preload="none"
+                  style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
+                />
+              </div>
+              <figcaption style={{ fontSize: 17, fontWeight: 600, color: "#E8EEFF" }}>{video.caption}</figcaption>
+            </figure>
+          </section>
+        )}
+
+        {/* SCREENS */}
         {screens.length > 0 && (
           <section aria-labelledby="screens" className="blk blk-wide">
-            <SectionHead n={num("screens")} id="screens" title="Screens" />
+            <SectionHead n={num("screens")} id="screens" title={visual?.mediaTitle ?? "Screens"} />
             <div style={{ display: "flex", flexDirection: "column", gap: "clamp(40px, 6vw, 72px)", minWidth: 0 }}>
               {storyRows(screens).map((row) => (
                 <div key={row[0].src} className={row.length === 2 ? "shot-pair" : undefined}>

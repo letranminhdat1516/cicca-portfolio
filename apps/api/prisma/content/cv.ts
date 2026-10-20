@@ -140,6 +140,26 @@ export const projects = [
     loadout: ['TypeScript', 'Python', 'PostgreSQL', 'AWS'],
   },
   {
+    slug: 'chord-agents',
+    title: 'Chord — TOKEN2049 Origins Runner-up',
+    objective:
+      'Chord is a startup project. I was part of its team at the TOKEN2049 Origins Hackathon 2026 in Singapore, where we were named runner-up on the main track.',
+    difficulty: '★★★★★',
+    impact: 'TOKEN2049 ORIGINS RUNNER-UP',
+    status: MissionStatus.COMPLETE,
+    loadout: ['Hackathon', 'Pitch'],
+  },
+  {
+    slug: 'viettel-ai-race-2026',
+    title: 'Viettel AI Race — 3D Gaussian Splatting',
+    objective:
+      'Novel view synthesis for the Viettel AI Race 2026: from photos with known camera positions, render what a camera would see from places it never visited. The qualifying rounds covered seven scenes, two objects and five aerial captures over Ho Chi Minh City; the final was one large urban scene scored on image quality, with inference time measured on an H200. Our three-person team, Zillexa, finished runner-up (top 4) out of 1,628 teams.',
+    difficulty: '★★★★★',
+    impact: 'RUNNER-UP OF 1,628 TEAMS',
+    status: MissionStatus.COMPLETE,
+    loadout: ['3D Gaussian Splatting', 'PyTorch', 'gsplat', 'Multi-GPU', 'SCUNet'],
+  },
+  {
     slug: 'cicca-fleet-k3s',
     title: 'Cicca Fleet — Multi-site k3s Cluster',
     objective:
@@ -209,7 +229,7 @@ export const skillGroups: { group: string; items: SkillSeed[] }[] = [
 ];
 
 export const achievements = [
-  { year: '2026', title: 'Chord — Finalist, 2nd prize', description: 'ETHGlobal Singapore 2026 (TOKEN2049): top 5 on the main track, US$10k AWS credits.', color: '#ffd23f', glow: 'rgba(255,210,63,0.65)' },
+  { year: '2026', title: 'Chord — Runner-up, TOKEN2049 Origins Hackathon', description: 'TOKEN2049 Origins Hackathon 2026, Singapore: runner-up on the main track, US$10k AWS credits.', color: '#ffd23f', glow: 'rgba(255,210,63,0.65)' },
   { year: '2026', title: 'Viettel AI Race 2026 — Runner-up (Top 4)', description: 'Finalist out of 1,628 teams, organised by Viettel Group.', color: '#22d3ee', glow: 'rgba(34,211,238,0.6)' },
   { year: '2026', title: 'B.Eng. Software Engineering — FPT University', description: 'FPT University, Ho Chi Minh City · GPA 3.47 / 4.0 · 2026.', color: '#b026ff', glow: 'rgba(176,38,255,0.6)' },
 ];

@@ -217,6 +217,49 @@ The platform went from an empty repository to live in 20 days, deployed on AWS: 
 - AWS
 `,
 
+  'chord-agents': `## The project
+
+Chord is a startup project. I was part of its team at the TOKEN2049 Origins Hackathon 2026 in Singapore: building, pitching on the Origins stage, and meeting the other teams and sponsors on the hackathon floor.
+
+## Outcome
+
+Our team was named runner-up on the main track and received US$10k in AWS credits. The photos are from the pitch, the awards and the hours in between.
+`,
+
+  'viettel-ai-race-2026': `## The problem
+
+Viettel AI Race 2026 gave every team photos of real places, each with a known camera position, and asked for the pictures a camera would take from positions it never visited. That is novel view synthesis, the core of any digital twin you can fly through. A submission was 386 rendered images, scored per scene and averaged:
+
+\`score = 0.4 × (1 − LPIPS) + 0.3 × SSIM + 0.3 × min(PSNR / 50, 1)\`
+
+Teams had fifteen submissions a day.
+
+## What I built
+
+I competed in Zillexa, a three-person team, with a 3D Gaussian Splatting pipeline and a written log of every experiment, dead ends included.
+
+- **Read the metric scene by scene** — the aerial scenes already had low LPIPS, so PSNR was the term left to move; on the two objects LPIPS was the lever.
+- **Fix the geometry first** — the aerial cameras had radial lens distortion, and so did the test images. We undistorted the training photos, trained a pinhole model, rendered the test views and re-applied the exact distortion with cubic resampling. On the first version of the task, this alone took the score from 65 to 77.
+- **Capacity where it was missing** — raising the cap from 12 to 16 million Gaussians helped four of the five aerial scenes by filling in far-field detail.
+- **Fusion and sharding** — the biggest jumps came from averaging the renders of several independently trained models pixel by pixel. Models too large for one GPU were trained across four and merged.
+
+## How it works
+
+What did not help mattered as much. Higher spherical-harmonics degree and penalties on scale and opacity made novel views worse, refining camera poses cost almost two points, and diffusion enhancers gave nothing back because our test views sat between training views. Our held-out split also lied: it said one change was worth +0.16 when the official score said −0.08, so every object experiment had to prove itself on the leaderboard.
+
+The final was one large urban scene scored against sharp full-resolution images, with inference time measured on an H200. There, post-processing that had been useless against the softer qualifying images paid off: MCMC densification up to 14 million Gaussians, weight-decay regularisation, multi-view accumulation in training, and a SCUNet restoration model fine-tuned on our own renders.
+
+## Outcome
+
+Zillexa reached the final as one of twelve teams and finished runner-up (top 4) out of 1,628. We kept the pipeline, the experiment log and the list of dead ends.
+
+## Stack
+
+- 3D Gaussian Splatting (gsplat, MCMC densification)
+- PyTorch, multi-GPU training with model sharding
+- SCUNet restoration fine-tuned on our renders
+`,
+
   'cicca-fleet-k3s': `## The problem
 
 I wanted one place to run my own services, this website included, that behaves like production rather than a pet server: declarative, observable and recoverable, across machines that are not in the same building or even the same CPU architecture.

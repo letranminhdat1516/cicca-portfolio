@@ -62,10 +62,24 @@ describe('CV content', () => {
     }
   });
 
+  // Startup work shown only as "what it is and that I was on the team": no
+  // product detail, so a short two-section write-up instead of the full one.
+  const BRIEF = new Set(['chord-agents']);
+
+  it('keeps brief case studies to what the project is and the outcome', () => {
+    for (const slug of BRIEF) {
+      const md = caseStudies[slug];
+      expect(md).toContain('## The project');
+      expect(md).toContain('## Outcome');
+      expect(md.split(/\s+/).filter(Boolean).length).toBeLessThanOrEqual(150);
+    }
+  });
+
   it('has a factual case study for every project with the standard sections', () => {
     for (const p of projects) {
       const md = caseStudies[p.slug];
       expect(md).toBeDefined();
+      if (BRIEF.has(p.slug)) continue;
       for (const h of ['## The problem', '## What I built', '## How it works', '## Outcome', '## Stack']) {
         expect(md).toContain(h);
       }

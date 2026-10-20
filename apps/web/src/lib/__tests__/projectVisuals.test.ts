@@ -39,11 +39,13 @@ describe("project visuals map", () => {
     expect(Object.keys(PROJECT_VISUALS).sort()).toEqual(
       [
         "bank-llm-gateway",
+        "chord-agents",
         "ipbms-patient-monitoring",
         "neuradao-ai-trading",
         "rag-enrollment-advisor",
         "siz-commerce-gateway",
         "vas-accounting-erp",
+        "viettel-ai-race-2026",
         "voice-ordering-agent",
       ].sort(),
     );
@@ -93,8 +95,11 @@ describe("project screenshots", () => {
     }
   });
 
-  it("every project ships a full set of five screenshots", () => {
-    for (const v of Object.values(PROJECT_VISUALS)) expect(v.images ?? []).toHaveLength(5);
+  it("every project ships between one and five images", () => {
+    for (const v of Object.values(PROJECT_VISUALS)) {
+      expect((v.images ?? []).length).toBeGreaterThanOrEqual(1);
+      expect((v.images ?? []).length).toBeLessThanOrEqual(5);
+    }
   });
 });
 

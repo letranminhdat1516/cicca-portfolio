@@ -9,6 +9,14 @@ export const PANEL: CSSProperties = {
   background: "rgba(10,16,52,0.75)",
 };
 
+/** Blue-to-violet gradient fill for one or two words of a headline ("AI-Native"). */
+export const GRADIENT_TEXT: CSSProperties = {
+  background: "linear-gradient(90deg,#5FC0FF,#3D6BFF 60%,#8A6BFF)",
+  WebkitBackgroundClip: "text",
+  backgroundClip: "text",
+  color: "transparent",
+};
+
 /** Small mono kicker above a section heading ("01 · SELECTED WORK"). */
 export function Eyebrow({ children, color = "#6FA8FF" }: { children: ReactNode; color?: string }) {
   return (

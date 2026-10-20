@@ -1,7 +1,7 @@
 import type { Profile } from "@portfolio/types";
 import { ACCENT, HERO } from "@/data/home";
 import { HeroArt } from "./HeroArt";
-import { MONO } from "./ui";
+import { GRADIENT_TEXT, MONO } from "./ui";
 
 /** "AI-Native Software Engineer" → ["AI-Native", "Software Engineer"]. */
 export function splitRole(role: string | null | undefined): [string, string] {
@@ -61,14 +61,7 @@ export function Hero({ profile }: { profile: Profile }) {
                 color: "#F2F5FF",
               }}
             >
-              <span
-                style={{
-                  background: "linear-gradient(90deg,#5FC0FF,#3D6BFF 60%,#8A6BFF)",
-                  WebkitBackgroundClip: "text",
-                  backgroundClip: "text",
-                  color: "transparent",
-                }}
-              >
+              <span style={GRADIENT_TEXT}>
                 {lead}
               </span>
               {rest && (

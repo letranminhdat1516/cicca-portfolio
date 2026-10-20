@@ -31,6 +31,7 @@ function Art({ w, large, priority = false }: { w: WorkItem; large: boolean; prio
             alt={cover.alt}
             fill
             sizes={large ? LARGE_SIZES : SMALL_SIZES}
+            quality={90}
             priority={priority}
             style={{ objectFit: "cover", objectPosition: "top" }}
           />

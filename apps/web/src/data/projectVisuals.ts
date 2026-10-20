@@ -35,6 +35,16 @@ export interface ProjectVisual {
   statusLabel?: string;
   /** Real screenshots (16:10, 1600px) under /public/projects/<slug>/; the first is the card art. */
   images?: ProjectImage[];
+  /** Heading for the image section on the case-study page; defaults to "Screens". */
+  mediaTitle?: string;
+  /** Demo recording shown on the case-study page under the cover. */
+  video?: ProjectVideo;
+}
+
+export interface ProjectVideo {
+  src: string;
+  poster: string;
+  caption: string;
 }
 
 export interface ProjectImage {
@@ -184,6 +194,47 @@ export const PROJECT_VISUALS: Record<string, ProjectVisual> = {
       ["AI chat assistant", "Screenshot of the AI chat assistant answering a trading question"],
       ["Earnings dashboard", "Screenshot of the earnings dashboard showing a user's trading returns"],
       ["Chrome extension", "Screenshot of the NEURADAO Chrome extension"],
+    ]),
+  },
+  "chord-agents": {
+    short: "Chord",
+    tagline: "Runner-up at the TOKEN2049 Origins Hackathon 2026 in Singapore.",
+    glyph: "2049",
+    art: "linear-gradient(135deg,#123B2E,#1C3FD6 55%,#0A1240)",
+    tags: ["Hackathon", "TOKEN2049", "Singapore"],
+    when: "Oct 2026",
+    domain: "Startup",
+    role: "Team member",
+    client: "TOKEN2049 Origins Hackathon 2026",
+    outcome: "Runner-up, main track",
+    statusLabel: "RUNNER-UP",
+    mediaTitle: "Photos",
+    images: shots("chord-agents", [
+      ["Main-track finalists at the awards", "TOKEN2049 Origins Hackathon finalists on stage in front of the AWS prize board"],
+      ["Pitching on the Origins stage", "The Chord team pitching on the TOKEN2049 Origins Hackathon stage in Singapore"],
+      ["Between the sessions", "Hackathon participants laughing together at the TOKEN2049 Origins swag table"],
+      ["Workshops on the hackathon floor", "Teams working at their tables during a sponsor workshop at the TOKEN2049 Origins Hackathon"],
+    ]),
+  },
+  "viettel-ai-race-2026": {
+    short: "Viettel AI Race",
+    tagline: "Rendering views no camera took, with 3D Gaussian Splatting.",
+    glyph: "3DGS",
+    art: "linear-gradient(135deg,#8A1C2B,#5B4BE6 60%,#0A1240)",
+    tags: ["3D Gaussian Splatting", "Computer vision", "Competition"],
+    when: "Jul – Sep 2026",
+    domain: "Computer vision",
+    role: "Team Zillexa (3 people)",
+    client: "Viettel Group",
+    outcome: "Runner-up (top 4) of 1,628 teams",
+    statusLabel: "RUNNER-UP",
+    mediaTitle: "Photos",
+    images: shots("viettel-ai-race-2026", [
+      ["Team Zillexa at the final", "Three members of team Zillexa holding their award at the Viettel AI Race 2026 final"],
+      ["1,628 teams, 12 finalists", "All Viettel AI Race 2026 finalists on stage under a screen reading 1628 teams, 12 finalists"],
+      ["Heads down during the final", "Team Zillexa working on laptops during the Viettel AI Race 2026 final"],
+      ["Checking renders between rounds", "Finalists comparing results on their laptops at the Viettel AI Race 2026"],
+      ["The awards night", "The Viettel AI Race 2026 awards stage"],
     ]),
   },
 };

@@ -171,10 +171,10 @@ body {
 .bob3 { animation: bob 6.2s cubic-bezier(0.45, 0, 0.55, 1) 2.8s infinite; }
 
 @keyframes bit {
-  0% { opacity: 0; transform: translateY(-10px); }
-  25% { opacity: 0.95; }
-  60% { opacity: 0.6; }
-  100% { opacity: 0; transform: translateY(26px); }
+  0% { opacity: 0; transform: translateY(26px); }
+  40% { opacity: 0.95; }
+  75% { opacity: 0.6; }
+  100% { opacity: 0; transform: translateY(-10px); }
 }
 .bit {
   opacity: 0;

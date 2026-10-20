@@ -17,6 +17,8 @@ const nextConfig: NextConfig = {
   // Self-contained server for the container image (apps/web/Dockerfile).
   output: "standalone",
   poweredByHeader: false,
+  // 90 is for the project screenshots, where text must stay crisp; 75 stays the default.
+  images: { qualities: [75, 90] },
   outputFileTracingRoot: path.join(__dirname, "../../"),
   transpilePackages: ["@portfolio/design-tokens", "@portfolio/types"],
   // Proxy same-origin /api/* to the internal NestJS API, so the browser only
