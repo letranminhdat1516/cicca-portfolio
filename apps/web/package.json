@@ -13,7 +13,6 @@
     "@portfolio/design-tokens": "workspace:*",
     "@portfolio/types": "workspace:*",
     "lucide-react": "^1.21.0",
-    "marked": "^18.1.3",
     "next": "16.2.9",
     "react": "19.2.4",
     "react-dom": "19.2.4",
