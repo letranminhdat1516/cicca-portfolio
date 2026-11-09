@@ -72,6 +72,8 @@ export default async function BlogPostPage({
   const headings = extractHeadings(post.content);
   const hasToc = headings.length >= TOC_MIN;
 
+  console.log("[BlogPage] slug:", slug, "content length:", post.content.length, "has images:", post.content.includes("!["));
+
   return (
     <main className="post">
       <JsonLd
