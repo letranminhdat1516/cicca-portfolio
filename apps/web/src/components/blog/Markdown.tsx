@@ -7,26 +7,6 @@ type HastNode = { type: string; tagName?: string; value?: string; children?: Has
 const textOf = (n: HastNode | undefined): string =>
   !n ? "" : n.type === "text" ? (n.value ?? "") : (n.children ?? []).map(textOf).join("");
 
-const IMG_RE = /^!\[([^\]]*)\]\(([^)]+)\)\s*$/;
-
-type Segment = { kind: "md"; text: string } | { kind: "img"; alt: string; src: string };
-
-function splitImages(md: string): Segment[] {
-  const out: Segment[] = [];
-  let buf: string[] = [];
-  for (const line of md.split("\n")) {
-    const m = line.match(IMG_RE);
-    if (m) {
-      if (buf.length) { out.push({ kind: "md", text: buf.join("\n") }); buf = []; }
-      out.push({ kind: "img", alt: m[1], src: m[2] });
-    } else {
-      buf.push(line);
-    }
-  }
-  if (buf.length) out.push({ kind: "md", text: buf.join("\n") });
-  return out;
-}
-
 export function Markdown({ children }: { children: string }) {
   const slug = createSlugger();
   const components: Components = {
@@ -35,22 +15,43 @@ export function Markdown({ children }: { children: string }) {
       return <h2 id={text ? slug(text) : undefined}>{kids}</h2>;
     },
   };
-  const segments = splitImages(children);
+
+  const parts: { type: "md" | "img"; content: string; alt?: string }[] = [];
+  let buf: string[] = [];
+  for (const line of children.split("\n")) {
+    const m = /^!\[([^\]]*)\]\(([^)]+)\)\s*$/.exec(line);
+    if (m) {
+      if (buf.length) { parts.push({ type: "md", content: buf.join("\n") }); buf = []; }
+      parts.push({ type: "img", content: m[2], alt: m[1] });
+    } else {
+      buf.push(line);
+    }
+  }
+  if (buf.length) parts.push({ type: "md", content: buf.join("\n") });
+
+  if (parts.length <= 1) {
+    return (
+      <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
+        {children}
+      </ReactMarkdown>
+    );
+  }
+
   return (
-    <>
-      {segments.map((seg, i) =>
-        seg.kind === "img" ? (
-          <figure key={i}>
+    <div>
+      {parts.map((p, i) =>
+        p.type === "img" ? (
+          <figure key={`fig-${i}`}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={seg.src} alt={seg.alt} loading="lazy" />
-            {seg.alt && <figcaption>{seg.alt}</figcaption>}
+            <img src={p.content} alt={p.alt ?? ""} loading="lazy" />
+            {p.alt && <figcaption>{p.alt}</figcaption>}
           </figure>
         ) : (
-          <ReactMarkdown key={i} remarkPlugins={[remarkGfm]} components={components}>
-            {seg.text}
+          <ReactMarkdown key={`md-${i}`} remarkPlugins={[remarkGfm]} components={components}>
+            {p.content}
           </ReactMarkdown>
         ),
       )}
-    </>
+    </div>
   );
 }
