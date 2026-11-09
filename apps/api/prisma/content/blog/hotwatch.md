@@ -17,16 +17,31 @@ I wanted one place to glance at all of them. It had to be native, start instantl
 
 Hotwatch shows what a machine is doing in one window: CPU, memory, disk, network, GPU, battery and every process. The Overview is a grid of cards with live charts. Click a card and you get the full page.
 
+![Overview — dark theme](/projects/hotwatch/overview.png)
+
 Some of the pages:
 
 - **CPU**: user and system time, per-core bars with performance and efficiency cores shown apart, temperature, load averages and the busiest apps.
+
+![CPU page](/projects/hotwatch/cpu.png)
+
 - **Memory**: app, wired, compressed and cached memory counted the way Activity Monitor counts them, plus pressure and swap.
+
+![Memory page](/projects/hotwatch/memory.png)
+
 - **Processes**: a fast table with search, a tree view, a detail panel, and terminate or force quit.
+
+![Processes page](/projects/hotwatch/processes.png)
+
 - **Docker** (remote hosts): containers with state, health and usage. You can start, stop and restart them and follow their logs live.
 
 On MacBooks with a notch, CPU and memory sit right next to it. Rest the pointer on the notch and a small island drops down with the essentials.
 
+![Notch island](/projects/hotwatch/nook.png)
+
 The same window works for remote hosts. A host switcher at the bottom of the sidebar moves between This Mac, the GPU box and the VPS, and every page shows that host's data.
+
+![Overview — light theme](/projects/hotwatch/overview-light.png)
 
 ## How it is built
 
