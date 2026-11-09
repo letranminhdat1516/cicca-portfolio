@@ -20,6 +20,13 @@ export function Markdown({ children }: { children: string }) {
       const text = textOf(node as HastNode).replace(/\s+/g, " ").trim();
       return <h2 id={text ? slug(text) : undefined}>{kids}</h2>;
     },
+    img: ({ src, alt, title }) => (
+      <figure>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={src ?? ""} alt={alt ?? ""} loading="lazy" />
+        {(title || alt) && <figcaption>{title || alt}</figcaption>}
+      </figure>
+    ),
     p: ({ node, children: kids }) => {
       const parts = ((node as HastNode | undefined)?.children ?? []).filter((c) => !(c.type === "text" && !c.value?.trim()));
       const only = parts.length === 1 && parts[0].tagName === "img" ? parts[0] : null;
@@ -29,7 +36,6 @@ export function Markdown({ children }: { children: string }) {
       const caption = String(only.properties?.title ?? "") || alt;
       return (
         <figure>
-          {/* CMS images are arbitrary URLs, so a plain <img> (no remotePatterns needed). */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={src} alt={alt} loading="lazy" />
           {caption && <figcaption>{caption}</figcaption>}
