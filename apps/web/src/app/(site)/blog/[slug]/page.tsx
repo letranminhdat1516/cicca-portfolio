@@ -175,6 +175,8 @@ export default async function BlogPostPage({
 
         <div className="post-body">
           <article className="md md-article">
+            {/* debug: image count */}
+            <div data-debug-img-count={(post.content.match(/!\[/g) || []).length} style={{display:'none'}} />
             <Markdown>{post.content}</Markdown>
           </article>
           {post.tags.length > 0 && (
