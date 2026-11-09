@@ -41,6 +41,7 @@ export function Markdown({ children }: { children: string }) {
   const segments = splitImages(children);
   return (
     <>
+      <div data-debug-segments={segments.length} data-debug-images={segments.filter(s => s.kind === "img").length} />
       {segments.map((seg, i) =>
         seg.kind === "img" ? (
           <figure key={i}>
