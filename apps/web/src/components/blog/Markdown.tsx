@@ -22,17 +22,15 @@ export function Markdown({ children }: { children: string }) {
     return `<figure><img src="${href}" alt="${alt}" loading="lazy" />${alt ? `<figcaption>${alt}</figcaption>` : ""}</figure>`;
   };
 
-  renderer.paragraph = ({ text }) => {
-    if (text.startsWith("<figure>")) return `${text}\n`;
-    return `<p>${text}</p>\n`;
-  };
-
-  const html = marked.parse(children, {
+  let html = marked.parse(children, {
     renderer,
     gfm: true,
     breaks: false,
     async: false,
   }) as string;
+
+  // Unwrap <figure> from <p> tags (marked wraps inline images in paragraphs)
+  html = html.replace(/<p>(<figure>[\s\S]*?<\/figure>)<\/p>/g, "$1");
 
   return <div dangerouslySetInnerHTML={{ __html: html }} />;
 }
