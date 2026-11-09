@@ -174,8 +174,8 @@ export default async function BlogPostPage({
         <Toc headings={headings} />
 
         <div className="post-body">
-          <article className="md md-article" data-build-id="v3-marked">
-            <Markdown>{post.content}</Markdown>
+          <article className="md md-article" data-build-id="v4-test">
+            <pre>{post.content.substring(0, 100)}</pre>
           </article>
           {post.tags.length > 0 && (
             <ul aria-label="Tags" style={{ margin: "40px 0 0", padding: 0, listStyle: "none", display: "flex", flexWrap: "wrap", gap: 8 }}>
