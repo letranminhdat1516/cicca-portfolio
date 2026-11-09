@@ -8,11 +8,26 @@ type HastNode = { type: string; tagName?: string; value?: string; children?: Has
 const textOf = (n: HastNode | undefined): string =>
   !n ? "" : n.type === "text" ? (n.value ?? "") : (n.children ?? []).map(textOf).join("");
 
-/**
- * Article markdown: every h2 gets the anchor id the "On this page" list links
- * to (lib/toc.ts makes the same ids), and a paragraph holding just an image
- * becomes a <figure> captioned by the image title, else its alt text.
- */
+const IMG_RE = /^!\[([^\]]*)\]\(([^)]+)\)\s*$/;
+
+type Segment = { kind: "md"; text: string } | { kind: "img"; alt: string; src: string };
+
+function splitImages(md: string): Segment[] {
+  const out: Segment[] = [];
+  let buf: string[] = [];
+  for (const line of md.split("\n")) {
+    const m = line.match(IMG_RE);
+    if (m) {
+      if (buf.length) { out.push({ kind: "md", text: buf.join("\n") }); buf = []; }
+      out.push({ kind: "img", alt: m[1], src: m[2] });
+    } else {
+      buf.push(line);
+    }
+  }
+  if (buf.length) out.push({ kind: "md", text: buf.join("\n") });
+  return out;
+}
+
 export function Markdown({ children }: { children: string }) {
   const slug = createSlugger();
   const components: Components = {
@@ -20,32 +35,23 @@ export function Markdown({ children }: { children: string }) {
       const text = textOf(node as HastNode).replace(/\s+/g, " ").trim();
       return <h2 id={text ? slug(text) : undefined}>{kids}</h2>;
     },
-    img: ({ src, alt, title }) => (
-      <figure>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={src ?? ""} alt={alt ?? ""} loading="lazy" />
-        {(title || alt) && <figcaption>{title || alt}</figcaption>}
-      </figure>
-    ),
-    p: ({ node, children: kids }) => {
-      const parts = ((node as HastNode | undefined)?.children ?? []).filter((c) => !(c.type === "text" && !c.value?.trim()));
-      const only = parts.length === 1 && parts[0].tagName === "img" ? parts[0] : null;
-      if (!only) return <p>{kids}</p>;
-      const src = String(only.properties?.src ?? "");
-      const alt = String(only.properties?.alt ?? "");
-      const caption = String(only.properties?.title ?? "") || alt;
-      return (
-        <figure>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={src} alt={alt} loading="lazy" />
-          {caption && <figcaption>{caption}</figcaption>}
-        </figure>
-      );
-    },
   };
+  const segments = splitImages(children);
   return (
-    <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
-      {children}
-    </ReactMarkdown>
+    <>
+      {segments.map((seg, i) =>
+        seg.kind === "img" ? (
+          <figure key={i}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={seg.src} alt={seg.alt} loading="lazy" />
+            {seg.alt && <figcaption>{seg.alt}</figcaption>}
+          </figure>
+        ) : (
+          <ReactMarkdown key={i} remarkPlugins={[remarkGfm]} components={components}>
+            {seg.text}
+          </ReactMarkdown>
+        ),
+      )}
+    </>
   );
 }
