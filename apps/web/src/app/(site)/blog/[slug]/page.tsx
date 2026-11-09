@@ -177,7 +177,7 @@ export default async function BlogPostPage({
         <Toc headings={headings} />
 
         <div className="post-body">
-          <article className="md md-article">
+          <article className="md md-article" data-build-id="v3-marked">
             <Markdown>{post.content}</Markdown>
           </article>
           {post.tags.length > 0 && (
