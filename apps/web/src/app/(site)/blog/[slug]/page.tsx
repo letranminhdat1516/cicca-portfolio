@@ -72,9 +72,6 @@ export default async function BlogPostPage({
   const headings = extractHeadings(post.content);
   const hasToc = headings.length >= TOC_MIN;
 
-  const fs = await import("fs");
-  fs.writeFileSync("/tmp/blog-debug.txt", `slug=${slug} content_len=${post.content.length} has_images=${post.content.includes("![")}\n`, { flag: "a" });
-
   return (
     <main className="post">
       <JsonLd

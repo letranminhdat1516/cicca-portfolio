@@ -19,7 +19,5 @@ export function Markdown({ children }: { children: string }) {
 
   const html = marked.parse(children, { renderer, async: false }) as string;
 
-  console.log("[Markdown] content length:", children.length, "html length:", html.length, "has figure:", html.includes("<figure>"));
-
   return <div dangerouslySetInnerHTML={{ __html: html }} />;
 }
